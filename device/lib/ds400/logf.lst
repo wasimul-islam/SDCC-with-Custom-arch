@@ -1,0 +1,980 @@
+                                      1 ;--------------------------------------------------------
+                                      2 ; File Created by SDCC : free open source ISO C Compiler 
+                                      3 ; Version 4.2.14 #0 (Linux)
+                                      4 ;--------------------------------------------------------
+                                      5 	.module logf
+                                      6 	.optsdcc -mds400 --model-flat24
+                                      7 	
+                                      8 ;--------------------------------------------------------
+                                      9 ; CPU specific extensions
+                                     10 ;--------------------------------------------------------
+                                     11 	.DS80C390
+                                     12 	.amode	2	; 24 bit flat addressing
+                           000082    13 dpl	=	0x82
+                           000083    14 dph	=	0x83
+                           000084    15 dpl1	=	0x84
+                           000085    16 dph1	=	0x85
+                           000086    17 dps	=	0x86
+                           000093    18 dpx	=	0x93
+                           000095    19 dpx1	=	0x95
+                           00009B    20 esp	=	0x9B
+                           00009C    21 ap	=	0x9C
+                           00009C    22 acc1	=	0x9C
+                           0000D1    23 mcnt0	=	0xD1
+                           0000D2    24 mcnt1	=	0xD2
+                           0000D3    25 ma	=	0xD3
+                           0000D4    26 mb	=	0xD4
+                           0000D5    27 mc	=	0xD5
+                           00009D    28 acon	=	0x9D
+                           0000C6    29 mcon	=	0xC6
+                           0000D1    30 F1	=	0xD1	; user flag
+                                     31 ;--------------------------------------------------------
+                                     32 ; Public variables in this module
+                                     33 ;--------------------------------------------------------
+                                     34 	.globl _frexpf
+                                     35 	.globl _logf
+                                     36 ;--------------------------------------------------------
+                                     37 ; special function registers
+                                     38 ;--------------------------------------------------------
+                                     39 ;--------------------------------------------------------
+                                     40 ; special function bits
+                                     41 ;--------------------------------------------------------
+                                     42 ;--------------------------------------------------------
+                                     43 ; overlayable register banks
+                                     44 ;--------------------------------------------------------
+                                     45 	.area REG_BANK_0	(REL,OVR,DATA)
+      000000                         46 	.ds 8
+                                     47 	.area REG_BANK_3	(REL,OVR,DATA)
+      000000                         48 	.ds 8
+                                     49 ;--------------------------------------------------------
+                                     50 ; internal ram data
+                                     51 ;--------------------------------------------------------
+                                     52 	.area DSEG    (DATA)
+                                     53 ;--------------------------------------------------------
+                                     54 ; overlayable items in internal ram
+                                     55 ;--------------------------------------------------------
+                                     56 ;--------------------------------------------------------
+                                     57 ; indirectly addressable internal ram data
+                                     58 ;--------------------------------------------------------
+                                     59 	.area ISEG    (DATA)
+                                     60 ;--------------------------------------------------------
+                                     61 ; absolute internal ram data
+                                     62 ;--------------------------------------------------------
+                                     63 	.area IABS    (ABS,DATA)
+                                     64 	.area IABS    (ABS,DATA)
+                                     65 ;--------------------------------------------------------
+                                     66 ; bit data
+                                     67 ;--------------------------------------------------------
+                                     68 	.area BSEG    (BIT)
+                                     69 ;--------------------------------------------------------
+                                     70 ; paged external ram data
+                                     71 ;--------------------------------------------------------
+                                     72 	.area PSEG    (PAG,XDATA)
+                                     73 ;--------------------------------------------------------
+                                     74 ; uninitialized external ram data
+                                     75 ;--------------------------------------------------------
+                                     76 	.area XSEG    (XDATA)
+                                     77 ;--------------------------------------------------------
+                                     78 ; absolute external ram data
+                                     79 ;--------------------------------------------------------
+                                     80 	.area XABS    (ABS,XDATA)
+                                     81 ;--------------------------------------------------------
+                                     82 ; initialized external ram data
+                                     83 ;--------------------------------------------------------
+                                     84 	.area XISEG   (XDATA)
+                                     85 ;--------------------------------------------------------
+                                     86 ; global & static initialisations
+                                     87 ;--------------------------------------------------------
+                                     88 	.area HOME    (CODE)
+                                     89 	.area GSINIT  (CODE)
+                                     90 	.area GSFINAL (CODE)
+                                     91 	.area GSINIT  (CODE)
+                                     92 ;--------------------------------------------------------
+                                     93 ; Home
+                                     94 ;--------------------------------------------------------
+                                     95 	.area HOME    (CODE)
+                                     96 	.area HOME    (CODE)
+                                     97 ;--------------------------------------------------------
+                                     98 ; code
+                                     99 ;--------------------------------------------------------
+                                    100 	.area CSEG    (CODE)
+                                    101 ;------------------------------------------------------------
+                                    102 ;Allocation info for local variables in function 'logf'
+                                    103 ;------------------------------------------------------------
+                                    104 ;x                         Allocated to registers r2 r3 r4 r5 
+                                    105 ;Rz                        Allocated to stack - _bp +1
+                                    106 ;f                         Allocated to stack - _bp +5
+                                    107 ;z                         Allocated to stack - _bp +9
+                                    108 ;w                         Allocated to registers r2 r3 r4 r5 
+                                    109 ;znum                      Allocated to stack - _bp +13
+                                    110 ;zden                      Allocated to registers r2 r3 r4 r5 
+                                    111 ;xn                        Allocated to registers r6 r7 r0 r1 
+                                    112 ;n                         Allocated to stack - _bp +17
+                                    113 ;------------------------------------------------------------
+                                    114 ;	logf.c:216: float logf(float x) _FLOAT_FUNC_REENTRANT
+                                    115 ;	-----------------------------------------
+                                    116 ;	 function logf
+                                    117 ;	-----------------------------------------
+      000000                        118 _logf:
+                           000002   119 	ar2 = 0x02
+                           000003   120 	ar3 = 0x03
+                           000004   121 	ar4 = 0x04
+                           000005   122 	ar5 = 0x05
+                           000006   123 	ar6 = 0x06
+                           000007   124 	ar7 = 0x07
+                           000000   125 	ar0 = 0x00
+                           000001   126 	ar1 = 0x01
+      000000 C0*00            [ 8]  127 	push	_bpx
+      000002 C0*01            [ 8]  128 	push	_bpx+1
+      000004 85 81*00         [12]  129 	mov	_bpx,sp
+      000007 85 9B*01         [12]  130 	mov	_bpx+1,esp
+      00000A 53*01 03         [12]  131 	anl	_bpx+1,#3
+      00000D 43*01 DC         [12]  132 	orl	_bpx+1,#0xdc
+      000010 E5 81            [ 8]  133 	mov	a,sp
+      000012 24 12            [ 8]  134 	add	a,#0x12
+      000014 F5 81            [ 8]  135 	mov	sp,a
+      000016 E5 9B            [ 8]  136 	mov	a,esp
+      000018 54 03            [ 8]  137 	anl	a,#3
+      00001A 44 DC            [ 8]  138 	orl	a,#0xdc
+      00001C 34 00            [ 8]  139 	addc	a,#0x00
+      00001E F5 9B            [ 8]  140 	mov	esp,a
+      000020 AA 82            [ 8]  141 	mov	r2,dpl
+      000022 AB 83            [ 8]  142 	mov	r3,dph
+      000024 AC 93            [ 8]  143 	mov	r4,dpx
+      000026 AD F0            [ 8]  144 	mov	r5,b
+                                    145 ;	logf.c:226: if (x<=0.0)
+                                    146 ;	genAssign: resultIsFar = TRUE
+      000028 90s00r00r00      [12]  147 	mov	dptr,#___fslt_PARM_2
+      00002C EA               [ 4]  148 	mov	a,r2
+      00002D F0               [ 8]  149 	movx	@dptr,a
+      00002E A3               [12]  150 	inc	dptr
+      00002F EB               [ 4]  151 	mov	a,r3
+      000030 F0               [ 8]  152 	movx	@dptr,a
+      000031 A3               [12]  153 	inc	dptr
+      000032 EC               [ 4]  154 	mov	a,r4
+      000033 F0               [ 8]  155 	movx	@dptr,a
+      000034 A3               [12]  156 	inc	dptr
+      000035 ED               [ 4]  157 	mov	a,r5
+      000036 F0               [ 8]  158 	movx	@dptr,a
+      000037 C0 02            [ 8]  159 	push	ar2
+      000039 C0 03            [ 8]  160 	push	ar3
+      00003B C0 04            [ 8]  161 	push	ar4
+      00003D C0 05            [ 8]  162 	push	ar5
+      00003F 90 00 00 00      [12]  163 	mov  dptr,#0x0000
+      000043 75 F0 00         [12]  164 	mov	b,#0x00
+      000046 12s00r00r00      [16]  165 	lcall	___fslt
+      00004A D0 05            [ 8]  166 	pop	ar5
+      00004C D0 04            [ 8]  167 	pop	ar4
+      00004E D0 03            [ 8]  168 	pop	ar3
+      000050 D0 02            [ 8]  169 	pop	ar2
+      000052 E5 82            [ 8]  170 	mov	a,dpl
+      000054 70 15            [12]  171 	jnz  00102$
+      000056                        172 00116$:
+                                    173 ;	logf.c:228: errno=EDOM;
+                                    174 ;	genAssign: resultIsFar = TRUE
+      000056 90s00r00r00      [12]  175 	mov	dptr,#_errno
+      00005A 74 21            [ 8]  176 	mov	a,#0x21
+      00005C F0               [ 8]  177 	movx	@dptr,a
+      00005D E4               [ 4]  178 	clr	a
+      00005E A3               [12]  179 	inc	dptr
+      00005F F0               [ 8]  180 	movx	@dptr,a
+                                    181 ;	logf.c:229: return 0.0;
+      000060 90 00 00 00      [12]  182 	mov  dptr,#0x0000
+      000064 75 F0 00         [12]  183 	mov	b,#0x00
+      000067 02s00r05r66      [16]  184 	ljmp	00106$
+      00006B                        185 00102$:
+                                    186 ;	logf.c:231: f=frexpf(x, &n);
+      00006B E5*00            [ 8]  187 	mov	a,_bpx
+      00006D 24 11            [ 8]  188 	add	a,#0x11
+      00006F F5 F0            [ 8]  189 	mov	b,a
+      000071 E4               [ 4]  190 	clr	a
+      000072 35*01            [ 8]  191 	addc	a,_bpx+1
+      000074 AE F0            [ 8]  192 	mov	r6,b
+      000076 FF               [ 4]  193 	mov	r7,a
+      000077 78 FF            [ 8]  194 	mov	r0,#0xff
+      000079 90s00r00r00      [12]  195 	mov	dptr,#_frexpf_PARM_2
+      00007D EE               [ 4]  196 	mov	a,r6
+      00007E F0               [ 8]  197 	movx	@dptr,a
+      00007F A3               [12]  198 	inc	dptr
+      000080 EF               [ 4]  199 	mov	a,r7
+      000081 F0               [ 8]  200 	movx	@dptr,a
+      000082 A3               [12]  201 	inc	dptr
+      000083 E8               [ 4]  202 	mov	a,r0
+      000084 F0               [ 8]  203 	movx	@dptr,a
+      000085 A3               [12]  204 	inc	dptr
+      000086 E4               [ 4]  205 	clr	a
+      000087 F0               [ 8]  206 	movx	@dptr,a
+      000088 8A 82            [ 8]  207 	mov	dpl,r2
+      00008A 8B 83            [ 8]  208 	mov	dph,r3
+      00008C 8C 93            [ 8]  209 	mov	dpx,r4
+      00008E 8D F0            [ 8]  210 	mov	b,r5
+      000090 12s00r00r00      [16]  211 	lcall	_frexpf
+      000094 AA 82            [ 8]  212 	mov	r2,dpl
+      000096 AB 83            [ 8]  213 	mov	r3,dph
+      000098 AC 93            [ 8]  214 	mov	r4,dpx
+      00009A AD F0            [ 8]  215 	mov	r5,b
+                                    216 ;	genAssign: resultIsFar = TRUE
+      00009C E5*00            [ 8]  217 	mov	a,_bpx
+      00009E C3               [ 4]  218 	clr	c
+      00009F 94 FB            [ 8]  219 	subb	a,#0xfb
+      0000A1 F5 82            [ 8]  220 	mov	dpl,a
+      0000A3 E5*01            [ 8]  221 	mov	a,_bpx+1
+      0000A5 94 FF            [ 8]  222 	subb	a,#0xff
+      0000A7 F5 83            [ 8]  223 	mov	dph,a
+      0000A9 75 93 FF         [12]  224 	mov	dpx,#0xff
+      0000AC EA               [ 4]  225 	mov	a,r2
+      0000AD F0               [ 8]  226 	movx	@dptr,a
+      0000AE A3               [12]  227 	inc	dptr
+      0000AF EB               [ 4]  228 	mov	a,r3
+      0000B0 F0               [ 8]  229 	movx	@dptr,a
+      0000B1 A3               [12]  230 	inc	dptr
+      0000B2 EC               [ 4]  231 	mov	a,r4
+      0000B3 F0               [ 8]  232 	movx	@dptr,a
+      0000B4 A3               [12]  233 	inc	dptr
+      0000B5 ED               [ 4]  234 	mov	a,r5
+      0000B6 F0               [ 8]  235 	movx	@dptr,a
+                                    236 ;	logf.c:232: znum=f-0.5;
+                                    237 ;	genAssign: resultIsFar = TRUE
+      0000B7 90s00r00r00      [12]  238 	mov	dptr,#___fssub_PARM_2
+      0000BB E4               [ 4]  239 	clr	a
+      0000BC F0               [ 8]  240 	movx	@dptr,a
+      0000BD A3               [12]  241 	inc	dptr
+      0000BE E4               [ 4]  242 	clr	a
+      0000BF F0               [ 8]  243 	movx	@dptr,a
+      0000C0 A3               [12]  244 	inc	dptr
+      0000C1 E4               [ 4]  245 	clr	a
+      0000C2 F0               [ 8]  246 	movx	@dptr,a
+      0000C3 A3               [12]  247 	inc	dptr
+      0000C4 74 3F            [ 8]  248 	mov	a,#0x3f
+      0000C6 F0               [ 8]  249 	movx	@dptr,a
+      0000C7 E5*00            [ 8]  250 	mov	a,_bpx
+      0000C9 C3               [ 4]  251 	clr	c
+      0000CA 94 FB            [ 8]  252 	subb	a,#0xfb
+      0000CC F5 84            [ 8]  253 	mov	dpl1,a
+      0000CE E5*01            [ 8]  254 	mov	a,_bpx+1
+      0000D0 94 FF            [ 8]  255 	subb	a,#0xff
+      0000D2 F5 85            [ 8]  256 	mov	dph1,a
+      0000D4 75 95 FF         [12]  257 	mov	dpx1,#0xff
+      0000D7 05 86            [ 8]  258 	inc	dps
+      0000D9 E0               [ 8]  259 	movx	a,@dptr
+      0000DA F5 82            [ 8]  260 	mov	dpl,a
+      0000DC A3               [12]  261 	inc	dptr
+      0000DD E0               [ 8]  262 	movx	a,@dptr
+      0000DE F5 83            [ 8]  263 	mov	dph,a
+      0000E0 A3               [12]  264 	inc	dptr
+      0000E1 E0               [ 8]  265 	movx	a,@dptr
+      0000E2 F5 93            [ 8]  266 	mov	dpx,a
+      0000E4 A3               [12]  267 	inc	dptr
+      0000E5 E0               [ 8]  268 	movx	a,@dptr
+      0000E6 F5 F0            [ 8]  269 	mov	b,a
+      0000E8 75 86 00         [12]  270 	mov	dps,#0
+      0000EB 12s00r00r00      [16]  271 	lcall	___fssub
+      0000EF AE 82            [ 8]  272 	mov	r6,dpl
+      0000F1 AF 83            [ 8]  273 	mov	r7,dph
+      0000F3 A8 93            [ 8]  274 	mov	r0,dpx
+      0000F5 A9 F0            [ 8]  275 	mov	r1,b
+                                    276 ;	genAssign: resultIsFar = TRUE
+      0000F7 E5*00            [ 8]  277 	mov	a,_bpx
+      0000F9 C3               [ 4]  278 	clr	c
+      0000FA 94 F3            [ 8]  279 	subb	a,#0xf3
+      0000FC F5 82            [ 8]  280 	mov	dpl,a
+      0000FE E5*01            [ 8]  281 	mov	a,_bpx+1
+      000100 94 FF            [ 8]  282 	subb	a,#0xff
+      000102 F5 83            [ 8]  283 	mov	dph,a
+      000104 75 93 FF         [12]  284 	mov	dpx,#0xff
+      000107 EE               [ 4]  285 	mov	a,r6
+      000108 F0               [ 8]  286 	movx	@dptr,a
+      000109 A3               [12]  287 	inc	dptr
+      00010A EF               [ 4]  288 	mov	a,r7
+      00010B F0               [ 8]  289 	movx	@dptr,a
+      00010C A3               [12]  290 	inc	dptr
+      00010D E8               [ 4]  291 	mov	a,r0
+      00010E F0               [ 8]  292 	movx	@dptr,a
+      00010F A3               [12]  293 	inc	dptr
+      000110 E9               [ 4]  294 	mov	a,r1
+      000111 F0               [ 8]  295 	movx	@dptr,a
+                                    296 ;	logf.c:233: if (f>C0)
+      000112 E5*00            [ 8]  297 	mov	a,_bpx
+      000114 C3               [ 4]  298 	clr	c
+      000115 94 FB            [ 8]  299 	subb	a,#0xfb
+      000117 F5 82            [ 8]  300 	mov	dpl,a
+      000119 E5*01            [ 8]  301 	mov	a,_bpx+1
+      00011B 94 FF            [ 8]  302 	subb	a,#0xff
+      00011D F5 83            [ 8]  303 	mov	dph,a
+      00011F 75 93 FF         [12]  304 	mov	dpx,#0xff
+                                    305 ;	genAssign: resultIsFar = TRUE
+      000122 75 86 21         [12]  306 	mov	dps,#0x21
+      000125 90s00r00r00      [12]  307 	mov	dptr,#___fslt_PARM_2
+      000129 E0               [ 8]  308 	movx	a,@dptr
+      00012A F0               [ 8]  309 	movx	@dptr,a
+      00012B A3               [12]  310 	inc	dptr
+      00012C A3               [12]  311 	inc	dptr
+      00012D E0               [ 8]  312 	movx	a,@dptr
+      00012E F0               [ 8]  313 	movx	@dptr,a
+      00012F A3               [12]  314 	inc	dptr
+      000130 A3               [12]  315 	inc	dptr
+      000131 E0               [ 8]  316 	movx	a,@dptr
+      000132 F0               [ 8]  317 	movx	@dptr,a
+      000133 A3               [12]  318 	inc	dptr
+      000134 A3               [12]  319 	inc	dptr
+      000135 E0               [ 8]  320 	movx	a,@dptr
+      000136 F0               [ 8]  321 	movx	@dptr,a
+      000137 75 86 00         [12]  322 	mov	dps,#0
+      00013A 90 35 04 F3      [12]  323 	mov	dptr,#0x3504f3
+      00013E 75 F0 3F         [12]  324 	mov	b,#0x3f
+      000141 12s00r00r00      [16]  325 	lcall	___fslt
+      000145 E5 82            [ 8]  326 	mov	a,dpl
+      000147 70 04            [12]  327 	jnz	00117$
+      000149 02s00r02r0B      [16]  328 	ljmp	00104$
+      00014D                        329 00117$:
+                                    330 ;	logf.c:235: znum-=0.5;
+                                    331 ;	genAssign: resultIsFar = TRUE
+      00014D 90s00r00r00      [12]  332 	mov	dptr,#___fssub_PARM_2
+      000151 E4               [ 4]  333 	clr	a
+      000152 F0               [ 8]  334 	movx	@dptr,a
+      000153 A3               [12]  335 	inc	dptr
+      000154 E4               [ 4]  336 	clr	a
+      000155 F0               [ 8]  337 	movx	@dptr,a
+      000156 A3               [12]  338 	inc	dptr
+      000157 E4               [ 4]  339 	clr	a
+      000158 F0               [ 8]  340 	movx	@dptr,a
+      000159 A3               [12]  341 	inc	dptr
+      00015A 74 3F            [ 8]  342 	mov	a,#0x3f
+      00015C F0               [ 8]  343 	movx	@dptr,a
+      00015D E5*00            [ 8]  344 	mov	a,_bpx
+      00015F C3               [ 4]  345 	clr	c
+      000160 94 F3            [ 8]  346 	subb	a,#0xf3
+      000162 F5 84            [ 8]  347 	mov	dpl1,a
+      000164 E5*01            [ 8]  348 	mov	a,_bpx+1
+      000166 94 FF            [ 8]  349 	subb	a,#0xff
+      000168 F5 85            [ 8]  350 	mov	dph1,a
+      00016A 75 95 FF         [12]  351 	mov	dpx1,#0xff
+      00016D 05 86            [ 8]  352 	inc	dps
+      00016F E0               [ 8]  353 	movx	a,@dptr
+      000170 F5 82            [ 8]  354 	mov	dpl,a
+      000172 A3               [12]  355 	inc	dptr
+      000173 E0               [ 8]  356 	movx	a,@dptr
+      000174 F5 83            [ 8]  357 	mov	dph,a
+      000176 A3               [12]  358 	inc	dptr
+      000177 E0               [ 8]  359 	movx	a,@dptr
+      000178 F5 93            [ 8]  360 	mov	dpx,a
+      00017A A3               [12]  361 	inc	dptr
+      00017B E0               [ 8]  362 	movx	a,@dptr
+      00017C F5 F0            [ 8]  363 	mov	b,a
+      00017E 75 86 00         [12]  364 	mov	dps,#0
+      000181 12s00r00r00      [16]  365 	lcall	___fssub
+      000185 AA 82            [ 8]  366 	mov	r2,dpl
+      000187 AB 83            [ 8]  367 	mov	r3,dph
+      000189 AC 93            [ 8]  368 	mov	r4,dpx
+      00018B AD F0            [ 8]  369 	mov	r5,b
+                                    370 ;	genAssign: resultIsFar = TRUE
+      00018D E5*00            [ 8]  371 	mov	a,_bpx
+      00018F C3               [ 4]  372 	clr	c
+      000190 94 F3            [ 8]  373 	subb	a,#0xf3
+      000192 F5 82            [ 8]  374 	mov	dpl,a
+      000194 E5*01            [ 8]  375 	mov	a,_bpx+1
+      000196 94 FF            [ 8]  376 	subb	a,#0xff
+      000198 F5 83            [ 8]  377 	mov	dph,a
+      00019A 75 93 FF         [12]  378 	mov	dpx,#0xff
+      00019D EA               [ 4]  379 	mov	a,r2
+      00019E F0               [ 8]  380 	movx	@dptr,a
+      00019F A3               [12]  381 	inc	dptr
+      0001A0 EB               [ 4]  382 	mov	a,r3
+      0001A1 F0               [ 8]  383 	movx	@dptr,a
+      0001A2 A3               [12]  384 	inc	dptr
+      0001A3 EC               [ 4]  385 	mov	a,r4
+      0001A4 F0               [ 8]  386 	movx	@dptr,a
+      0001A5 A3               [12]  387 	inc	dptr
+      0001A6 ED               [ 4]  388 	mov	a,r5
+      0001A7 F0               [ 8]  389 	movx	@dptr,a
+                                    390 ;	logf.c:236: zden=(f*0.5)+0.5;
+      0001A8 E5*00            [ 8]  391 	mov	a,_bpx
+      0001AA C3               [ 4]  392 	clr	c
+      0001AB 94 FB            [ 8]  393 	subb	a,#0xfb
+      0001AD F5 82            [ 8]  394 	mov	dpl,a
+      0001AF E5*01            [ 8]  395 	mov	a,_bpx+1
+      0001B1 94 FF            [ 8]  396 	subb	a,#0xff
+      0001B3 F5 83            [ 8]  397 	mov	dph,a
+      0001B5 75 93 FF         [12]  398 	mov	dpx,#0xff
+                                    399 ;	genAssign: resultIsFar = TRUE
+      0001B8 75 86 21         [12]  400 	mov	dps,#0x21
+      0001BB 90s00r00r00      [12]  401 	mov	dptr,#___fsmul_PARM_2
+      0001BF E0               [ 8]  402 	movx	a,@dptr
+      0001C0 F0               [ 8]  403 	movx	@dptr,a
+      0001C1 A3               [12]  404 	inc	dptr
+      0001C2 A3               [12]  405 	inc	dptr
+      0001C3 E0               [ 8]  406 	movx	a,@dptr
+      0001C4 F0               [ 8]  407 	movx	@dptr,a
+      0001C5 A3               [12]  408 	inc	dptr
+      0001C6 A3               [12]  409 	inc	dptr
+      0001C7 E0               [ 8]  410 	movx	a,@dptr
+      0001C8 F0               [ 8]  411 	movx	@dptr,a
+      0001C9 A3               [12]  412 	inc	dptr
+      0001CA A3               [12]  413 	inc	dptr
+      0001CB E0               [ 8]  414 	movx	a,@dptr
+      0001CC F0               [ 8]  415 	movx	@dptr,a
+      0001CD 75 86 00         [12]  416 	mov	dps,#0
+      0001D0 90 00 00 00      [12]  417 	mov  dptr,#0x0000
+      0001D4 75 F0 3F         [12]  418 	mov	b,#0x3f
+      0001D7 12s00r00r00      [16]  419 	lcall	___fsmul
+      0001DB AA 82            [ 8]  420 	mov	r2,dpl
+      0001DD AB 83            [ 8]  421 	mov	r3,dph
+      0001DF AC 93            [ 8]  422 	mov	r4,dpx
+      0001E1 AD F0            [ 8]  423 	mov	r5,b
+                                    424 ;	genAssign: resultIsFar = TRUE
+      0001E3 90s00r00r00      [12]  425 	mov	dptr,#___fsadd_PARM_2
+      0001E7 E4               [ 4]  426 	clr	a
+      0001E8 F0               [ 8]  427 	movx	@dptr,a
+      0001E9 A3               [12]  428 	inc	dptr
+      0001EA E4               [ 4]  429 	clr	a
+      0001EB F0               [ 8]  430 	movx	@dptr,a
+      0001EC A3               [12]  431 	inc	dptr
+      0001ED E4               [ 4]  432 	clr	a
+      0001EE F0               [ 8]  433 	movx	@dptr,a
+      0001EF A3               [12]  434 	inc	dptr
+      0001F0 74 3F            [ 8]  435 	mov	a,#0x3f
+      0001F2 F0               [ 8]  436 	movx	@dptr,a
+      0001F3 8A 82            [ 8]  437 	mov	dpl,r2
+      0001F5 8B 83            [ 8]  438 	mov	dph,r3
+      0001F7 8C 93            [ 8]  439 	mov	dpx,r4
+      0001F9 8D F0            [ 8]  440 	mov	b,r5
+      0001FB 12s00r00r00      [16]  441 	lcall	___fsadd
+      0001FF AA 82            [ 8]  442 	mov	r2,dpl
+      000201 AB 83            [ 8]  443 	mov	r3,dph
+      000203 AC 93            [ 8]  444 	mov	r4,dpx
+      000205 AD F0            [ 8]  445 	mov	r5,b
+                                    446 ;	genAssign: resultIsFar = TRUE
+      000207 02s00r02rA0      [16]  447 	ljmp	00105$
+      00020B                        448 00104$:
+                                    449 ;	logf.c:240: n--;
+      00020B E5*00            [ 8]  450 	mov	a,_bpx
+      00020D C3               [ 4]  451 	clr	c
+      00020E 94 EF            [ 8]  452 	subb	a,#0xef
+      000210 F5 82            [ 8]  453 	mov	dpl,a
+      000212 E5*01            [ 8]  454 	mov	a,_bpx+1
+      000214 94 FF            [ 8]  455 	subb	a,#0xff
+      000216 F5 83            [ 8]  456 	mov	dph,a
+      000218 75 93 FF         [12]  457 	mov	dpx,#0xff
+      00021B E0               [ 8]  458 	movx	a,@dptr
+      00021C 24 FF            [ 8]  459 	add	a,#0xff
+      00021E FE               [ 4]  460 	mov	r6,a
+      00021F A3               [12]  461 	inc	dptr
+      000220 E0               [ 8]  462 	movx	a,@dptr
+      000221 34 FF            [ 8]  463 	addc	a,#0xff
+      000223 FF               [ 4]  464 	mov	r7,a
+                                    465 ;	genAssign: resultIsFar = TRUE
+      000224 E5*00            [ 8]  466 	mov	a,_bpx
+      000226 C3               [ 4]  467 	clr	c
+      000227 94 EF            [ 8]  468 	subb	a,#0xef
+      000229 F5 82            [ 8]  469 	mov	dpl,a
+      00022B E5*01            [ 8]  470 	mov	a,_bpx+1
+      00022D 94 FF            [ 8]  471 	subb	a,#0xff
+      00022F F5 83            [ 8]  472 	mov	dph,a
+      000231 75 93 FF         [12]  473 	mov	dpx,#0xff
+      000234 EE               [ 4]  474 	mov	a,r6
+      000235 F0               [ 8]  475 	movx	@dptr,a
+      000236 A3               [12]  476 	inc	dptr
+      000237 EF               [ 4]  477 	mov	a,r7
+      000238 F0               [ 8]  478 	movx	@dptr,a
+                                    479 ;	logf.c:241: zden=znum*0.5+0.5;
+      000239 E5*00            [ 8]  480 	mov	a,_bpx
+      00023B C3               [ 4]  481 	clr	c
+      00023C 94 F3            [ 8]  482 	subb	a,#0xf3
+      00023E F5 82            [ 8]  483 	mov	dpl,a
+      000240 E5*01            [ 8]  484 	mov	a,_bpx+1
+      000242 94 FF            [ 8]  485 	subb	a,#0xff
+      000244 F5 83            [ 8]  486 	mov	dph,a
+      000246 75 93 FF         [12]  487 	mov	dpx,#0xff
+                                    488 ;	genAssign: resultIsFar = TRUE
+      000249 75 86 21         [12]  489 	mov	dps,#0x21
+      00024C 90s00r00r00      [12]  490 	mov	dptr,#___fsmul_PARM_2
+      000250 E0               [ 8]  491 	movx	a,@dptr
+      000251 F0               [ 8]  492 	movx	@dptr,a
+      000252 A3               [12]  493 	inc	dptr
+      000253 A3               [12]  494 	inc	dptr
+      000254 E0               [ 8]  495 	movx	a,@dptr
+      000255 F0               [ 8]  496 	movx	@dptr,a
+      000256 A3               [12]  497 	inc	dptr
+      000257 A3               [12]  498 	inc	dptr
+      000258 E0               [ 8]  499 	movx	a,@dptr
+      000259 F0               [ 8]  500 	movx	@dptr,a
+      00025A A3               [12]  501 	inc	dptr
+      00025B A3               [12]  502 	inc	dptr
+      00025C E0               [ 8]  503 	movx	a,@dptr
+      00025D F0               [ 8]  504 	movx	@dptr,a
+      00025E 75 86 00         [12]  505 	mov	dps,#0
+      000261 90 00 00 00      [12]  506 	mov  dptr,#0x0000
+      000265 75 F0 3F         [12]  507 	mov	b,#0x3f
+      000268 12s00r00r00      [16]  508 	lcall	___fsmul
+      00026C AE 82            [ 8]  509 	mov	r6,dpl
+      00026E AF 83            [ 8]  510 	mov	r7,dph
+      000270 A8 93            [ 8]  511 	mov	r0,dpx
+      000272 A9 F0            [ 8]  512 	mov	r1,b
+                                    513 ;	genAssign: resultIsFar = TRUE
+      000274 90s00r00r00      [12]  514 	mov	dptr,#___fsadd_PARM_2
+      000278 E4               [ 4]  515 	clr	a
+      000279 F0               [ 8]  516 	movx	@dptr,a
+      00027A A3               [12]  517 	inc	dptr
+      00027B E4               [ 4]  518 	clr	a
+      00027C F0               [ 8]  519 	movx	@dptr,a
+      00027D A3               [12]  520 	inc	dptr
+      00027E E4               [ 4]  521 	clr	a
+      00027F F0               [ 8]  522 	movx	@dptr,a
+      000280 A3               [12]  523 	inc	dptr
+      000281 74 3F            [ 8]  524 	mov	a,#0x3f
+      000283 F0               [ 8]  525 	movx	@dptr,a
+      000284 8E 82            [ 8]  526 	mov	dpl,r6
+      000286 8F 83            [ 8]  527 	mov	dph,r7
+      000288 88 93            [ 8]  528 	mov	dpx,r0
+      00028A 89 F0            [ 8]  529 	mov	b,r1
+      00028C 12s00r00r00      [16]  530 	lcall	___fsadd
+      000290 AE 82            [ 8]  531 	mov	r6,dpl
+      000292 AF 83            [ 8]  532 	mov	r7,dph
+      000294 A8 93            [ 8]  533 	mov	r0,dpx
+      000296 A9 F0            [ 8]  534 	mov	r1,b
+                                    535 ;	genAssign: resultIsFar = TRUE
+      000298 8E 02            [ 8]  536 	mov	ar2,r6
+      00029A 8F 03            [ 8]  537 	mov	ar3,r7
+      00029C 88 04            [ 8]  538 	mov	ar4,r0
+      00029E 89 05            [ 8]  539 	mov	ar5,r1
+      0002A0                        540 00105$:
+                                    541 ;	logf.c:243: z=znum/zden;
+                                    542 ;	genAssign: resultIsFar = TRUE
+      0002A0 90s00r00r00      [12]  543 	mov	dptr,#___fsdiv_PARM_2
+      0002A4 EA               [ 4]  544 	mov	a,r2
+      0002A5 F0               [ 8]  545 	movx	@dptr,a
+      0002A6 A3               [12]  546 	inc	dptr
+      0002A7 EB               [ 4]  547 	mov	a,r3
+      0002A8 F0               [ 8]  548 	movx	@dptr,a
+      0002A9 A3               [12]  549 	inc	dptr
+      0002AA EC               [ 4]  550 	mov	a,r4
+      0002AB F0               [ 8]  551 	movx	@dptr,a
+      0002AC A3               [12]  552 	inc	dptr
+      0002AD ED               [ 4]  553 	mov	a,r5
+      0002AE F0               [ 8]  554 	movx	@dptr,a
+      0002AF E5*00            [ 8]  555 	mov	a,_bpx
+      0002B1 C3               [ 4]  556 	clr	c
+      0002B2 94 F3            [ 8]  557 	subb	a,#0xf3
+      0002B4 F5 84            [ 8]  558 	mov	dpl1,a
+      0002B6 E5*01            [ 8]  559 	mov	a,_bpx+1
+      0002B8 94 FF            [ 8]  560 	subb	a,#0xff
+      0002BA F5 85            [ 8]  561 	mov	dph1,a
+      0002BC 75 95 FF         [12]  562 	mov	dpx1,#0xff
+      0002BF 05 86            [ 8]  563 	inc	dps
+      0002C1 E0               [ 8]  564 	movx	a,@dptr
+      0002C2 F5 82            [ 8]  565 	mov	dpl,a
+      0002C4 A3               [12]  566 	inc	dptr
+      0002C5 E0               [ 8]  567 	movx	a,@dptr
+      0002C6 F5 83            [ 8]  568 	mov	dph,a
+      0002C8 A3               [12]  569 	inc	dptr
+      0002C9 E0               [ 8]  570 	movx	a,@dptr
+      0002CA F5 93            [ 8]  571 	mov	dpx,a
+      0002CC A3               [12]  572 	inc	dptr
+      0002CD E0               [ 8]  573 	movx	a,@dptr
+      0002CE F5 F0            [ 8]  574 	mov	b,a
+      0002D0 75 86 00         [12]  575 	mov	dps,#0
+      0002D3 12s00r00r00      [16]  576 	lcall	___fsdiv
+      0002D7 AA 82            [ 8]  577 	mov	r2,dpl
+      0002D9 AB 83            [ 8]  578 	mov	r3,dph
+      0002DB AC 93            [ 8]  579 	mov	r4,dpx
+      0002DD AD F0            [ 8]  580 	mov	r5,b
+                                    581 ;	genAssign: resultIsFar = TRUE
+      0002DF E5*00            [ 8]  582 	mov	a,_bpx
+      0002E1 C3               [ 4]  583 	clr	c
+      0002E2 94 F7            [ 8]  584 	subb	a,#0xf7
+      0002E4 F5 82            [ 8]  585 	mov	dpl,a
+      0002E6 E5*01            [ 8]  586 	mov	a,_bpx+1
+      0002E8 94 FF            [ 8]  587 	subb	a,#0xff
+      0002EA F5 83            [ 8]  588 	mov	dph,a
+      0002EC 75 93 FF         [12]  589 	mov	dpx,#0xff
+      0002EF EA               [ 4]  590 	mov	a,r2
+      0002F0 F0               [ 8]  591 	movx	@dptr,a
+      0002F1 A3               [12]  592 	inc	dptr
+      0002F2 EB               [ 4]  593 	mov	a,r3
+      0002F3 F0               [ 8]  594 	movx	@dptr,a
+      0002F4 A3               [12]  595 	inc	dptr
+      0002F5 EC               [ 4]  596 	mov	a,r4
+      0002F6 F0               [ 8]  597 	movx	@dptr,a
+      0002F7 A3               [12]  598 	inc	dptr
+      0002F8 ED               [ 4]  599 	mov	a,r5
+      0002F9 F0               [ 8]  600 	movx	@dptr,a
+                                    601 ;	logf.c:244: w=z*z;
+      0002FA E5*00            [ 8]  602 	mov	a,_bpx
+      0002FC C3               [ 4]  603 	clr	c
+      0002FD 94 F7            [ 8]  604 	subb	a,#0xf7
+      0002FF F5 82            [ 8]  605 	mov	dpl,a
+      000301 E5*01            [ 8]  606 	mov	a,_bpx+1
+      000303 94 FF            [ 8]  607 	subb	a,#0xff
+      000305 F5 83            [ 8]  608 	mov	dph,a
+      000307 75 93 FF         [12]  609 	mov	dpx,#0xff
+                                    610 ;	genAssign: resultIsFar = TRUE
+      00030A 75 86 21         [12]  611 	mov	dps,#0x21
+      00030D 90s00r00r00      [12]  612 	mov	dptr,#___fsmul_PARM_2
+      000311 E0               [ 8]  613 	movx	a,@dptr
+      000312 F0               [ 8]  614 	movx	@dptr,a
+      000313 A3               [12]  615 	inc	dptr
+      000314 A3               [12]  616 	inc	dptr
+      000315 E0               [ 8]  617 	movx	a,@dptr
+      000316 F0               [ 8]  618 	movx	@dptr,a
+      000317 A3               [12]  619 	inc	dptr
+      000318 A3               [12]  620 	inc	dptr
+      000319 E0               [ 8]  621 	movx	a,@dptr
+      00031A F0               [ 8]  622 	movx	@dptr,a
+      00031B A3               [12]  623 	inc	dptr
+      00031C A3               [12]  624 	inc	dptr
+      00031D E0               [ 8]  625 	movx	a,@dptr
+      00031E F0               [ 8]  626 	movx	@dptr,a
+      00031F 75 86 00         [12]  627 	mov	dps,#0
+      000322 E5*00            [ 8]  628 	mov	a,_bpx
+      000324 C3               [ 4]  629 	clr	c
+      000325 94 F7            [ 8]  630 	subb	a,#0xf7
+      000327 F5 84            [ 8]  631 	mov	dpl1,a
+      000329 E5*01            [ 8]  632 	mov	a,_bpx+1
+      00032B 94 FF            [ 8]  633 	subb	a,#0xff
+      00032D F5 85            [ 8]  634 	mov	dph1,a
+      00032F 75 95 FF         [12]  635 	mov	dpx1,#0xff
+      000332 05 86            [ 8]  636 	inc	dps
+      000334 E0               [ 8]  637 	movx	a,@dptr
+      000335 F5 82            [ 8]  638 	mov	dpl,a
+      000337 A3               [12]  639 	inc	dptr
+      000338 E0               [ 8]  640 	movx	a,@dptr
+      000339 F5 83            [ 8]  641 	mov	dph,a
+      00033B A3               [12]  642 	inc	dptr
+      00033C E0               [ 8]  643 	movx	a,@dptr
+      00033D F5 93            [ 8]  644 	mov	dpx,a
+      00033F A3               [12]  645 	inc	dptr
+      000340 E0               [ 8]  646 	movx	a,@dptr
+      000341 F5 F0            [ 8]  647 	mov	b,a
+      000343 75 86 00         [12]  648 	mov	dps,#0
+      000346 12s00r00r00      [16]  649 	lcall	___fsmul
+      00034A AE 82            [ 8]  650 	mov	r6,dpl
+      00034C AF 83            [ 8]  651 	mov	r7,dph
+      00034E A8 93            [ 8]  652 	mov	r0,dpx
+      000350 A9 F0            [ 8]  653 	mov	r1,b
+                                    654 ;	genAssign: resultIsFar = FALSE
+      000352 8E 02            [ 8]  655 	mov	ar2,r6
+      000354 8F 03            [ 8]  656 	mov	ar3,r7
+      000356 88 04            [ 8]  657 	mov	ar4,r0
+      000358 89 05            [ 8]  658 	mov	ar5,r1
+                                    659 ;	logf.c:246: Rz=z+z*(w*A(w)/B(w));
+                                    660 ;	genAssign: resultIsFar = TRUE
+      00035A 90s00r00r00      [12]  661 	mov	dptr,#___fsmul_PARM_2
+      00035E EA               [ 4]  662 	mov	a,r2
+      00035F F0               [ 8]  663 	movx	@dptr,a
+      000360 A3               [12]  664 	inc	dptr
+      000361 EB               [ 4]  665 	mov	a,r3
+      000362 F0               [ 8]  666 	movx	@dptr,a
+      000363 A3               [12]  667 	inc	dptr
+      000364 EC               [ 4]  668 	mov	a,r4
+      000365 F0               [ 8]  669 	movx	@dptr,a
+      000366 A3               [12]  670 	inc	dptr
+      000367 ED               [ 4]  671 	mov	a,r5
+      000368 F0               [ 8]  672 	movx	@dptr,a
+      000369 C0 02            [ 8]  673 	push	ar2
+      00036B C0 03            [ 8]  674 	push	ar3
+      00036D C0 04            [ 8]  675 	push	ar4
+      00036F C0 05            [ 8]  676 	push	ar5
+      000371 90 0D 7E 3D      [12]  677 	mov	dptr,#0x0d7e3d
+      000375 75 F0 BF         [12]  678 	mov	b,#0xbf
+      000378 12s00r00r00      [16]  679 	lcall	___fsmul
+      00037C AE 82            [ 8]  680 	mov	r6,dpl
+      00037E AF 83            [ 8]  681 	mov	r7,dph
+      000380 A8 93            [ 8]  682 	mov	r0,dpx
+      000382 A9 F0            [ 8]  683 	mov	r1,b
+      000384 D0 05            [ 8]  684 	pop	ar5
+      000386 D0 04            [ 8]  685 	pop	ar4
+      000388 D0 03            [ 8]  686 	pop	ar3
+      00038A D0 02            [ 8]  687 	pop	ar2
+                                    688 ;	genAssign: resultIsFar = TRUE
+      00038C 90s00r00r00      [12]  689 	mov	dptr,#___fsadd_PARM_2
+      000390 74 3A            [ 8]  690 	mov	a,#0x3a
+      000392 F0               [ 8]  691 	movx	@dptr,a
+      000393 A3               [12]  692 	inc	dptr
+      000394 74 3F            [ 8]  693 	mov	a,#0x3f
+      000396 F0               [ 8]  694 	movx	@dptr,a
+      000397 A3               [12]  695 	inc	dptr
+      000398 74 D4            [ 8]  696 	mov	a,#0xd4
+      00039A F0               [ 8]  697 	movx	@dptr,a
+      00039B A3               [12]  698 	inc	dptr
+      00039C 74 C0            [ 8]  699 	mov	a,#0xc0
+      00039E F0               [ 8]  700 	movx	@dptr,a
+      00039F C0 06            [ 8]  701 	push	ar6
+      0003A1 C0 07            [ 8]  702 	push	ar7
+      0003A3 C0 00            [ 8]  703 	push	ar0
+      0003A5 C0 01            [ 8]  704 	push	ar1
+      0003A7 8A 82            [ 8]  705 	mov	dpl,r2
+      0003A9 8B 83            [ 8]  706 	mov	dph,r3
+      0003AB 8C 93            [ 8]  707 	mov	dpx,r4
+      0003AD 8D F0            [ 8]  708 	mov	b,r5
+      0003AF 12s00r00r00      [16]  709 	lcall	___fsadd
+      0003B3 AA 82            [ 8]  710 	mov	r2,dpl
+      0003B5 AB 83            [ 8]  711 	mov	r3,dph
+      0003B7 AC 93            [ 8]  712 	mov	r4,dpx
+      0003B9 AD F0            [ 8]  713 	mov	r5,b
+      0003BB D0 01            [ 8]  714 	pop	ar1
+      0003BD D0 00            [ 8]  715 	pop	ar0
+      0003BF D0 07            [ 8]  716 	pop	ar7
+      0003C1 D0 06            [ 8]  717 	pop	ar6
+                                    718 ;	genAssign: resultIsFar = TRUE
+      0003C3 90s00r00r00      [12]  719 	mov	dptr,#___fsdiv_PARM_2
+      0003C7 EA               [ 4]  720 	mov	a,r2
+      0003C8 F0               [ 8]  721 	movx	@dptr,a
+      0003C9 A3               [12]  722 	inc	dptr
+      0003CA EB               [ 4]  723 	mov	a,r3
+      0003CB F0               [ 8]  724 	movx	@dptr,a
+      0003CC A3               [12]  725 	inc	dptr
+      0003CD EC               [ 4]  726 	mov	a,r4
+      0003CE F0               [ 8]  727 	movx	@dptr,a
+      0003CF A3               [12]  728 	inc	dptr
+      0003D0 ED               [ 4]  729 	mov	a,r5
+      0003D1 F0               [ 8]  730 	movx	@dptr,a
+      0003D2 8E 82            [ 8]  731 	mov	dpl,r6
+      0003D4 8F 83            [ 8]  732 	mov	dph,r7
+      0003D6 88 93            [ 8]  733 	mov	dpx,r0
+      0003D8 89 F0            [ 8]  734 	mov	b,r1
+      0003DA 12s00r00r00      [16]  735 	lcall	___fsdiv
+      0003DE AA 82            [ 8]  736 	mov	r2,dpl
+      0003E0 AB 83            [ 8]  737 	mov	r3,dph
+      0003E2 AC 93            [ 8]  738 	mov	r4,dpx
+      0003E4 AD F0            [ 8]  739 	mov	r5,b
+                                    740 ;	genAssign: resultIsFar = TRUE
+      0003E6 90s00r00r00      [12]  741 	mov	dptr,#___fsmul_PARM_2
+      0003EA EA               [ 4]  742 	mov	a,r2
+      0003EB F0               [ 8]  743 	movx	@dptr,a
+      0003EC A3               [12]  744 	inc	dptr
+      0003ED EB               [ 4]  745 	mov	a,r3
+      0003EE F0               [ 8]  746 	movx	@dptr,a
+      0003EF A3               [12]  747 	inc	dptr
+      0003F0 EC               [ 4]  748 	mov	a,r4
+      0003F1 F0               [ 8]  749 	movx	@dptr,a
+      0003F2 A3               [12]  750 	inc	dptr
+      0003F3 ED               [ 4]  751 	mov	a,r5
+      0003F4 F0               [ 8]  752 	movx	@dptr,a
+      0003F5 E5*00            [ 8]  753 	mov	a,_bpx
+      0003F7 C3               [ 4]  754 	clr	c
+      0003F8 94 F7            [ 8]  755 	subb	a,#0xf7
+      0003FA F5 84            [ 8]  756 	mov	dpl1,a
+      0003FC E5*01            [ 8]  757 	mov	a,_bpx+1
+      0003FE 94 FF            [ 8]  758 	subb	a,#0xff
+      000400 F5 85            [ 8]  759 	mov	dph1,a
+      000402 75 95 FF         [12]  760 	mov	dpx1,#0xff
+      000405 05 86            [ 8]  761 	inc	dps
+      000407 E0               [ 8]  762 	movx	a,@dptr
+      000408 F5 82            [ 8]  763 	mov	dpl,a
+      00040A A3               [12]  764 	inc	dptr
+      00040B E0               [ 8]  765 	movx	a,@dptr
+      00040C F5 83            [ 8]  766 	mov	dph,a
+      00040E A3               [12]  767 	inc	dptr
+      00040F E0               [ 8]  768 	movx	a,@dptr
+      000410 F5 93            [ 8]  769 	mov	dpx,a
+      000412 A3               [12]  770 	inc	dptr
+      000413 E0               [ 8]  771 	movx	a,@dptr
+      000414 F5 F0            [ 8]  772 	mov	b,a
+      000416 75 86 00         [12]  773 	mov	dps,#0
+      000419 12s00r00r00      [16]  774 	lcall	___fsmul
+      00041D AA 82            [ 8]  775 	mov	r2,dpl
+      00041F AB 83            [ 8]  776 	mov	r3,dph
+      000421 AC 93            [ 8]  777 	mov	r4,dpx
+      000423 AD F0            [ 8]  778 	mov	r5,b
+                                    779 ;	genAssign: resultIsFar = TRUE
+      000425 90s00r00r00      [12]  780 	mov	dptr,#___fsadd_PARM_2
+      000429 EA               [ 4]  781 	mov	a,r2
+      00042A F0               [ 8]  782 	movx	@dptr,a
+      00042B A3               [12]  783 	inc	dptr
+      00042C EB               [ 4]  784 	mov	a,r3
+      00042D F0               [ 8]  785 	movx	@dptr,a
+      00042E A3               [12]  786 	inc	dptr
+      00042F EC               [ 4]  787 	mov	a,r4
+      000430 F0               [ 8]  788 	movx	@dptr,a
+      000431 A3               [12]  789 	inc	dptr
+      000432 ED               [ 4]  790 	mov	a,r5
+      000433 F0               [ 8]  791 	movx	@dptr,a
+      000434 E5*00            [ 8]  792 	mov	a,_bpx
+      000436 C3               [ 4]  793 	clr	c
+      000437 94 F7            [ 8]  794 	subb	a,#0xf7
+      000439 F5 84            [ 8]  795 	mov	dpl1,a
+      00043B E5*01            [ 8]  796 	mov	a,_bpx+1
+      00043D 94 FF            [ 8]  797 	subb	a,#0xff
+      00043F F5 85            [ 8]  798 	mov	dph1,a
+      000441 75 95 FF         [12]  799 	mov	dpx1,#0xff
+      000444 05 86            [ 8]  800 	inc	dps
+      000446 E0               [ 8]  801 	movx	a,@dptr
+      000447 F5 82            [ 8]  802 	mov	dpl,a
+      000449 A3               [12]  803 	inc	dptr
+      00044A E0               [ 8]  804 	movx	a,@dptr
+      00044B F5 83            [ 8]  805 	mov	dph,a
+      00044D A3               [12]  806 	inc	dptr
+      00044E E0               [ 8]  807 	movx	a,@dptr
+      00044F F5 93            [ 8]  808 	mov	dpx,a
+      000451 A3               [12]  809 	inc	dptr
+      000452 E0               [ 8]  810 	movx	a,@dptr
+      000453 F5 F0            [ 8]  811 	mov	b,a
+      000455 75 86 00         [12]  812 	mov	dps,#0
+      000458 12s00r00r00      [16]  813 	lcall	___fsadd
+      00045C AA 82            [ 8]  814 	mov	r2,dpl
+      00045E AB 83            [ 8]  815 	mov	r3,dph
+      000460 AC 93            [ 8]  816 	mov	r4,dpx
+      000462 AD F0            [ 8]  817 	mov	r5,b
+                                    818 ;	genAssign: resultIsFar = TRUE
+      000464 75 93 FF         [12]  819 	mov	dpx,#0xff
+      000467 85*01 83         [12]  820 	mov	dph,_bpx+1
+      00046A 85*00 82         [12]  821 	mov	dpl,_bpx
+      00046D A3               [12]  822 	inc	dptr
+      00046E EA               [ 4]  823 	mov	a,r2
+      00046F F0               [ 8]  824 	movx	@dptr,a
+      000470 A3               [12]  825 	inc	dptr
+      000471 EB               [ 4]  826 	mov	a,r3
+      000472 F0               [ 8]  827 	movx	@dptr,a
+      000473 A3               [12]  828 	inc	dptr
+      000474 EC               [ 4]  829 	mov	a,r4
+      000475 F0               [ 8]  830 	movx	@dptr,a
+      000476 A3               [12]  831 	inc	dptr
+      000477 ED               [ 4]  832 	mov	a,r5
+      000478 F0               [ 8]  833 	movx	@dptr,a
+                                    834 ;	logf.c:247: xn=n;
+      000479 E5*00            [ 8]  835 	mov	a,_bpx
+      00047B C3               [ 4]  836 	clr	c
+      00047C 94 EF            [ 8]  837 	subb	a,#0xef
+      00047E F5 84            [ 8]  838 	mov	dpl1,a
+      000480 E5*01            [ 8]  839 	mov	a,_bpx+1
+      000482 94 FF            [ 8]  840 	subb	a,#0xff
+      000484 F5 85            [ 8]  841 	mov	dph1,a
+      000486 75 95 FF         [12]  842 	mov	dpx1,#0xff
+      000489 05 86            [ 8]  843 	inc	dps
+      00048B E0               [ 8]  844 	movx	a,@dptr
+      00048C F5 82            [ 8]  845 	mov	dpl,a
+      00048E A3               [12]  846 	inc	dptr
+      00048F E0               [ 8]  847 	movx	a,@dptr
+      000490 F5 83            [ 8]  848 	mov	dph,a
+      000492 75 86 00         [12]  849 	mov	dps,#0
+      000495 12s00r00r00      [16]  850 	lcall	___sint2fs
+      000499 AE 82            [ 8]  851 	mov	r6,dpl
+      00049B AF 83            [ 8]  852 	mov	r7,dph
+      00049D A8 93            [ 8]  853 	mov	r0,dpx
+      00049F A9 F0            [ 8]  854 	mov	r1,b
+                                    855 ;	genAssign: resultIsFar = TRUE
+                                    856 ;	logf.c:248: return ((xn*C2+Rz)+xn*C1);
+                                    857 ;	genAssign: resultIsFar = TRUE
+      0004A1 90s00r00r00      [12]  858 	mov	dptr,#___fsmul_PARM_2
+      0004A5 EE               [ 4]  859 	mov	a,r6
+      0004A6 F0               [ 8]  860 	movx	@dptr,a
+      0004A7 A3               [12]  861 	inc	dptr
+      0004A8 EF               [ 4]  862 	mov	a,r7
+      0004A9 F0               [ 8]  863 	movx	@dptr,a
+      0004AA A3               [12]  864 	inc	dptr
+      0004AB E8               [ 4]  865 	mov	a,r0
+      0004AC F0               [ 8]  866 	movx	@dptr,a
+      0004AD A3               [12]  867 	inc	dptr
+      0004AE E9               [ 4]  868 	mov	a,r1
+      0004AF F0               [ 8]  869 	movx	@dptr,a
+      0004B0 C0 06            [ 8]  870 	push	ar6
+      0004B2 C0 07            [ 8]  871 	push	ar7
+      0004B4 C0 00            [ 8]  872 	push	ar0
+      0004B6 C0 01            [ 8]  873 	push	ar1
+      0004B8 90 5E 80 83      [12]  874 	mov	dptr,#0x5e8083
+      0004BC 75 F0 B9         [12]  875 	mov	b,#0xb9
+      0004BF 12s00r00r00      [16]  876 	lcall	___fsmul
+      0004C3 AA 82            [ 8]  877 	mov	r2,dpl
+      0004C5 AB 83            [ 8]  878 	mov	r3,dph
+      0004C7 AC 93            [ 8]  879 	mov	r4,dpx
+      0004C9 AD F0            [ 8]  880 	mov	r5,b
+      0004CB D0 01            [ 8]  881 	pop	ar1
+      0004CD D0 00            [ 8]  882 	pop	ar0
+      0004CF D0 07            [ 8]  883 	pop	ar7
+      0004D1 D0 06            [ 8]  884 	pop	ar6
+      0004D3 75 93 FF         [12]  885 	mov	dpx,#0xff
+      0004D6 85*01 83         [12]  886 	mov	dph,_bpx+1
+      0004D9 85*00 82         [12]  887 	mov	dpl,_bpx
+      0004DC A3               [12]  888 	inc	dptr
+                                    889 ;	genAssign: resultIsFar = TRUE
+      0004DD 75 86 21         [12]  890 	mov	dps,#0x21
+      0004E0 90s00r00r00      [12]  891 	mov	dptr,#___fsadd_PARM_2
+      0004E4 E0               [ 8]  892 	movx	a,@dptr
+      0004E5 F0               [ 8]  893 	movx	@dptr,a
+      0004E6 A3               [12]  894 	inc	dptr
+      0004E7 A3               [12]  895 	inc	dptr
+      0004E8 E0               [ 8]  896 	movx	a,@dptr
+      0004E9 F0               [ 8]  897 	movx	@dptr,a
+      0004EA A3               [12]  898 	inc	dptr
+      0004EB A3               [12]  899 	inc	dptr
+      0004EC E0               [ 8]  900 	movx	a,@dptr
+      0004ED F0               [ 8]  901 	movx	@dptr,a
+      0004EE A3               [12]  902 	inc	dptr
+      0004EF A3               [12]  903 	inc	dptr
+      0004F0 E0               [ 8]  904 	movx	a,@dptr
+      0004F1 F0               [ 8]  905 	movx	@dptr,a
+      0004F2 75 86 00         [12]  906 	mov	dps,#0
+      0004F5 C0 06            [ 8]  907 	push	ar6
+      0004F7 C0 07            [ 8]  908 	push	ar7
+      0004F9 C0 00            [ 8]  909 	push	ar0
+      0004FB C0 01            [ 8]  910 	push	ar1
+      0004FD 8A 82            [ 8]  911 	mov	dpl,r2
+      0004FF 8B 83            [ 8]  912 	mov	dph,r3
+      000501 8C 93            [ 8]  913 	mov	dpx,r4
+      000503 8D F0            [ 8]  914 	mov	b,r5
+      000505 12s00r00r00      [16]  915 	lcall	___fsadd
+      000509 AA 82            [ 8]  916 	mov	r2,dpl
+      00050B AB 83            [ 8]  917 	mov	r3,dph
+      00050D AC 93            [ 8]  918 	mov	r4,dpx
+      00050F AD F0            [ 8]  919 	mov	r5,b
+      000511 D0 01            [ 8]  920 	pop	ar1
+      000513 D0 00            [ 8]  921 	pop	ar0
+      000515 D0 07            [ 8]  922 	pop	ar7
+      000517 D0 06            [ 8]  923 	pop	ar6
+                                    924 ;	genAssign: resultIsFar = TRUE
+      000519 90s00r00r00      [12]  925 	mov	dptr,#___fsmul_PARM_2
+      00051D EE               [ 4]  926 	mov	a,r6
+      00051E F0               [ 8]  927 	movx	@dptr,a
+      00051F A3               [12]  928 	inc	dptr
+      000520 EF               [ 4]  929 	mov	a,r7
+      000521 F0               [ 8]  930 	movx	@dptr,a
+      000522 A3               [12]  931 	inc	dptr
+      000523 E8               [ 4]  932 	mov	a,r0
+      000524 F0               [ 8]  933 	movx	@dptr,a
+      000525 A3               [12]  934 	inc	dptr
+      000526 E9               [ 4]  935 	mov	a,r1
+      000527 F0               [ 8]  936 	movx	@dptr,a
+      000528 C0 02            [ 8]  937 	push	ar2
+      00052A C0 03            [ 8]  938 	push	ar3
+      00052C C0 04            [ 8]  939 	push	ar4
+      00052E C0 05            [ 8]  940 	push	ar5
+      000530 90 31 80 00      [12]  941 	mov	dptr,#0x318000
+      000534 75 F0 3F         [12]  942 	mov	b,#0x3f
+      000537 12s00r00r00      [16]  943 	lcall	___fsmul
+      00053B AE 82            [ 8]  944 	mov	r6,dpl
+      00053D AF 83            [ 8]  945 	mov	r7,dph
+      00053F A8 93            [ 8]  946 	mov	r0,dpx
+      000541 A9 F0            [ 8]  947 	mov	r1,b
+      000543 D0 05            [ 8]  948 	pop	ar5
+      000545 D0 04            [ 8]  949 	pop	ar4
+      000547 D0 03            [ 8]  950 	pop	ar3
+      000549 D0 02            [ 8]  951 	pop	ar2
+                                    952 ;	genAssign: resultIsFar = TRUE
+      00054B 90s00r00r00      [12]  953 	mov	dptr,#___fsadd_PARM_2
+      00054F EE               [ 4]  954 	mov	a,r6
+      000550 F0               [ 8]  955 	movx	@dptr,a
+      000551 A3               [12]  956 	inc	dptr
+      000552 EF               [ 4]  957 	mov	a,r7
+      000553 F0               [ 8]  958 	movx	@dptr,a
+      000554 A3               [12]  959 	inc	dptr
+      000555 E8               [ 4]  960 	mov	a,r0
+      000556 F0               [ 8]  961 	movx	@dptr,a
+      000557 A3               [12]  962 	inc	dptr
+      000558 E9               [ 4]  963 	mov	a,r1
+      000559 F0               [ 8]  964 	movx	@dptr,a
+      00055A 8A 82            [ 8]  965 	mov	dpl,r2
+      00055C 8B 83            [ 8]  966 	mov	dph,r3
+      00055E 8C 93            [ 8]  967 	mov	dpx,r4
+      000560 8D F0            [ 8]  968 	mov	b,r5
+      000562 12s00r00r00      [16]  969 	lcall	___fsadd
+      000566                        970 00106$:
+                                    971 ;	logf.c:249: }
+      000566 85*00 81         [12]  972 	mov	sp,_bpx
+      000569 85*01 9B         [12]  973 	mov	esp,_bpx+1
+      00056C D0*01            [ 8]  974 	pop	_bpx+1
+      00056E D0*00            [ 8]  975 	pop	_bpx
+      000570 22               [16]  976 	ret
+                                    977 	.area CSEG    (CODE)
+                                    978 	.area CONST   (CODE)
+                                    979 	.area XINIT   (CODE)
+                                    980 	.area CABS    (ABS,CODE)

@@ -1,0 +1,379 @@
+                                      1 ;--------------------------------------------------------
+                                      2 ; File Created by SDCC : free open source ISO C Compiler 
+                                      3 ; Version 4.2.14 #0 (Linux)
+                                      4 ;--------------------------------------------------------
+                                      5 	.module mbstowcs
+                                      6 	.optsdcc -mds390 --model-flat24
+                                      7 	
+                                      8 ;--------------------------------------------------------
+                                      9 ; CPU specific extensions
+                                     10 ;--------------------------------------------------------
+                                     11 	.DS80C390
+                                     12 	.amode	2	; 24 bit flat addressing
+                           000082    13 dpl	=	0x82
+                           000083    14 dph	=	0x83
+                           000084    15 dpl1	=	0x84
+                           000085    16 dph1	=	0x85
+                           000086    17 dps	=	0x86
+                           000093    18 dpx	=	0x93
+                           000095    19 dpx1	=	0x95
+                           00009B    20 esp	=	0x9B
+                           00009C    21 ap	=	0x9C
+                           00009C    22 acc1	=	0x9C
+                           0000D1    23 mcnt0	=	0xD1
+                           0000D2    24 mcnt1	=	0xD2
+                           0000D3    25 ma	=	0xD3
+                           0000D4    26 mb	=	0xD4
+                           0000D5    27 mc	=	0xD5
+                           00009D    28 acon	=	0x9D
+                           0000C6    29 mcon	=	0xC6
+                           0000D1    30 F1	=	0xD1	; user flag
+                                     31 ;--------------------------------------------------------
+                                     32 ; Public variables in this module
+                                     33 ;--------------------------------------------------------
+                                     34 	.globl _mbtowc
+                                     35 	.globl _mbstowcs_PARM_3
+                                     36 	.globl _mbstowcs_PARM_2
+                                     37 	.globl _mbstowcs
+                                     38 ;--------------------------------------------------------
+                                     39 ; special function registers
+                                     40 ;--------------------------------------------------------
+                                     41 ;--------------------------------------------------------
+                                     42 ; special function bits
+                                     43 ;--------------------------------------------------------
+                                     44 ;--------------------------------------------------------
+                                     45 ; overlayable register banks
+                                     46 ;--------------------------------------------------------
+                                     47 	.area REG_BANK_0	(REL,OVR,DATA)
+      000000                         48 	.ds 8
+                                     49 ;--------------------------------------------------------
+                                     50 ; internal ram data
+                                     51 ;--------------------------------------------------------
+                                     52 	.area DSEG    (DATA)
+                                     53 ;--------------------------------------------------------
+                                     54 ; overlayable items in internal ram
+                                     55 ;--------------------------------------------------------
+                                     56 ;--------------------------------------------------------
+                                     57 ; indirectly addressable internal ram data
+                                     58 ;--------------------------------------------------------
+                                     59 	.area ISEG    (DATA)
+                                     60 ;--------------------------------------------------------
+                                     61 ; absolute internal ram data
+                                     62 ;--------------------------------------------------------
+                                     63 	.area IABS    (ABS,DATA)
+                                     64 	.area IABS    (ABS,DATA)
+                                     65 ;--------------------------------------------------------
+                                     66 ; bit data
+                                     67 ;--------------------------------------------------------
+                                     68 	.area BSEG    (BIT)
+                                     69 ;--------------------------------------------------------
+                                     70 ; paged external ram data
+                                     71 ;--------------------------------------------------------
+                                     72 	.area PSEG    (PAG,XDATA)
+                                     73 ;--------------------------------------------------------
+                                     74 ; uninitialized external ram data
+                                     75 ;--------------------------------------------------------
+                                     76 	.area XSEG    (XDATA)
+      000000                         77 _mbstowcs_PARM_2:
+      000000                         78 	.ds 4
+      000004                         79 _mbstowcs_PARM_3:
+      000004                         80 	.ds 2
+      000006                         81 _mbstowcs_m_65536_37:
+      000006                         82 	.ds 2
+      000008                         83 _mbstowcs_sloc0_1_0:
+      000008                         84 	.ds 2
+      00000A                         85 _mbstowcs_sloc1_1_0:
+      00000A                         86 	.ds 4
+                                     87 ;--------------------------------------------------------
+                                     88 ; absolute external ram data
+                                     89 ;--------------------------------------------------------
+                                     90 	.area XABS    (ABS,XDATA)
+                                     91 ;--------------------------------------------------------
+                                     92 ; initialized external ram data
+                                     93 ;--------------------------------------------------------
+                                     94 	.area XISEG   (XDATA)
+                                     95 ;--------------------------------------------------------
+                                     96 ; global & static initialisations
+                                     97 ;--------------------------------------------------------
+                                     98 	.area HOME    (CODE)
+                                     99 	.area GSINIT  (CODE)
+                                    100 	.area GSFINAL (CODE)
+                                    101 	.area GSINIT  (CODE)
+                                    102 ;--------------------------------------------------------
+                                    103 ; Home
+                                    104 ;--------------------------------------------------------
+                                    105 	.area HOME    (CODE)
+                                    106 	.area HOME    (CODE)
+                                    107 ;--------------------------------------------------------
+                                    108 ; code
+                                    109 ;--------------------------------------------------------
+                                    110 	.area CSEG    (CODE)
+                                    111 ;------------------------------------------------------------
+                                    112 ;Allocation info for local variables in function 'mbstowcs'
+                                    113 ;------------------------------------------------------------
+                                    114 ;s                         Allocated with name '_mbstowcs_PARM_2'
+                                    115 ;n                         Allocated with name '_mbstowcs_PARM_3'
+                                    116 ;pwcs                      Allocated to registers 
+                                    117 ;m                         Allocated with name '_mbstowcs_m_65536_37'
+                                    118 ;b                         Allocated to registers r6 r7 
+                                    119 ;sloc0                     Allocated with name '_mbstowcs_sloc0_1_0'
+                                    120 ;sloc1                     Allocated with name '_mbstowcs_sloc1_1_0'
+                                    121 ;------------------------------------------------------------
+                                    122 ;	mbstowcs.c:33: size_t mbstowcs(wchar_t *restrict pwcs, const char *restrict s, size_t n)
+                                    123 ;	-----------------------------------------
+                                    124 ;	 function mbstowcs
+                                    125 ;	-----------------------------------------
+      000000                        126 _mbstowcs:
+                           000002   127 	ar2 = 0x02
+                           000003   128 	ar3 = 0x03
+                           000004   129 	ar4 = 0x04
+                           000005   130 	ar5 = 0x05
+                           000006   131 	ar6 = 0x06
+                           000007   132 	ar7 = 0x07
+                           000000   133 	ar0 = 0x00
+                           000001   134 	ar1 = 0x01
+      000000 AA 82            [ 8]  135 	mov	r2,dpl
+      000002 AB 83            [ 8]  136 	mov	r3,dph
+      000004 AC 93            [ 8]  137 	mov	r4,dpx
+      000006 AD F0            [ 8]  138 	mov	r5,b
+                                    139 ;	mbstowcs.c:35: size_t m = 0;
+                                    140 ;	genAssign: resultIsFar = TRUE
+      000008 90s00r00r06      [12]  141 	mov	dptr,#_mbstowcs_m_65536_37
+      00000C E4               [ 4]  142 	clr	a
+      00000D F0               [ 8]  143 	movx	@dptr,a
+      00000E A3               [12]  144 	inc	dptr
+      00000F F0               [ 8]  145 	movx	@dptr,a
+                                    146 ;	mbstowcs.c:36: while(n--)
+                                    147 ;	genAssign: resultIsFar = FALSE
+      000010 78 00            [ 8]  148 	mov	r0,#0x00
+      000012 79 00            [ 8]  149 	mov	r1,#0x00
+      000014 90s00r00r04      [12]  150 	mov	dptr,#_mbstowcs_PARM_3
+                                    151 ;	genAssign: resultIsFar = TRUE
+      000018 75 86 21         [12]  152 	mov	dps,#0x21
+      00001B 90s00r00r08      [12]  153 	mov	dptr,#_mbstowcs_sloc0_1_0
+      00001F E0               [ 8]  154 	movx	a,@dptr
+      000020 F0               [ 8]  155 	movx	@dptr,a
+      000021 A3               [12]  156 	inc	dptr
+      000022 A3               [12]  157 	inc	dptr
+      000023 E0               [ 8]  158 	movx	a,@dptr
+      000024 F0               [ 8]  159 	movx	@dptr,a
+      000025 75 86 00         [12]  160 	mov	dps,#0
+      000028                        161 00105$:
+      000028 90s00r00r08      [12]  162 	mov	dptr,#_mbstowcs_sloc0_1_0
+                                    163 ;	genAssign: resultIsFar = FALSE
+      00002C E0               [ 8]  164 	movx	a,@dptr
+      00002D FE               [ 4]  165 	mov	r6,a
+      00002E A3               [12]  166 	inc	dptr
+      00002F E0               [ 8]  167 	movx	a,@dptr
+      000030 FF               [ 4]  168 	mov	r7,a
+      000031 90s00r00r08      [12]  169 	mov	dptr,#_mbstowcs_sloc0_1_0
+      000035 E0               [ 8]  170 	movx	a,@dptr
+      000036 24 FF            [ 8]  171 	add	a,#0xff
+      000038 F0               [ 8]  172 	movx	@dptr,a
+      000039 A3               [12]  173 	inc	dptr
+      00003A E0               [ 8]  174 	movx	a,@dptr
+      00003B 34 FF            [ 8]  175 	addc	a,#0xff
+      00003D F0               [ 8]  176 	movx	@dptr,a
+      00003E EE               [ 4]  177 	mov	a,r6
+      00003F 4F               [ 4]  178 	orl	a,r7
+      000040 70 04            [12]  179 	jnz	00126$
+      000042 02s00r01r54      [16]  180 	ljmp	00107$
+      000046                        181 00126$:
+                                    182 ;	mbstowcs.c:38: int b = mbtowc(pwcs++, s, MB_LEN_MAX);
+      000046 C0 00            [ 8]  183 	push	ar0
+      000048 C0 01            [ 8]  184 	push	ar1
+                                    185 ;	genAssign: resultIsFar = TRUE
+      00004A 90s00r00r0A      [12]  186 	mov	dptr,#_mbstowcs_sloc1_1_0
+      00004E EA               [ 4]  187 	mov	a,r2
+      00004F F0               [ 8]  188 	movx	@dptr,a
+      000050 A3               [12]  189 	inc	dptr
+      000051 EB               [ 4]  190 	mov	a,r3
+      000052 F0               [ 8]  191 	movx	@dptr,a
+      000053 A3               [12]  192 	inc	dptr
+      000054 EC               [ 4]  193 	mov	a,r4
+      000055 F0               [ 8]  194 	movx	@dptr,a
+      000056 A3               [12]  195 	inc	dptr
+      000057 ED               [ 4]  196 	mov	a,r5
+      000058 F0               [ 8]  197 	movx	@dptr,a
+      000059 74 04            [ 8]  198 	mov	a,#0x04
+      00005B 2A               [ 4]  199 	add	a,r2
+      00005C FA               [ 4]  200 	mov	r2,a
+      00005D E4               [ 4]  201 	clr	a
+      00005E 3B               [ 4]  202 	addc	a,r3
+      00005F FB               [ 4]  203 	mov	r3,a
+      000060 E4               [ 4]  204 	clr	a
+      000061 3C               [ 4]  205 	addc	a,r4
+      000062 FC               [ 4]  206 	mov	r4,a
+      000063 90s00r00r00      [12]  207 	mov	dptr,#_mbstowcs_PARM_2
+                                    208 ;	genAssign: resultIsFar = FALSE
+      000067 E0               [ 8]  209 	movx	a,@dptr
+      000068 FE               [ 4]  210 	mov	r6,a
+      000069 A3               [12]  211 	inc	dptr
+      00006A E0               [ 8]  212 	movx	a,@dptr
+      00006B FF               [ 4]  213 	mov	r7,a
+      00006C A3               [12]  214 	inc	dptr
+      00006D E0               [ 8]  215 	movx	a,@dptr
+      00006E F8               [ 4]  216 	mov	r0,a
+      00006F A3               [12]  217 	inc	dptr
+      000070 E0               [ 8]  218 	movx	a,@dptr
+      000071 F9               [ 4]  219 	mov	r1,a
+                                    220 ;	genAssign: resultIsFar = TRUE
+      000072 90s00r00r00      [12]  221 	mov	dptr,#_mbtowc_PARM_2
+      000076 EE               [ 4]  222 	mov	a,r6
+      000077 F0               [ 8]  223 	movx	@dptr,a
+      000078 A3               [12]  224 	inc	dptr
+      000079 EF               [ 4]  225 	mov	a,r7
+      00007A F0               [ 8]  226 	movx	@dptr,a
+      00007B A3               [12]  227 	inc	dptr
+      00007C E8               [ 4]  228 	mov	a,r0
+      00007D F0               [ 8]  229 	movx	@dptr,a
+      00007E A3               [12]  230 	inc	dptr
+      00007F E9               [ 4]  231 	mov	a,r1
+      000080 F0               [ 8]  232 	movx	@dptr,a
+                                    233 ;	genAssign: resultIsFar = TRUE
+      000081 90s00r00r00      [12]  234 	mov	dptr,#_mbtowc_PARM_3
+      000085 74 04            [ 8]  235 	mov	a,#0x04
+      000087 F0               [ 8]  236 	movx	@dptr,a
+      000088 E4               [ 4]  237 	clr	a
+      000089 A3               [12]  238 	inc	dptr
+      00008A F0               [ 8]  239 	movx	@dptr,a
+      00008B C0 02            [ 8]  240 	push	ar2
+      00008D C0 03            [ 8]  241 	push	ar3
+      00008F C0 04            [ 8]  242 	push	ar4
+      000091 C0 05            [ 8]  243 	push	ar5
+      000093 C0 00            [ 8]  244 	push	ar0
+      000095 C0 01            [ 8]  245 	push	ar1
+      000097 05 86            [ 8]  246 	inc	dps
+      000099 90s00r00r0A      [12]  247 	mov	dptr,#_mbstowcs_sloc1_1_0
+      00009D E0               [ 8]  248 	movx	a,@dptr
+      00009E F5 82            [ 8]  249 	mov	dpl,a
+      0000A0 A3               [12]  250 	inc	dptr
+      0000A1 E0               [ 8]  251 	movx	a,@dptr
+      0000A2 F5 83            [ 8]  252 	mov	dph,a
+      0000A4 A3               [12]  253 	inc	dptr
+      0000A5 E0               [ 8]  254 	movx	a,@dptr
+      0000A6 F5 93            [ 8]  255 	mov	dpx,a
+      0000A8 A3               [12]  256 	inc	dptr
+      0000A9 E0               [ 8]  257 	movx	a,@dptr
+      0000AA F5 F0            [ 8]  258 	mov	b,a
+      0000AC 75 86 00         [12]  259 	mov	dps,#0
+      0000AF 12s00r00r00      [16]  260 	lcall	_mbtowc
+      0000B3 AE 82            [ 8]  261 	mov	r6,dpl
+      0000B5 AF 83            [ 8]  262 	mov	r7,dph
+      0000B7 D0 01            [ 8]  263 	pop	ar1
+      0000B9 D0 00            [ 8]  264 	pop	ar0
+      0000BB D0 05            [ 8]  265 	pop	ar5
+      0000BD D0 04            [ 8]  266 	pop	ar4
+      0000BF D0 03            [ 8]  267 	pop	ar3
+      0000C1 D0 02            [ 8]  268 	pop	ar2
+                                    269 ;	genAssign: resultIsFar = FALSE
+                                    270 ;	mbstowcs.c:39: if(!b)
+      0000C3 D0 01            [ 8]  271 	pop	ar1
+      0000C5 D0 00            [ 8]  272 	pop	ar0
+      0000C7 EE               [ 4]  273 	mov	a,r6
+      0000C8 4F               [ 4]  274 	orl	a,r7
+      0000C9 70 04            [12]  275 	jnz	00127$
+      0000CB 02s00r01r54      [16]  276 	ljmp	00107$
+      0000CF                        277 00127$:
+                                    278 ;	mbstowcs.c:41: if(b < 0)
+      0000CF EF               [ 4]  279 	mov	a,r7
+      0000D0 30 E7 08         [12]  280 	jnb  acc[7],00104$
+      0000D3                        281 00128$:
+                                    282 ;	mbstowcs.c:42: return(-1);
+      0000D3 90 00 FF FF      [12]  283 	mov  dptr,#0xffff
+      0000D7 02s00r01r65      [16]  284 	ljmp	00108$
+      0000DB                        285 00104$:
+                                    286 ;	mbstowcs.c:43: s += b;
+      0000DB C0 02            [ 8]  287 	push	ar2
+      0000DD C0 03            [ 8]  288 	push	ar3
+      0000DF C0 04            [ 8]  289 	push	ar4
+      0000E1 C0 05            [ 8]  290 	push	ar5
+      0000E3 90s00r00r00      [12]  291 	mov	dptr,#_mbstowcs_PARM_2
+                                    292 ;	genAssign: resultIsFar = TRUE
+      0000E7 75 86 21         [12]  293 	mov	dps,#0x21
+      0000EA 90s00r00r0A      [12]  294 	mov	dptr,#_mbstowcs_sloc1_1_0
+      0000EE E0               [ 8]  295 	movx	a,@dptr
+      0000EF F0               [ 8]  296 	movx	@dptr,a
+      0000F0 A3               [12]  297 	inc	dptr
+      0000F1 A3               [12]  298 	inc	dptr
+      0000F2 E0               [ 8]  299 	movx	a,@dptr
+      0000F3 F0               [ 8]  300 	movx	@dptr,a
+      0000F4 A3               [12]  301 	inc	dptr
+      0000F5 A3               [12]  302 	inc	dptr
+      0000F6 E0               [ 8]  303 	movx	a,@dptr
+      0000F7 F0               [ 8]  304 	movx	@dptr,a
+      0000F8 A3               [12]  305 	inc	dptr
+      0000F9 A3               [12]  306 	inc	dptr
+      0000FA E0               [ 8]  307 	movx	a,@dptr
+      0000FB F0               [ 8]  308 	movx	@dptr,a
+      0000FC 75 86 00         [12]  309 	mov	dps,#0
+      0000FF 8E 04            [ 8]  310 	mov	ar4,r6
+      000101 8F 05            [ 8]  311 	mov	ar5,r7
+      000103 EF               [ 4]  312 	mov	a,r7
+      000104 33               [ 4]  313 	rlc	a
+      000105 95 E0            [ 8]  314 	subb	a,acc
+      000107 FA               [ 4]  315 	mov	r2,a
+      000108 FB               [ 4]  316 	mov	r3,a
+      000109 90s00r00r0A      [12]  317 	mov	dptr,#_mbstowcs_sloc1_1_0
+      00010D 75 86 01         [12]  318 	mov	dps, #1
+      000110 90s00r00r00      [12]  319 	mov	dptr, #_mbstowcs_PARM_2
+      000114 15 86            [ 8]  320 	dec	dps
+      000116 E0               [ 8]  321 	movx	a,@dptr
+      000117 2C               [ 4]  322 	add	a,r4
+      000118 05 86            [ 8]  323 	inc	dps
+      00011A F0               [ 8]  324 	movx	@dptr,a
+      00011B 15 86            [ 8]  325 	dec	dps
+      00011D A3               [12]  326 	inc	dptr
+      00011E E0               [ 8]  327 	movx	a,@dptr
+      00011F 3D               [ 4]  328 	addc	a,r5
+      000120 05 86            [ 8]  329 	inc	dps
+      000122 A3               [12]  330 	inc	dptr
+      000123 F0               [ 8]  331 	movx	@dptr,a
+      000124 15 86            [ 8]  332 	dec	dps
+      000126 A3               [12]  333 	inc	dptr
+      000127 E0               [ 8]  334 	movx	a,@dptr
+      000128 3A               [ 4]  335 	addc	a,r2
+      000129 05 86            [ 8]  336 	inc	dps
+      00012B A3               [12]  337 	inc	dptr
+      00012C F0               [ 8]  338 	movx	@dptr,a
+      00012D 75 86 00         [12]  339 	mov	dps,#0
+      000130 A3               [12]  340 	inc	dptr
+      000131 E0               [ 8]  341 	movx	a,@dptr
+      000132 75 86 01         [12]  342 	mov	dps,#1
+      000135 A3               [12]  343 	inc	dptr
+      000136 F0               [ 8]  344 	movx	@dptr,a
+      000137 75 86 00         [12]  345 	mov	dps,#0
+                                    346 ;	mbstowcs.c:44: m++;
+      00013A 08               [ 4]  347 	inc	r0
+      00013B B8 00 01         [16]  348 	cjne	r0,#0x00,00129$
+      00013E 09               [ 4]  349 	inc	r1
+      00013F                        350 00129$:
+                                    351 ;	genAssign: resultIsFar = TRUE
+      00013F 90s00r00r06      [12]  352 	mov	dptr,#_mbstowcs_m_65536_37
+      000143 E8               [ 4]  353 	mov	a,r0
+      000144 F0               [ 8]  354 	movx	@dptr,a
+      000145 A3               [12]  355 	inc	dptr
+      000146 E9               [ 4]  356 	mov	a,r1
+      000147 F0               [ 8]  357 	movx	@dptr,a
+      000148 D0 05            [ 8]  358 	pop	ar5
+      00014A D0 04            [ 8]  359 	pop	ar4
+      00014C D0 03            [ 8]  360 	pop	ar3
+      00014E D0 02            [ 8]  361 	pop	ar2
+      000150 02s00r00r28      [16]  362 	ljmp	00105$
+      000154                        363 00107$:
+                                    364 ;	mbstowcs.c:47: return(m);
+      000154 75 86 01         [12]  365 	mov     dps, #1
+      000157 90s00r00r06      [12]  366 	mov     dptr, #_mbstowcs_m_65536_37
+      00015B E0               [ 8]  367 	movx	a,@dptr
+      00015C F5 82            [ 8]  368 	mov	dpl,a
+      00015E A3               [12]  369 	inc	dptr
+      00015F E0               [ 8]  370 	movx	a,@dptr
+      000160 F5 83            [ 8]  371 	mov	dph,a
+      000162 75 86 00         [12]  372 	mov	dps,#0
+      000165                        373 00108$:
+                                    374 ;	mbstowcs.c:48: }
+      000165 22               [16]  375 	ret
+                                    376 	.area CSEG    (CODE)
+                                    377 	.area CONST   (CODE)
+                                    378 	.area XINIT   (CODE)
+                                    379 	.area CABS    (ABS,CODE)

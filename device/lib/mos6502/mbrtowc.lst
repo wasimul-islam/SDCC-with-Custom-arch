@@ -1,0 +1,585 @@
+                              1 ;--------------------------------------------------------
+                              2 ; File Created by SDCC : free open source ISO C Compiler 
+                              3 ; Version 4.2.14 #0 (Linux)
+                              4 ;--------------------------------------------------------
+                              5 	.module mbrtowc
+                              6 	.optsdcc -mmos6502
+                              7 	
+                              8 ;--------------------------------------------------------
+                              9 ; Public variables in this module
+                             10 ;--------------------------------------------------------
+                             11 	.globl _mbrtowc_PARM_4
+                             12 	.globl _mbrtowc_PARM_3
+                             13 	.globl _mbrtowc_PARM_2
+                             14 	.globl _mbrtowc
+                             15 ;--------------------------------------------------------
+                             16 ; ZP ram data
+                             17 ;--------------------------------------------------------
+                             18 	.area ZP      (PAG)
+   0000                      19 _mbrtowc_sloc0_1_0:
+   0000                      20 	.ds 2
+   0002                      21 _mbrtowc_sloc1_1_0:
+   0002                      22 	.ds 2
+   0004                      23 _mbrtowc_sloc2_1_0:
+   0004                      24 	.ds 2
+   0006                      25 _mbrtowc_sloc3_1_0:
+   0006                      26 	.ds 2
+   0008                      27 _mbrtowc_sloc4_1_0:
+   0008                      28 	.ds 2
+   000A                      29 _mbrtowc_sloc5_1_0:
+   000A                      30 	.ds 2
+   000C                      31 _mbrtowc_sloc6_1_0:
+   000C                      32 	.ds 4
+                             33 ;--------------------------------------------------------
+                             34 ; overlayable items in ram
+                             35 ;--------------------------------------------------------
+                             36 ;--------------------------------------------------------
+                             37 ; uninitialized external ram data
+                             38 ;--------------------------------------------------------
+                             39 	.area BSS
+   0000                      40 _mbrtowc_PARM_2:
+   0000                      41 	.ds 2
+   0002                      42 _mbrtowc_PARM_3:
+   0002                      43 	.ds 2
+   0004                      44 _mbrtowc_PARM_4:
+   0004                      45 	.ds 2
+   0006                      46 _mbrtowc_pwc_65536_9:
+   0006                      47 	.ds 2
+   0008                      48 _mbrtowc_first_byte_65536_10:
+   0008                      49 	.ds 1
+   0009                      50 _mbrtowc_mbseq_65536_10:
+   0009                      51 	.ds 4
+   000D                      52 _mbrtowc_codepoint_65536_10:
+   000D                      53 	.ds 4
+   0011                      54 _mbrtowc_i_65536_10:
+   0011                      55 	.ds 1
+   0012                      56 _mbrtowc_sps_65536_10:
+   0012                      57 	.ds 3
+                             58 ;--------------------------------------------------------
+                             59 ; absolute external ram data
+                             60 ;--------------------------------------------------------
+                             61 	.area DABS    (ABS)
+                             62 ;--------------------------------------------------------
+                             63 ; initialized external ram data
+                             64 ;--------------------------------------------------------
+                             65 	.area DATA
+                             66 ;--------------------------------------------------------
+                             67 ; global & static initialisations
+                             68 ;--------------------------------------------------------
+                             69 	.area _CODE
+                             70 	.area GSINIT
+                             71 	.area GSFINAL
+                             72 	.area GSINIT
+                             73 ;--------------------------------------------------------
+                             74 ; Home
+                             75 ;--------------------------------------------------------
+                             76 	.area _CODE
+                             77 	.area _CODE
+                             78 ;--------------------------------------------------------
+                             79 ; code
+                             80 ;--------------------------------------------------------
+                             81 	.area CODE
+                             82 ;------------------------------------------------------------
+                             83 ;Allocation info for local variables in function 'mbrtowc'
+                             84 ;------------------------------------------------------------
+                             85 ;sloc0                     Allocated with name '_mbrtowc_sloc0_1_0'
+                             86 ;sloc1                     Allocated with name '_mbrtowc_sloc1_1_0'
+                             87 ;sloc2                     Allocated with name '_mbrtowc_sloc2_1_0'
+                             88 ;sloc3                     Allocated with name '_mbrtowc_sloc3_1_0'
+                             89 ;sloc4                     Allocated with name '_mbrtowc_sloc4_1_0'
+                             90 ;sloc5                     Allocated with name '_mbrtowc_sloc5_1_0'
+                             91 ;sloc6                     Allocated with name '_mbrtowc_sloc6_1_0'
+                             92 ;s                         Allocated with name '_mbrtowc_PARM_2'
+                             93 ;n                         Allocated with name '_mbrtowc_PARM_3'
+                             94 ;ps                        Allocated with name '_mbrtowc_PARM_4'
+                             95 ;pwc                       Allocated with name '_mbrtowc_pwc_65536_9'
+                             96 ;first_byte                Allocated with name '_mbrtowc_first_byte_65536_10'
+                             97 ;seqlen                    Allocated to registers 
+                             98 ;mbseq                     Allocated with name '_mbrtowc_mbseq_65536_10'
+                             99 ;codepoint                 Allocated with name '_mbrtowc_codepoint_65536_10'
+                            100 ;i                         Allocated with name '_mbrtowc_i_65536_10'
+                            101 ;j                         Allocated to registers 
+                            102 ;sps                       Allocated with name '_mbrtowc_sps_65536_10'
+                            103 ;------------------------------------------------------------
+                            104 ;	../mbrtowc.c: 32: size_t mbrtowc(wchar_t *restrict pwc, const char *restrict s, size_t n, mbstate_t *restrict ps)
+                            105 ;	-----------------------------------------
+                            106 ;	 function mbrtowc
+                            107 ;	-----------------------------------------
+                            108 ;	Register assignment is optimal.
+                            109 ;	Stack space usage: 0 bytes.
+   0000                     110 _mbrtowc:
+   0000 8Dr06r00      [ 4]  111 	sta	_mbrtowc_pwc_65536_9
+   0003 8Er07r00      [ 4]  112 	stx	(_mbrtowc_pwc_65536_9 + 1)
+                            113 ;	../mbrtowc.c: 41: if(!s)
+   0006 ADr01r00      [ 4]  114 	lda	(_mbrtowc_PARM_2 + 1)
+   0009 0Dr00r00      [ 4]  115 	ora	_mbrtowc_PARM_2
+   000C D0 17         [ 4]  116 	bne	00102$
+                            117 ;	../mbrtowc.c: 42: return(mbrtowc(0, "", 1, ps));
+   000E A9r00         [ 2]  118 	lda	#___str_0
+   0010 8Dr00r00      [ 4]  119 	sta	_mbrtowc_PARM_2
+   0013 A9s00         [ 2]  120 	lda	#>___str_0
+   0015 8Dr01r00      [ 4]  121 	sta	(_mbrtowc_PARM_2 + 1)
+   0018 A2 01         [ 2]  122 	ldx	#0x01
+   001A 8Er02r00      [ 4]  123 	stx	_mbrtowc_PARM_3
+   001D CA            [ 2]  124 	dex
+   001E 8Er03r00      [ 4]  125 	stx	(_mbrtowc_PARM_3 + 1)
+   0021 8A            [ 2]  126 	txa
+   0022 4Cr00r00      [ 3]  127 	jmp	_mbrtowc
+   0025                     128 00102$:
+                            129 ;	../mbrtowc.c: 43: if(!n)
+   0025 ADr03r00      [ 4]  130 	lda	(_mbrtowc_PARM_3 + 1)
+   0028 0Dr02r00      [ 4]  131 	ora	_mbrtowc_PARM_3
+   002B D0 03         [ 4]  132 	bne	00280$
+   002D 4Cr37r03      [ 3]  133 	jmp	00128$
+   0030                     134 00280$:
+                            135 ;	../mbrtowc.c: 45: if(!ps)
+   0030 ADr05r00      [ 4]  136 	lda	(_mbrtowc_PARM_4 + 1)
+   0033 0Dr04r00      [ 4]  137 	ora	_mbrtowc_PARM_4
+   0036 D0 0A         [ 4]  138 	bne	00106$
+                            139 ;	../mbrtowc.c: 47: ps = &sps;
+   0038 A9r12         [ 2]  140 	lda	#_mbrtowc_sps_65536_10
+   003A 8Dr04r00      [ 4]  141 	sta	_mbrtowc_PARM_4
+   003D A9s00         [ 2]  142 	lda	#>_mbrtowc_sps_65536_10
+   003F 8Dr05r00      [ 4]  143 	sta	(_mbrtowc_PARM_4 + 1)
+   0042                     144 00106$:
+                            145 ;	../mbrtowc.c: 50: for(i = 0; ps->c[i] && i < 3; i++)
+   0042 ADr04r00      [ 4]  146 	lda	_mbrtowc_PARM_4
+   0045 85*00         [ 3]  147 	sta	*_mbrtowc_sloc0_1_0
+   0047 ADr05r00      [ 4]  148 	lda	(_mbrtowc_PARM_4 + 1)
+   004A 85*01         [ 3]  149 	sta	*(_mbrtowc_sloc0_1_0 + 1)
+   004C A2 00         [ 2]  150 	ldx	#0x00
+   004E                     151 00131$:
+   004E 8A            [ 2]  152 	txa
+   004F 18            [ 2]  153 	clc
+   0050 65*00         [ 3]  154 	adc	*_mbrtowc_sloc0_1_0
+   0052 85*02         [ 3]  155 	sta	*_mbrtowc_sloc1_1_0
+   0054 A9 00         [ 2]  156 	lda	#0x00
+   0056 65*01         [ 3]  157 	adc	*(_mbrtowc_sloc0_1_0 + 1)
+   0058 85*03         [ 3]  158 	sta	*(_mbrtowc_sloc1_1_0 + 1)
+   005A A0 00         [ 2]  159 	ldy	#0x00
+   005C B1*02         [ 6]  160 	lda	[*_mbrtowc_sloc1_1_0],y
+   005E F0 23         [ 4]  161 	beq	00174$
+   0060 E0 03         [ 2]  162 	cpx	#0x03
+   0062 B0 1F         [ 4]  163 	bcs	00174$
+                            164 ;	../mbrtowc.c: 51: mbseq[i] = ps->c[i];
+   0064 86*02         [ 3]  165 	stx	*_mbrtowc_sloc1_1_0
+   0066 84*03         [ 3]  166 	sty	*(_mbrtowc_sloc1_1_0 + 1)
+   0068 85*00         [ 3]  167 	sta	*(__TEMP+0)
+   006A 86*01         [ 3]  168 	stx	*(__TEMP+1)
+   006C 18            [ 2]  169 	clc
+   006D A5*02         [ 3]  170 	lda	*_mbrtowc_sloc1_1_0
+   006F 69r09         [ 2]  171 	adc	#<(_mbrtowc_mbseq_65536_10+0)
+   0071 85*00         [ 3]  172 	sta	*(__DPTR+0)
+   0073 A5*03         [ 3]  173 	lda	*(_mbrtowc_sloc1_1_0 + 1)
+   0075 69s00         [ 2]  174 	adc	#>(_mbrtowc_mbseq_65536_10+0)
+   0077 85*01         [ 3]  175 	sta	*(__DPTR+1)
+   0079 A5*00         [ 3]  176 	lda	*(__TEMP+0)
+   007B 91*00         [ 6]  177 	sta	[__DPTR],y
+   007D A6*01         [ 3]  178 	ldx	*(__TEMP+1)
+                            179 ;	../mbrtowc.c: 50: for(i = 0; ps->c[i] && i < 3; i++)
+   007F E8            [ 2]  180 	inx
+   0080 4Cr4Er00      [ 3]  181 	jmp	00131$
+   0083                     182 00174$:
+   0083 8Er11r00      [ 4]  183 	stx	_mbrtowc_i_65536_10
+                            184 ;	../mbrtowc.c: 53: seqlen = 1;
+   0086 A2 01         [ 2]  185 	ldx	#0x01
+   0088 86*02         [ 3]  186 	stx	*_mbrtowc_sloc1_1_0
+                            187 ;	../mbrtowc.c: 54: first_byte = ps->c[0] ? ps->c[0] : *s;
+   008A ADr04r00      [ 4]  188 	lda	_mbrtowc_PARM_4
+   008D 85*00         [ 3]  189 	sta	*(__DPTR+0)
+   008F ADr05r00      [ 4]  190 	lda	(_mbrtowc_PARM_4 + 1)
+   0092 85*01         [ 3]  191 	sta	*(__DPTR+1)
+   0094 A0 00         [ 2]  192 	ldy	#0x00
+   0096 B1*00         [ 6]  193 	lda	[__DPTR],y
+   0098 D0 0E         [ 4]  194 	bne	00148$
+   009A ADr00r00      [ 4]  195 	lda	_mbrtowc_PARM_2
+   009D 85*00         [ 3]  196 	sta	*(__DPTR+0)
+   009F ADr01r00      [ 4]  197 	lda	(_mbrtowc_PARM_2 + 1)
+   00A2 85*01         [ 3]  198 	sta	*(__DPTR+1)
+   00A4 A0 00         [ 2]  199 	ldy	#0x00
+   00A6 B1*00         [ 6]  200 	lda	[__DPTR],y
+   00A8                     201 00148$:
+   00A8 8Dr08r00      [ 4]  202 	sta	_mbrtowc_first_byte_65536_10
+                            203 ;	../mbrtowc.c: 56: if(first_byte & 0x80)
+   00AB A9 80         [ 2]  204 	lda	#0x80
+   00AD 2Dr08r00      [ 4]  205 	and	_mbrtowc_first_byte_65536_10
+   00B0 F0 4E         [ 4]  206 	beq	00112$
+                            207 ;	../mbrtowc.c: 58: while (first_byte & (0x80 >> seqlen))
+   00B2 A0 01         [ 2]  208 	ldy	#0x01
+   00B4                     209 00108$:
+   00B4 98            [ 2]  210 	tya
+   00B5 AA            [ 2]  211 	tax
+   00B6 A9 80         [ 2]  212 	lda	#0x80
+   00B8 85*00         [ 3]  213 	sta	*_mbrtowc_sloc0_1_0
+   00BA A9 00         [ 2]  214 	lda	#0x00
+   00BC 85*01         [ 3]  215 	sta	*(_mbrtowc_sloc0_1_0 + 1)
+   00BE E0 00         [ 2]  216 	cpx	#0x00
+   00C0 F0 0D         [ 4]  217 	beq	00287$
+   00C2                     218 00286$:
+   00C2 48            [ 3]  219 	pha
+   00C3 A5*01         [ 3]  220 	lda	*(_mbrtowc_sloc0_1_0 + 1)
+   00C5 C9 80         [ 2]  221 	cmp	#0x80
+   00C7 68            [ 4]  222 	pla
+   00C8 66*01         [ 5]  223 	ror	*(_mbrtowc_sloc0_1_0 + 1)
+   00CA 66*00         [ 5]  224 	ror	*_mbrtowc_sloc0_1_0
+   00CC CA            [ 2]  225 	dex
+   00CD D0 F3         [ 4]  226 	bne	00286$
+   00CF                     227 00287$:
+   00CF ADr08r00      [ 4]  228 	lda	_mbrtowc_first_byte_65536_10
+   00D2 A2 00         [ 2]  229 	ldx	#0x00
+   00D4 25*00         [ 3]  230 	and	*_mbrtowc_sloc0_1_0
+   00D6 D0 06         [ 4]  231 	bne	00288$
+   00D8 A5*01         [ 3]  232 	lda	*(_mbrtowc_sloc0_1_0 + 1)
+   00DA 86*00         [ 3]  233 	stx	*(__TEMP+0)
+   00DC 25*00         [ 3]  234 	and	*(__TEMP+0)
+   00DE                     235 00288$:
+   00DE F0 04         [ 4]  236 	beq	00175$
+                            237 ;	../mbrtowc.c: 59: seqlen++;
+   00E0 C8            [ 2]  238 	iny
+   00E1 4CrB4r00      [ 3]  239 	jmp	00108$
+   00E4                     240 00175$:
+   00E4 84*02         [ 3]  241 	sty	*_mbrtowc_sloc1_1_0
+                            242 ;	../mbrtowc.c: 60: first_byte &= (0xff >> (seqlen + 1));
+   00E6 C8            [ 2]  243 	iny
+   00E7 A9 FF         [ 2]  244 	lda	#0xff
+   00E9 A2 00         [ 2]  245 	ldx	#0x00
+   00EB C0 00         [ 2]  246 	cpy	#0x00
+   00ED F0 0B         [ 4]  247 	beq	00291$
+   00EF                     248 00290$:
+   00EF 48            [ 3]  249 	pha
+   00F0 8A            [ 2]  250 	txa
+   00F1 C9 80         [ 2]  251 	cmp	#0x80
+   00F3 6A            [ 2]  252 	ror	a
+   00F4 AA            [ 2]  253 	tax
+   00F5 68            [ 4]  254 	pla
+   00F6 6A            [ 2]  255 	ror	a
+   00F7 88            [ 2]  256 	dey
+   00F8 D0 F5         [ 4]  257 	bne	00290$
+   00FA                     258 00291$:
+   00FA 2Dr08r00      [ 4]  259 	and	_mbrtowc_first_byte_65536_10
+   00FD 8Dr08r00      [ 4]  260 	sta	_mbrtowc_first_byte_65536_10
+   0100                     261 00112$:
+                            262 ;	../mbrtowc.c: 63: if(seqlen > 4)
+   0100 A5*02         [ 3]  263 	lda	*_mbrtowc_sloc1_1_0
+   0102 C9 04         [ 2]  264 	cmp	#0x04
+   0104 F0 05         [ 4]  265 	beq	00292$
+   0106 90 03         [ 4]  266 	bcc	00292$
+   0108 4Cr37r03      [ 3]  267 	jmp	00128$
+   010B                     268 00292$:
+                            269 ;	../mbrtowc.c: 66: if(i + n < seqlen) // Incomplete multibyte character
+   010B ADr11r00      [ 4]  270 	lda	_mbrtowc_i_65536_10
+   010E 85*00         [ 3]  271 	sta	*_mbrtowc_sloc0_1_0
+   0110 A2 00         [ 2]  272 	ldx	#0x00
+   0112 86*01         [ 3]  273 	stx	*(_mbrtowc_sloc0_1_0 + 1)
+   0114 A5*00         [ 3]  274 	lda	*_mbrtowc_sloc0_1_0
+   0116 A6*01         [ 3]  275 	ldx	*(_mbrtowc_sloc0_1_0 + 1)
+   0118 18            [ 2]  276 	clc
+   0119 6Dr02r00      [ 4]  277 	adc	_mbrtowc_PARM_3
+   011C 48            [ 3]  278 	pha
+   011D 8A            [ 2]  279 	txa
+   011E 6Dr03r00      [ 4]  280 	adc	(_mbrtowc_PARM_3 + 1)
+   0121 AA            [ 2]  281 	tax
+   0122 68            [ 4]  282 	pla
+   0123 A4*02         [ 3]  283 	ldy	*_mbrtowc_sloc1_1_0
+   0125 84*04         [ 3]  284 	sty	*_mbrtowc_sloc2_1_0
+   0127 A0 00         [ 2]  285 	ldy	#0x00
+   0129 84*05         [ 3]  286 	sty	*(_mbrtowc_sloc2_1_0 + 1)
+   012B 38            [ 2]  287 	sec
+   012C E5*04         [ 3]  288 	sbc	*_mbrtowc_sloc2_1_0
+   012E 8A            [ 2]  289 	txa
+   012F E5*05         [ 3]  290 	sbc	*(_mbrtowc_sloc2_1_0 + 1)
+   0131 B0 5B         [ 4]  291 	bcs	00164$
+                            292 ;	../mbrtowc.c: 70: return(-2);
+   0133 ADr04r00      [ 4]  293 	lda	_mbrtowc_PARM_4
+   0136 85*04         [ 3]  294 	sta	*_mbrtowc_sloc2_1_0
+   0138 ADr05r00      [ 4]  295 	lda	(_mbrtowc_PARM_4 + 1)
+   013B 85*05         [ 3]  296 	sta	*(_mbrtowc_sloc2_1_0 + 1)
+   013D ADr00r00      [ 4]  297 	lda	_mbrtowc_PARM_2
+   0140 85*06         [ 3]  298 	sta	*_mbrtowc_sloc3_1_0
+   0142 ADr01r00      [ 4]  299 	lda	(_mbrtowc_PARM_2 + 1)
+   0145 85*07         [ 3]  300 	sta	*(_mbrtowc_sloc3_1_0 + 1)
+   0147 AEr11r00      [ 4]  301 	ldx	_mbrtowc_i_65536_10
+   014A ADr02r00      [ 4]  302 	lda	_mbrtowc_PARM_3
+   014D 85*08         [ 3]  303 	sta	*_mbrtowc_sloc4_1_0
+   014F ADr03r00      [ 4]  304 	lda	(_mbrtowc_PARM_3 + 1)
+   0152 85*09         [ 3]  305 	sta	*(_mbrtowc_sloc4_1_0 + 1)
+   0154                     306 00134$:
+                            307 ;	../mbrtowc.c: 68: for(;n-- ; i++)
+   0154 A5*08         [ 3]  308 	lda	*_mbrtowc_sloc4_1_0
+   0156 85*0A         [ 3]  309 	sta	*_mbrtowc_sloc5_1_0
+   0158 A5*09         [ 3]  310 	lda	*(_mbrtowc_sloc4_1_0 + 1)
+   015A 85*0B         [ 3]  311 	sta	*(_mbrtowc_sloc5_1_0 + 1)
+   015C 38            [ 2]  312 	sec
+   015D A5*08         [ 3]  313 	lda	*_mbrtowc_sloc4_1_0
+   015F E9 01         [ 2]  314 	sbc	#0x01
+   0161 85*08         [ 3]  315 	sta	*_mbrtowc_sloc4_1_0
+   0163 B0 02         [ 4]  316 	bcs	00295$
+   0165 C6*09         [ 5]  317 	dec	*(_mbrtowc_sloc4_1_0 + 1)
+   0167                     318 00295$:
+   0167 A5*0B         [ 3]  319 	lda	*(_mbrtowc_sloc5_1_0 + 1)
+   0169 05*0A         [ 3]  320 	ora	*_mbrtowc_sloc5_1_0
+   016B F0 1C         [ 4]  321 	beq	00115$
+                            322 ;	../mbrtowc.c: 69: ps->c[i] = *s++;
+   016D 8A            [ 2]  323 	txa
+   016E 18            [ 2]  324 	clc
+   016F 65*04         [ 3]  325 	adc	*_mbrtowc_sloc2_1_0
+   0171 85*0A         [ 3]  326 	sta	*_mbrtowc_sloc5_1_0
+   0173 A9 00         [ 2]  327 	lda	#0x00
+   0175 65*05         [ 3]  328 	adc	*(_mbrtowc_sloc2_1_0 + 1)
+   0177 85*0B         [ 3]  329 	sta	*(_mbrtowc_sloc5_1_0 + 1)
+   0179 A0 00         [ 2]  330 	ldy	#0x00
+   017B B1*06         [ 6]  331 	lda	[*_mbrtowc_sloc3_1_0],y
+   017D E6*06         [ 5]  332 	inc	*_mbrtowc_sloc3_1_0
+   017F D0 02         [ 4]  333 	bne	00297$
+   0181 E6*07         [ 5]  334 	inc	*(_mbrtowc_sloc3_1_0 + 1)
+   0183                     335 00297$:
+   0183 91*0A         [ 6]  336 	sta	[*_mbrtowc_sloc5_1_0],y
+                            337 ;	../mbrtowc.c: 68: for(;n-- ; i++)
+   0185 E8            [ 2]  338 	inx
+   0186 4Cr54r01      [ 3]  339 	jmp	00134$
+   0189                     340 00115$:
+                            341 ;	../mbrtowc.c: 70: return(-2);
+   0189 A9 FE         [ 2]  342 	lda	#0xfe
+   018B A2 FF         [ 2]  343 	ldx	#0xff
+   018D 60            [ 6]  344 	rts
+                            345 ;	../mbrtowc.c: 73: for(j = 0; j < i; j++)
+   018E                     346 00164$:
+   018E ADr04r00      [ 4]  347 	lda	_mbrtowc_PARM_4
+   0191 85*0A         [ 3]  348 	sta	*_mbrtowc_sloc5_1_0
+   0193 ADr05r00      [ 4]  349 	lda	(_mbrtowc_PARM_4 + 1)
+   0196 85*0B         [ 3]  350 	sta	*(_mbrtowc_sloc5_1_0 + 1)
+   0198 A2 00         [ 2]  351 	ldx	#0x00
+   019A                     352 00137$:
+   019A ECr11r00      [ 4]  353 	cpx	_mbrtowc_i_65536_10
+   019D B0 15         [ 4]  354 	bcs	00118$
+                            355 ;	../mbrtowc.c: 74: ps->c[j] = 0;
+   019F 8A            [ 2]  356 	txa
+   01A0 18            [ 2]  357 	clc
+   01A1 65*0A         [ 3]  358 	adc	*_mbrtowc_sloc5_1_0
+   01A3 85*08         [ 3]  359 	sta	*_mbrtowc_sloc4_1_0
+   01A5 A9 00         [ 2]  360 	lda	#0x00
+   01A7 65*0B         [ 3]  361 	adc	*(_mbrtowc_sloc5_1_0 + 1)
+   01A9 85*09         [ 3]  362 	sta	*(_mbrtowc_sloc4_1_0 + 1)
+   01AB A9 00         [ 2]  363 	lda	#0x00
+   01AD A8            [ 2]  364 	tay
+   01AE 91*08         [ 6]  365 	sta	[*_mbrtowc_sloc4_1_0],y
+                            366 ;	../mbrtowc.c: 73: for(j = 0; j < i; j++)
+   01B0 E8            [ 2]  367 	inx
+   01B1 4Cr9Ar01      [ 3]  368 	jmp	00137$
+   01B4                     369 00118$:
+                            370 ;	../mbrtowc.c: 76: for(n = 1, i = i ? i : 1; i < seqlen; i++, n++)
+   01B4 A2 01         [ 2]  371 	ldx	#0x01
+   01B6 8Er02r00      [ 4]  372 	stx	_mbrtowc_PARM_3
+   01B9 CA            [ 2]  373 	dex
+   01BA 8Er03r00      [ 4]  374 	stx	(_mbrtowc_PARM_3 + 1)
+   01BD ADr11r00      [ 4]  375 	lda	_mbrtowc_i_65536_10
+   01C0 F0 07         [ 4]  376 	beq	00149$
+   01C2 A5*00         [ 3]  377 	lda	*_mbrtowc_sloc0_1_0
+   01C4 A6*01         [ 3]  378 	ldx	*(_mbrtowc_sloc0_1_0 + 1)
+   01C6 4CrCDr01      [ 3]  379 	jmp	00150$
+   01C9                     380 00149$:
+   01C9 A9 01         [ 2]  381 	lda	#0x01
+   01CB A2 00         [ 2]  382 	ldx	#0x00
+   01CD                     383 00150$:
+   01CD 85*0A         [ 3]  384 	sta	*_mbrtowc_sloc5_1_0
+   01CF ADr00r00      [ 4]  385 	lda	_mbrtowc_PARM_2
+   01D2 85*08         [ 3]  386 	sta	*_mbrtowc_sloc4_1_0
+   01D4 ADr01r00      [ 4]  387 	lda	(_mbrtowc_PARM_2 + 1)
+   01D7 85*09         [ 3]  388 	sta	*(_mbrtowc_sloc4_1_0 + 1)
+   01D9 A2 01         [ 2]  389 	ldx	#0x01
+   01DB 86*06         [ 3]  390 	stx	*_mbrtowc_sloc3_1_0
+   01DD CA            [ 2]  391 	dex
+   01DE 86*07         [ 3]  392 	stx	*(_mbrtowc_sloc3_1_0 + 1)
+   01E0                     393 00140$:
+   01E0 A5*0A         [ 3]  394 	lda	*_mbrtowc_sloc5_1_0
+   01E2 C5*02         [ 3]  395 	cmp	*_mbrtowc_sloc1_1_0
+   01E4 B0 3E         [ 4]  396 	bcs	00121$
+                            397 ;	../mbrtowc.c: 78: mbseq[i] = *s++;
+   01E6 A5*0A         [ 3]  398 	lda	*_mbrtowc_sloc5_1_0
+   01E8 A2 00         [ 2]  399 	ldx	#0x00
+   01EA 85*00         [ 3]  400 	sta	*(__TEMP+0)
+   01EC A0 00         [ 2]  401 	ldy	#0x00
+   01EE B1*08         [ 6]  402 	lda	[*_mbrtowc_sloc4_1_0],y
+   01F0 85*04         [ 3]  403 	sta	*_mbrtowc_sloc2_1_0
+   01F2 A5*00         [ 3]  404 	lda	*(__TEMP+0)
+   01F4 E6*08         [ 5]  405 	inc	*_mbrtowc_sloc4_1_0
+   01F6 D0 02         [ 4]  406 	bne	00301$
+   01F8 E6*09         [ 5]  407 	inc	*(_mbrtowc_sloc4_1_0 + 1)
+   01FA                     408 00301$:
+   01FA A8            [ 2]  409 	tay
+   01FB A5*04         [ 3]  410 	lda	*_mbrtowc_sloc2_1_0
+   01FD 99r09r00      [ 5]  411 	sta	(_mbrtowc_mbseq_65536_10+0+0x0000),y
+                            412 ;	../mbrtowc.c: 79: if((mbseq[i] & 0xc0) != 0x80)
+   0200 A5*04         [ 3]  413 	lda	*_mbrtowc_sloc2_1_0
+   0202 29 C0         [ 2]  414 	and	#0xc0
+   0204 C9 80         [ 2]  415 	cmp	#0x80
+   0206 D0 04         [ 4]  416 	bne	00303$
+   0208 E0 00         [ 2]  417 	cpx	#0x00
+   020A F0 03         [ 4]  418 	beq	00304$
+   020C                     419 00303$:
+   020C 4Cr37r03      [ 3]  420 	jmp	00128$
+   020F                     421 00304$:
+                            422 ;	../mbrtowc.c: 76: for(n = 1, i = i ? i : 1; i < seqlen; i++, n++)
+   020F E6*0A         [ 5]  423 	inc	*_mbrtowc_sloc5_1_0
+   0211 E6*06         [ 5]  424 	inc	*_mbrtowc_sloc3_1_0
+   0213 D0 02         [ 4]  425 	bne	00305$
+   0215 E6*07         [ 5]  426 	inc	*(_mbrtowc_sloc3_1_0 + 1)
+   0217                     427 00305$:
+   0217 A5*06         [ 3]  428 	lda	*_mbrtowc_sloc3_1_0
+   0219 8Dr02r00      [ 4]  429 	sta	_mbrtowc_PARM_3
+   021C A5*07         [ 3]  430 	lda	*(_mbrtowc_sloc3_1_0 + 1)
+   021E 8Dr03r00      [ 4]  431 	sta	(_mbrtowc_PARM_3 + 1)
+   0221 4CrE0r01      [ 3]  432 	jmp	00140$
+   0224                     433 00121$:
+                            434 ;	../mbrtowc.c: 83: codepoint = first_byte;
+   0224 ADr08r00      [ 4]  435 	lda	_mbrtowc_first_byte_65536_10
+   0227 8Dr0Dr00      [ 4]  436 	sta	_mbrtowc_codepoint_65536_10
+   022A A2 00         [ 2]  437 	ldx	#0x00
+   022C 8Er0Er00      [ 4]  438 	stx	(_mbrtowc_codepoint_65536_10 + 1)
+   022F 8Er0Fr00      [ 4]  439 	stx	(_mbrtowc_codepoint_65536_10 + 2)
+   0232 8Er10r00      [ 4]  440 	stx	(_mbrtowc_codepoint_65536_10 + 3)
+                            441 ;	../mbrtowc.c: 85: for(s = mbseq + 1, seqlen--; seqlen; seqlen--)
+   0235 A2r0A         [ 2]  442 	ldx	#(_mbrtowc_mbseq_65536_10 + 0x0001)
+   0237 A0s00         [ 2]  443 	ldy	#>(_mbrtowc_mbseq_65536_10 + 0x0001)
+   0239 86*0A         [ 3]  444 	stx	*_mbrtowc_sloc5_1_0
+   023B 84*0B         [ 3]  445 	sty	*(_mbrtowc_sloc5_1_0 + 1)
+   023D A5*02         [ 3]  446 	lda	*_mbrtowc_sloc1_1_0
+   023F 38            [ 2]  447 	sec
+   0240 E9 01         [ 2]  448 	sbc	#0x01
+   0242 85*08         [ 3]  449 	sta	*_mbrtowc_sloc4_1_0
+   0244                     450 00143$:
+   0244 A5*08         [ 3]  451 	lda	*_mbrtowc_sloc4_1_0
+   0246 D0 03         [ 4]  452 	bne	00306$
+   0248 4CrD8r02      [ 3]  453 	jmp	00122$
+   024B                     454 00306$:
+                            455 ;	../mbrtowc.c: 87: codepoint <<= 6;
+   024B 0Er0Dr00      [ 6]  456 	asl	_mbrtowc_codepoint_65536_10
+   024E 2Er0Er00      [ 6]  457 	rol	(_mbrtowc_codepoint_65536_10 + 1)
+   0251 2Er0Fr00      [ 6]  458 	rol	(_mbrtowc_codepoint_65536_10 + 2)
+   0254 2Er10r00      [ 6]  459 	rol	(_mbrtowc_codepoint_65536_10 + 3)
+   0257 0Er0Dr00      [ 6]  460 	asl	_mbrtowc_codepoint_65536_10
+   025A 2Er0Er00      [ 6]  461 	rol	(_mbrtowc_codepoint_65536_10 + 1)
+   025D 2Er0Fr00      [ 6]  462 	rol	(_mbrtowc_codepoint_65536_10 + 2)
+   0260 2Er10r00      [ 6]  463 	rol	(_mbrtowc_codepoint_65536_10 + 3)
+   0263 0Er0Dr00      [ 6]  464 	asl	_mbrtowc_codepoint_65536_10
+   0266 2Er0Er00      [ 6]  465 	rol	(_mbrtowc_codepoint_65536_10 + 1)
+   0269 2Er0Fr00      [ 6]  466 	rol	(_mbrtowc_codepoint_65536_10 + 2)
+   026C 2Er10r00      [ 6]  467 	rol	(_mbrtowc_codepoint_65536_10 + 3)
+   026F 0Er0Dr00      [ 6]  468 	asl	_mbrtowc_codepoint_65536_10
+   0272 2Er0Er00      [ 6]  469 	rol	(_mbrtowc_codepoint_65536_10 + 1)
+   0275 2Er0Fr00      [ 6]  470 	rol	(_mbrtowc_codepoint_65536_10 + 2)
+   0278 2Er10r00      [ 6]  471 	rol	(_mbrtowc_codepoint_65536_10 + 3)
+   027B 0Er0Dr00      [ 6]  472 	asl	_mbrtowc_codepoint_65536_10
+   027E 2Er0Er00      [ 6]  473 	rol	(_mbrtowc_codepoint_65536_10 + 1)
+   0281 2Er0Fr00      [ 6]  474 	rol	(_mbrtowc_codepoint_65536_10 + 2)
+   0284 2Er10r00      [ 6]  475 	rol	(_mbrtowc_codepoint_65536_10 + 3)
+   0287 0Er0Dr00      [ 6]  476 	asl	_mbrtowc_codepoint_65536_10
+   028A 2Er0Er00      [ 6]  477 	rol	(_mbrtowc_codepoint_65536_10 + 1)
+   028D 2Er0Fr00      [ 6]  478 	rol	(_mbrtowc_codepoint_65536_10 + 2)
+   0290 2Er10r00      [ 6]  479 	rol	(_mbrtowc_codepoint_65536_10 + 3)
+   0293 ADr10r00      [ 4]  480 	lda	(_mbrtowc_codepoint_65536_10 + 3)
+                            481 ;	../mbrtowc.c: 88: codepoint |= (*s & 0x3f);
+   0296 A0 00         [ 2]  482 	ldy	#0x00
+   0298 B1*0A         [ 6]  483 	lda	[*_mbrtowc_sloc5_1_0],y
+   029A A2 00         [ 2]  484 	ldx	#0x00
+   029C 29 3F         [ 2]  485 	and	#0x3f
+   029E 85*0C         [ 3]  486 	sta	*_mbrtowc_sloc6_1_0
+   02A0 86*0D         [ 3]  487 	stx	*(_mbrtowc_sloc6_1_0 + 1)
+   02A2 8A            [ 2]  488 	txa
+   02A3 0A            [ 2]  489 	asl	a
+   02A4 98            [ 2]  490 	tya
+   02A5 69 FF         [ 2]  491 	adc	#0xff
+   02A7 49 FF         [ 2]  492 	eor	#0xff
+   02A9 85*0E         [ 3]  493 	sta	*(_mbrtowc_sloc6_1_0 + 2)
+   02AB 85*0F         [ 3]  494 	sta	*(_mbrtowc_sloc6_1_0 + 3)
+   02AD ADr0Dr00      [ 4]  495 	lda	_mbrtowc_codepoint_65536_10
+   02B0 05*0C         [ 3]  496 	ora	*_mbrtowc_sloc6_1_0
+   02B2 8Dr0Dr00      [ 4]  497 	sta	_mbrtowc_codepoint_65536_10
+   02B5 ADr0Er00      [ 4]  498 	lda	(_mbrtowc_codepoint_65536_10 + 1)
+   02B8 05*0D         [ 3]  499 	ora	*(_mbrtowc_sloc6_1_0 + 1)
+   02BA 8Dr0Er00      [ 4]  500 	sta	(_mbrtowc_codepoint_65536_10 + 1)
+   02BD ADr0Fr00      [ 4]  501 	lda	(_mbrtowc_codepoint_65536_10 + 2)
+   02C0 05*0E         [ 3]  502 	ora	*(_mbrtowc_sloc6_1_0 + 2)
+   02C2 8Dr0Fr00      [ 4]  503 	sta	(_mbrtowc_codepoint_65536_10 + 2)
+   02C5 ADr10r00      [ 4]  504 	lda	(_mbrtowc_codepoint_65536_10 + 3)
+   02C8 05*0F         [ 3]  505 	ora	*(_mbrtowc_sloc6_1_0 + 3)
+   02CA 8Dr10r00      [ 4]  506 	sta	(_mbrtowc_codepoint_65536_10 + 3)
+                            507 ;	../mbrtowc.c: 89: s++;
+   02CD E6*0A         [ 5]  508 	inc	*_mbrtowc_sloc5_1_0
+   02CF D0 02         [ 4]  509 	bne	00307$
+   02D1 E6*0B         [ 5]  510 	inc	*(_mbrtowc_sloc5_1_0 + 1)
+   02D3                     511 00307$:
+                            512 ;	../mbrtowc.c: 85: for(s = mbseq + 1, seqlen--; seqlen; seqlen--)
+   02D3 C6*08         [ 5]  513 	dec	*_mbrtowc_sloc4_1_0
+   02D5 4Cr44r02      [ 3]  514 	jmp	00143$
+   02D8                     515 00122$:
+                            516 ;	../mbrtowc.c: 92: if(codepoint >= 0xd800 && codepoint <= 0xdfff) // UTF-16 surrogate.
+   02D8 ADr0Er00      [ 4]  517 	lda	(_mbrtowc_codepoint_65536_10 + 1)
+   02DB 38            [ 2]  518 	sec
+   02DC E9 D8         [ 2]  519 	sbc	#0xd8
+   02DE ADr0Fr00      [ 4]  520 	lda	(_mbrtowc_codepoint_65536_10 + 2)
+   02E1 E9 00         [ 2]  521 	sbc	#0x00
+   02E3 ADr10r00      [ 4]  522 	lda	(_mbrtowc_codepoint_65536_10 + 3)
+   02E6 E9 00         [ 2]  523 	sbc	#0x00
+   02E8 90 1B         [ 4]  524 	bcc	00124$
+   02EA A9 FF         [ 2]  525 	lda	#0xff
+   02EC 38            [ 2]  526 	sec
+   02ED EDr0Dr00      [ 4]  527 	sbc	_mbrtowc_codepoint_65536_10
+   02F0 A9 DF         [ 2]  528 	lda	#0xdf
+   02F2 EDr0Er00      [ 4]  529 	sbc	(_mbrtowc_codepoint_65536_10 + 1)
+   02F5 A9 00         [ 2]  530 	lda	#0x00
+   02F7 EDr0Fr00      [ 4]  531 	sbc	(_mbrtowc_codepoint_65536_10 + 2)
+   02FA A9 00         [ 2]  532 	lda	#0x00
+   02FC EDr10r00      [ 4]  533 	sbc	(_mbrtowc_codepoint_65536_10 + 3)
+   02FF 90 04         [ 4]  534 	bcc	00124$
+                            535 ;	../mbrtowc.c: 93: return(-1);
+   0301 A9 FF         [ 2]  536 	lda	#0xff
+   0303 AA            [ 2]  537 	tax
+   0304 60            [ 6]  538 	rts
+   0305                     539 00124$:
+                            540 ;	../mbrtowc.c: 95: if(pwc)
+   0305 ADr07r00      [ 4]  541 	lda	(_mbrtowc_pwc_65536_9 + 1)
+   0308 0Dr06r00      [ 4]  542 	ora	_mbrtowc_pwc_65536_9
+   030B F0 23         [ 4]  543 	beq	00127$
+                            544 ;	../mbrtowc.c: 96: *pwc = codepoint;
+   030D ADr06r00      [ 4]  545 	lda	_mbrtowc_pwc_65536_9
+   0310 85*00         [ 3]  546 	sta	*(__DPTR+0)
+   0312 ADr07r00      [ 4]  547 	lda	(_mbrtowc_pwc_65536_9 + 1)
+   0315 85*01         [ 3]  548 	sta	*(__DPTR+1)
+   0317 ADr0Dr00      [ 4]  549 	lda	_mbrtowc_codepoint_65536_10
+   031A A0 00         [ 2]  550 	ldy	#0x00
+   031C 91*00         [ 6]  551 	sta	[__DPTR],y
+   031E ADr0Er00      [ 4]  552 	lda	(_mbrtowc_codepoint_65536_10 + 1)
+   0321 C8            [ 2]  553 	iny
+   0322 91*00         [ 6]  554 	sta	[__DPTR],y
+   0324 ADr0Fr00      [ 4]  555 	lda	(_mbrtowc_codepoint_65536_10 + 2)
+   0327 C8            [ 2]  556 	iny
+   0328 91*00         [ 6]  557 	sta	[__DPTR],y
+   032A ADr10r00      [ 4]  558 	lda	(_mbrtowc_codepoint_65536_10 + 3)
+   032D C8            [ 2]  559 	iny
+   032E 91*00         [ 6]  560 	sta	[__DPTR],y
+   0330                     561 00127$:
+                            562 ;	../mbrtowc.c: 97: return(n);
+   0330 AEr03r00      [ 4]  563 	ldx	(_mbrtowc_PARM_3 + 1)
+   0333 ADr02r00      [ 4]  564 	lda	_mbrtowc_PARM_3
+   0336 60            [ 6]  565 	rts
+                            566 ;	../mbrtowc.c: 99: eilseq:
+   0337                     567 00128$:
+                            568 ;	../mbrtowc.c: 100: errno = EILSEQ;
+   0337 A2 54         [ 2]  569 	ldx	#0x54
+   0339 8Er00r00      [ 4]  570 	stx	_errno
+   033C A2 00         [ 2]  571 	ldx	#0x00
+   033E 8Er01r00      [ 4]  572 	stx	(_errno + 1)
+                            573 ;	../mbrtowc.c: 101: return(-1);
+   0341 A9 FF         [ 2]  574 	lda	#0xff
+   0343 AA            [ 2]  575 	tax
+                            576 ;	../mbrtowc.c: 102: }
+   0344 60            [ 6]  577 	rts
+                            578 	.area CODE
+                            579 	.area RODATA
+                            580 	.area RODATA
+   0000                     581 ___str_0:
+   0000 00                  582 	.db 0x00
+                            583 	.area CODE
+                            584 	.area XINIT
+                            585 	.area CABS    (ABS)

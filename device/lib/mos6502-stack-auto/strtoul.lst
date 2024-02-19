@@ -1,0 +1,863 @@
+                              1 ;--------------------------------------------------------
+                              2 ; File Created by SDCC : free open source ISO C Compiler 
+                              3 ; Version 4.2.14 #0 (Linux)
+                              4 ;--------------------------------------------------------
+                              5 	.module strtoul
+                              6 	.optsdcc -mmos6502
+                              7 	
+                              8 ;--------------------------------------------------------
+                              9 ; Public variables in this module
+                             10 ;--------------------------------------------------------
+                             11 	.globl _strncmp
+                             12 	.globl _strtoul
+                             13 ;--------------------------------------------------------
+                             14 ; ZP ram data
+                             15 ;--------------------------------------------------------
+                             16 	.area ZP      (PAG)
+                             17 ;--------------------------------------------------------
+                             18 ; overlayable items in ram
+                             19 ;--------------------------------------------------------
+                             20 ;--------------------------------------------------------
+                             21 ; uninitialized external ram data
+                             22 ;--------------------------------------------------------
+                             23 	.area BSS
+                             24 ;--------------------------------------------------------
+                             25 ; absolute external ram data
+                             26 ;--------------------------------------------------------
+                             27 	.area DABS    (ABS)
+                             28 ;--------------------------------------------------------
+                             29 ; initialized external ram data
+                             30 ;--------------------------------------------------------
+                             31 	.area DATA
+                             32 ;--------------------------------------------------------
+                             33 ; global & static initialisations
+                             34 ;--------------------------------------------------------
+                             35 	.area _CODE
+                             36 	.area GSINIT
+                             37 	.area GSFINAL
+                             38 	.area GSINIT
+                             39 ;--------------------------------------------------------
+                             40 ; Home
+                             41 ;--------------------------------------------------------
+                             42 	.area _CODE
+                             43 	.area _CODE
+                             44 ;--------------------------------------------------------
+                             45 ; code
+                             46 ;--------------------------------------------------------
+                             47 	.area CODE
+                             48 ;------------------------------------------------------------
+                             49 ;Allocation info for local variables in function '_isdigit'
+                             50 ;------------------------------------------------------------
+                             51 ;base                      Allocated to registers x 
+                             52 ;c                         Allocated to registers a 
+                             53 ;v                         Allocated to registers y 
+                             54 ;------------------------------------------------------------
+                             55 ;	../strtoul.c: 40: static signed char _isdigit(const char c, unsigned char base)
+                             56 ;	-----------------------------------------
+                             57 ;	 function _isdigit
+                             58 ;	-----------------------------------------
+                             59 ;	Register assignment is optimal.
+                             60 ;	Stack space usage: 0 bytes.
+   0000                      61 __isdigit:
+                             62 ;	../strtoul.c: 44: if (c >= '0' && c <= '9')
+   0000 C9 30         [ 2]   63 	cmp	#0x30
+   0002 90 0D         [ 4]   64 	bcc	00110$
+   0004 C9 39         [ 2]   65 	cmp	#0x39
+   0006 F0 02         [ 4]   66 	beq	00146$
+   0008 B0 07         [ 4]   67 	bcs	00110$
+   000A                      68 00146$:
+                             69 ;	../strtoul.c: 45: v = c - '0';
+   000A 38            [ 2]   70 	sec
+   000B E9 30         [ 2]   71 	sbc	#0x30
+   000D A8            [ 2]   72 	tay
+   000E 4Cr36r00      [ 3]   73 	jmp	00111$
+   0011                      74 00110$:
+                             75 ;	../strtoul.c: 46: else if (c >= 'a' && c <='z')
+   0011 C9 61         [ 2]   76 	cmp	#0x61
+   0013 90 0D         [ 4]   77 	bcc	00106$
+   0015 C9 7A         [ 2]   78 	cmp	#0x7a
+   0017 F0 02         [ 4]   79 	beq	00149$
+   0019 B0 07         [ 4]   80 	bcs	00106$
+   001B                      81 00149$:
+                             82 ;	../strtoul.c: 47: v = c - 'a' + 10;
+   001B 18            [ 2]   83 	clc
+   001C 69 A9         [ 2]   84 	adc	#0xa9
+   001E A8            [ 2]   85 	tay
+   001F 4Cr36r00      [ 3]   86 	jmp	00111$
+   0022                      87 00106$:
+                             88 ;	../strtoul.c: 48: else if (c >= 'A' && c <='Z')
+   0022 C9 41         [ 2]   89 	cmp	#0x41
+   0024 90 0D         [ 4]   90 	bcc	00102$
+   0026 C9 5A         [ 2]   91 	cmp	#0x5a
+   0028 F0 02         [ 4]   92 	beq	00152$
+   002A B0 07         [ 4]   93 	bcs	00102$
+   002C                      94 00152$:
+                             95 ;	../strtoul.c: 49: v = c - 'A' + 10;
+   002C 18            [ 2]   96 	clc
+   002D 69 C9         [ 2]   97 	adc	#0xc9
+   002F A8            [ 2]   98 	tay
+   0030 4Cr36r00      [ 3]   99 	jmp	00111$
+   0033                     100 00102$:
+                            101 ;	../strtoul.c: 51: return (-1);
+   0033 A9 FF         [ 2]  102 	lda	#0xff
+   0035 60            [ 6]  103 	rts
+   0036                     104 00111$:
+                            105 ;	../strtoul.c: 53: if (v >= base)
+   0036 8A            [ 2]  106 	txa
+   0037 84*00         [ 3]  107 	sty	*(__TEMP+0)
+   0039 C5*00         [ 3]  108 	cmp	*(__TEMP+0)
+   003B F0 02         [ 4]  109 	beq	00154$
+   003D B0 03         [ 4]  110 	bcs	00114$
+   003F                     111 00154$:
+                            112 ;	../strtoul.c: 54: return (-1);
+   003F A9 FF         [ 2]  113 	lda	#0xff
+   0041 60            [ 6]  114 	rts
+   0042                     115 00114$:
+                            116 ;	../strtoul.c: 56: return (v);
+   0042 98            [ 2]  117 	tya
+                            118 ;	../strtoul.c: 57: }
+   0043 60            [ 6]  119 	rts
+                            120 ;------------------------------------------------------------
+                            121 ;Allocation info for local variables in function 'strtoul'
+                            122 ;------------------------------------------------------------
+                            123 ;endptr                    Allocated to stack - sp +42
+                            124 ;base                      Allocated to stack - sp +44
+                            125 ;nptr                      Allocated to stack - sp +38
+                            126 ;__1310720004              Allocated to registers 
+                            127 ;ptr                       Allocated to stack - sp +36
+                            128 ;ret                       Allocated to stack - sp +9
+                            129 ;range_error               Allocated to stack - sp +35
+                            130 ;neg                       Allocated to stack - sp +34
+                            131 ;__1310720005              Allocated to registers 
+                            132 ;c                         Allocated to registers 
+                            133 ;__2621440017              Allocated to stack - sp +23
+                            134 ;__2621440012              Allocated to registers a 
+                            135 ;__2621440007              Allocated to stack - sp +21
+                            136 ;oldret                    Allocated to stack - sp +17
+                            137 ;digit                     Allocated to registers y 
+                            138 ;__2621440008              Allocated to stack - sp +14
+                            139 ;__2621440009              Allocated to stack - sp +6
+                            140 ;__2621440010              Allocated to stack - sp -2
+                            141 ;r                         Allocated to stack - sp -4
+                            142 ;a                         Allocated to stack - sp -12
+                            143 ;b                         Allocated to stack - sp -20
+                            144 ;result                    Allocated to stack - sp -28
+                            145 ;__2621440013              Allocated to stack - sp +32
+                            146 ;__2621440014              Allocated to stack - sp -38
+                            147 ;__2621440015              Allocated to stack - sp -46
+                            148 ;r                         Allocated to registers 
+                            149 ;a                         Allocated to stack - sp -56
+                            150 ;b                         Allocated to stack - sp -64
+                            151 ;result                    Allocated to stack - sp +1
+                            152 ;__2621440018              Allocated to stack - sp -74
+                            153 ;__2621440019              Allocated to stack - sp -82
+                            154 ;__2621440020              Allocated to stack - sp -90
+                            155 ;r                         Allocated to stack - sp -92
+                            156 ;a                         Allocated to stack - sp -100
+                            157 ;b                         Allocated to stack - sp -108
+                            158 ;result                    Allocated to stack - sp -116
+                            159 ;sloc0                     Allocated to stack - sp +31
+                            160 ;sloc1                     Allocated to stack - sp +29
+                            161 ;sloc2                     Allocated to stack - sp +21
+                            162 ;sloc3                     Allocated to stack - sp +13
+                            163 ;------------------------------------------------------------
+                            164 ;	../strtoul.c: 59: unsigned long int strtoul(const char *nptr, char **endptr, int base)
+                            165 ;	-----------------------------------------
+                            166 ;	 function strtoul
+                            167 ;	-----------------------------------------
+                            168 ;	Register assignment might be sub-optimal.
+                            169 ;	Stack space usage: 39 bytes.
+   0044                     170 _strtoul:
+   0044 85*00         [ 3]  171 	sta	*(__TEMP+0)
+   0046 8A            [ 2]  172 	txa
+   0047 48            [ 3]  173 	pha
+   0048 A5*00         [ 3]  174 	lda	*(__TEMP+0)
+   004A 48            [ 3]  175 	pha
+   004B 86*01         [ 3]  176 	stx	*(__TEMP+1)
+   004D BA            [ 2]  177 	tsx
+   004E 8A            [ 2]  178 	txa
+   004F 18            [ 2]  179 	clc
+   0050 69 DB         [ 2]  180 	adc	#0xdb
+   0052 AA            [ 2]  181 	tax
+   0053 9A            [ 2]  182 	txs
+                            183 ;	../strtoul.c: 63: bool range_error = false;
+   0054 BA            [ 2]  184 	tsx
+   0055 A9 00         [ 2]  185 	lda	#0x00
+   0057 9D 23 01      [ 5]  186 	sta	0x123,x
+                            187 ;	../strtoul.c: 64: bool neg = false;
+   005A 9D 22 01      [ 5]  188 	sta	0x122,x
+                            189 ;	../strtoul.c: 66: while (isblank (*ptr))
+   005D BD 26 01      [ 5]  190 	lda	0x126,x
+   0060 85*00         [ 3]  191 	sta	*(__TEMP+0)
+   0062 BD 27 01      [ 5]  192 	lda	0x127,x
+   0065 AA            [ 2]  193 	tax
+   0066 A5*00         [ 3]  194 	lda	*(__TEMP+0)
+   0068                     195 00101$:
+   0068 85*00         [ 3]  196 	sta	*(__TEMP+0)
+   006A 86*01         [ 3]  197 	stx	*(__TEMP+1)
+   006C 85*00         [ 3]  198 	sta	*(__DPTR+0)
+   006E 86*01         [ 3]  199 	stx	*(__DPTR+1)
+   0070 A0 00         [ 2]  200 	ldy	#0x00
+   0072 B1*00         [ 6]  201 	lda	[__DPTR],y
+   0074 A8            [ 2]  202 	tay
+   0075 A6*01         [ 3]  203 	ldx	*(__TEMP+1)
+   0077 A5*00         [ 3]  204 	lda	*(__TEMP+0)
+                            205 ;	./../../include/ctype.h: 53: return ((unsigned char)c == ' ' || (unsigned char)c == '\t');
+   0079 C0 20         [ 2]  206 	cpy	#0x20
+   007B F0 04         [ 4]  207 	beq	00141$
+   007D C0 09         [ 2]  208 	cpy	#0x09
+   007F D0 09         [ 4]  209 	bne	00163$
+   0081                     210 00141$:
+                            211 ;	../strtoul.c: 67: ptr++;
+   0081 18            [ 2]  212 	clc
+   0082 69 01         [ 2]  213 	adc	#0x01
+   0084 90 E2         [ 4]  214 	bcc	00101$
+   0086 E8            [ 2]  215 	inx
+   0087 4Cr68r00      [ 3]  216 	jmp	00101$
+   008A                     217 00163$:
+   008A 48            [ 3]  218 	pha
+   008B 86*00         [ 3]  219 	stx	*(__TEMP+0)
+   008D 8A            [ 2]  220 	txa
+   008E BA            [ 2]  221 	tsx
+   008F 9D 26 01      [ 5]  222 	sta	0x126,x
+   0092 68            [ 4]  223 	pla
+   0093 9D 25 01      [ 5]  224 	sta	0x125,x
+   0096 A6*00         [ 3]  225 	ldx	*(__TEMP+0)
+                            226 ;	../strtoul.c: 70: switch(*ptr)
+   0098 85*00         [ 3]  227 	sta	*(__DPTR+0)
+   009A 86*01         [ 3]  228 	stx	*(__DPTR+1)
+   009C A0 00         [ 2]  229 	ldy	#0x00
+   009E B1*00         [ 6]  230 	lda	[__DPTR],y
+   00A0 C9 2B         [ 2]  231 	cmp	#0x2b
+   00A2 F0 0A         [ 4]  232 	beq	00105$
+   00A4 C9 2D         [ 2]  233 	cmp	#0x2d
+   00A6 D0 18         [ 4]  234 	bne	00106$
+                            235 ;	../strtoul.c: 73: neg = true;
+   00A8 BA            [ 2]  236 	tsx
+   00A9 A9 01         [ 2]  237 	lda	#0x01
+   00AB 9D 22 01      [ 5]  238 	sta	0x122,x
+                            239 ;	../strtoul.c: 74: case '+':
+   00AE                     240 00105$:
+                            241 ;	../strtoul.c: 75: ptr++;
+   00AE BA            [ 2]  242 	tsx
+   00AF BD 24 01      [ 5]  243 	lda	0x124,x
+   00B2 18            [ 2]  244 	clc
+   00B3 69 01         [ 2]  245 	adc	#0x01
+   00B5 9D 24 01      [ 5]  246 	sta	0x124,x
+   00B8 BD 25 01      [ 5]  247 	lda	0x125,x
+   00BB 69 00         [ 2]  248 	adc	#0x00
+   00BD 9D 25 01      [ 5]  249 	sta	0x125,x
+                            250 ;	../strtoul.c: 76: }
+   00C0                     251 00106$:
+                            252 ;	../strtoul.c: 79: if (!base)
+   00C0 BA            [ 2]  253 	tsx
+   00C1 BD 2C 01      [ 5]  254 	lda	0x12c,x
+   00C4 1D 2D 01      [ 5]  255 	ora	0x12d,x
+   00C7 F0 03         [ 4]  256 	beq	00219$
+   00C9 4Cr80r01      [ 3]  257 	jmp	00119$
+   00CC                     258 00219$:
+                            259 ;	../strtoul.c: 81: if (!strncmp (ptr, "0x", 2) || !strncmp (ptr, "0X", 2))
+   00CC A9 00         [ 2]  260 	lda	#0x00
+   00CE 48            [ 3]  261 	pha
+   00CF A9 02         [ 2]  262 	lda	#0x02
+   00D1 48            [ 3]  263 	pha
+   00D2 A9s00         [ 2]  264 	lda	#>___str_0
+   00D4 48            [ 3]  265 	pha
+   00D5 A9r00         [ 2]  266 	lda	#___str_0
+   00D7 48            [ 3]  267 	pha
+   00D8 BD 25 01      [ 5]  268 	lda	0x125,x
+   00DB AA            [ 2]  269 	tax
+   00DC 86*00         [ 3]  270 	stx	*(__TEMP+0)
+   00DE BA            [ 2]  271 	tsx
+   00DF BD 28 01      [ 5]  272 	lda	0x128,x
+   00E2 08            [ 3]  273 	php
+   00E3 A6*00         [ 3]  274 	ldx	*(__TEMP+0)
+   00E5 28            [ 4]  275 	plp
+   00E6 20r00r00      [ 6]  276 	jsr	_strncmp
+   00E9 85*00         [ 3]  277 	sta	*(__TEMP+0)
+   00EB 68            [ 4]  278 	pla
+   00EC 68            [ 4]  279 	pla
+   00ED 68            [ 4]  280 	pla
+   00EE 68            [ 4]  281 	pla
+   00EF A5*00         [ 3]  282 	lda	*(__TEMP+0)
+   00F1 D0 02         [ 4]  283 	bne	00220$
+   00F3 E0 00         [ 2]  284 	cpx	#0x00
+   00F5                     285 00220$:
+   00F5 F0 2C         [ 4]  286 	beq	00110$
+   00F7 A9 00         [ 2]  287 	lda	#0x00
+   00F9 48            [ 3]  288 	pha
+   00FA A9 02         [ 2]  289 	lda	#0x02
+   00FC 48            [ 3]  290 	pha
+   00FD A9s00         [ 2]  291 	lda	#>___str_1
+   00FF 48            [ 3]  292 	pha
+   0100 A9r03         [ 2]  293 	lda	#___str_1
+   0102 48            [ 3]  294 	pha
+   0103 BA            [ 2]  295 	tsx
+   0104 BD 29 01      [ 5]  296 	lda	0x129,x
+   0107 AA            [ 2]  297 	tax
+   0108 86*00         [ 3]  298 	stx	*(__TEMP+0)
+   010A BA            [ 2]  299 	tsx
+   010B BD 28 01      [ 5]  300 	lda	0x128,x
+   010E 08            [ 3]  301 	php
+   010F A6*00         [ 3]  302 	ldx	*(__TEMP+0)
+   0111 28            [ 4]  303 	plp
+   0112 20r00r00      [ 6]  304 	jsr	_strncmp
+   0115 85*00         [ 3]  305 	sta	*(__TEMP+0)
+   0117 68            [ 4]  306 	pla
+   0118 68            [ 4]  307 	pla
+   0119 68            [ 4]  308 	pla
+   011A 68            [ 4]  309 	pla
+   011B A5*00         [ 3]  310 	lda	*(__TEMP+0)
+   011D D0 02         [ 4]  311 	bne	00222$
+   011F E0 00         [ 2]  312 	cpx	#0x00
+   0121                     313 00222$:
+   0121 D0 1F         [ 4]  314 	bne	00111$
+   0123                     315 00110$:
+                            316 ;	../strtoul.c: 83: base = 16;
+   0123 BA            [ 2]  317 	tsx
+   0124 A9 10         [ 2]  318 	lda	#0x10
+   0126 9D 2C 01      [ 5]  319 	sta	0x12c,x
+   0129 A9 00         [ 2]  320 	lda	#0x00
+   012B 9D 2D 01      [ 5]  321 	sta	0x12d,x
+                            322 ;	../strtoul.c: 84: ptr += 2;
+   012E BD 24 01      [ 5]  323 	lda	0x124,x
+   0131 18            [ 2]  324 	clc
+   0132 69 02         [ 2]  325 	adc	#0x02
+   0134 9D 24 01      [ 5]  326 	sta	0x124,x
+   0137 BD 25 01      [ 5]  327 	lda	0x125,x
+   013A 69 00         [ 2]  328 	adc	#0x00
+   013C 9D 25 01      [ 5]  329 	sta	0x125,x
+   013F 4CrF6r01      [ 3]  330 	jmp	00120$
+   0142                     331 00111$:
+                            332 ;	../strtoul.c: 86: else if (*ptr == '0')
+   0142 BA            [ 2]  333 	tsx
+   0143 BD 24 01      [ 5]  334 	lda	0x124,x
+   0146 85*00         [ 3]  335 	sta	*(__DPTR+0)
+   0148 BD 25 01      [ 5]  336 	lda	0x125,x
+   014B 85*01         [ 3]  337 	sta	*(__DPTR+1)
+   014D A0 00         [ 2]  338 	ldy	#0x00
+   014F B1*00         [ 6]  339 	lda	[__DPTR],y
+   0151 C9 30         [ 2]  340 	cmp	#0x30
+   0153 D0 1D         [ 4]  341 	bne	00108$
+                            342 ;	../strtoul.c: 88: base = 8;
+   0155 A9 08         [ 2]  343 	lda	#0x08
+   0157 9D 2C 01      [ 5]  344 	sta	0x12c,x
+   015A 98            [ 2]  345 	tya
+   015B 9D 2D 01      [ 5]  346 	sta	0x12d,x
+                            347 ;	../strtoul.c: 89: ptr++;
+   015E BD 24 01      [ 5]  348 	lda	0x124,x
+   0161 18            [ 2]  349 	clc
+   0162 69 01         [ 2]  350 	adc	#0x01
+   0164 9D 24 01      [ 5]  351 	sta	0x124,x
+   0167 BD 25 01      [ 5]  352 	lda	0x125,x
+   016A 69 00         [ 2]  353 	adc	#0x00
+   016C 9D 25 01      [ 5]  354 	sta	0x125,x
+   016F 4CrF6r01      [ 3]  355 	jmp	00120$
+   0172                     356 00108$:
+                            357 ;	../strtoul.c: 92: base = 10;
+   0172 BA            [ 2]  358 	tsx
+   0173 A9 0A         [ 2]  359 	lda	#0x0a
+   0175 9D 2C 01      [ 5]  360 	sta	0x12c,x
+   0178 A9 00         [ 2]  361 	lda	#0x00
+   017A 9D 2D 01      [ 5]  362 	sta	0x12d,x
+   017D 4CrF6r01      [ 3]  363 	jmp	00120$
+   0180                     364 00119$:
+                            365 ;	../strtoul.c: 95: else if (base == 16 && (!strncmp (ptr, "0x", 2) || !strncmp (ptr, "0X", 2)))
+   0180 BA            [ 2]  366 	tsx
+   0181 BD 2C 01      [ 5]  367 	lda	0x12c,x
+   0184 C9 10         [ 2]  368 	cmp	#0x10
+   0186 D0 6E         [ 4]  369 	bne	00120$
+   0188 BD 2D 01      [ 5]  370 	lda	0x12d,x
+   018B D0 69         [ 4]  371 	bne	00120$
+   018D A9 00         [ 2]  372 	lda	#0x00
+   018F 48            [ 3]  373 	pha
+   0190 A9 02         [ 2]  374 	lda	#0x02
+   0192 48            [ 3]  375 	pha
+   0193 A9s00         [ 2]  376 	lda	#>___str_0
+   0195 48            [ 3]  377 	pha
+   0196 A9r00         [ 2]  378 	lda	#___str_0
+   0198 48            [ 3]  379 	pha
+   0199 BD 25 01      [ 5]  380 	lda	0x125,x
+   019C AA            [ 2]  381 	tax
+   019D 86*00         [ 3]  382 	stx	*(__TEMP+0)
+   019F BA            [ 2]  383 	tsx
+   01A0 BD 28 01      [ 5]  384 	lda	0x128,x
+   01A3 08            [ 3]  385 	php
+   01A4 A6*00         [ 3]  386 	ldx	*(__TEMP+0)
+   01A6 28            [ 4]  387 	plp
+   01A7 20r00r00      [ 6]  388 	jsr	_strncmp
+   01AA 85*00         [ 3]  389 	sta	*(__TEMP+0)
+   01AC 68            [ 4]  390 	pla
+   01AD 68            [ 4]  391 	pla
+   01AE 68            [ 4]  392 	pla
+   01AF 68            [ 4]  393 	pla
+   01B0 A5*00         [ 3]  394 	lda	*(__TEMP+0)
+   01B2 D0 02         [ 4]  395 	bne	00228$
+   01B4 E0 00         [ 2]  396 	cpx	#0x00
+   01B6                     397 00228$:
+   01B6 F0 2C         [ 4]  398 	beq	00114$
+   01B8 A9 00         [ 2]  399 	lda	#0x00
+   01BA 48            [ 3]  400 	pha
+   01BB A9 02         [ 2]  401 	lda	#0x02
+   01BD 48            [ 3]  402 	pha
+   01BE A9s00         [ 2]  403 	lda	#>___str_1
+   01C0 48            [ 3]  404 	pha
+   01C1 A9r03         [ 2]  405 	lda	#___str_1
+   01C3 48            [ 3]  406 	pha
+   01C4 BA            [ 2]  407 	tsx
+   01C5 BD 29 01      [ 5]  408 	lda	0x129,x
+   01C8 AA            [ 2]  409 	tax
+   01C9 86*00         [ 3]  410 	stx	*(__TEMP+0)
+   01CB BA            [ 2]  411 	tsx
+   01CC BD 28 01      [ 5]  412 	lda	0x128,x
+   01CF 08            [ 3]  413 	php
+   01D0 A6*00         [ 3]  414 	ldx	*(__TEMP+0)
+   01D2 28            [ 4]  415 	plp
+   01D3 20r00r00      [ 6]  416 	jsr	_strncmp
+   01D6 85*00         [ 3]  417 	sta	*(__TEMP+0)
+   01D8 68            [ 4]  418 	pla
+   01D9 68            [ 4]  419 	pla
+   01DA 68            [ 4]  420 	pla
+   01DB 68            [ 4]  421 	pla
+   01DC A5*00         [ 3]  422 	lda	*(__TEMP+0)
+   01DE D0 02         [ 4]  423 	bne	00230$
+   01E0 E0 00         [ 2]  424 	cpx	#0x00
+   01E2                     425 00230$:
+   01E2 D0 12         [ 4]  426 	bne	00120$
+   01E4                     427 00114$:
+                            428 ;	../strtoul.c: 96: ptr += 2;
+   01E4 BA            [ 2]  429 	tsx
+   01E5 BD 24 01      [ 5]  430 	lda	0x124,x
+   01E8 18            [ 2]  431 	clc
+   01E9 69 02         [ 2]  432 	adc	#0x02
+   01EB 9D 24 01      [ 5]  433 	sta	0x124,x
+   01EE BD 25 01      [ 5]  434 	lda	0x125,x
+   01F1 69 00         [ 2]  435 	adc	#0x00
+   01F3 9D 25 01      [ 5]  436 	sta	0x125,x
+   01F6                     437 00120$:
+                            438 ;	../strtoul.c: 100: if (_isdigit (*ptr, base) < 0)
+   01F6 BA            [ 2]  439 	tsx
+   01F7 BD 2C 01      [ 5]  440 	lda	0x12c,x
+   01FA 9D 1F 01      [ 5]  441 	sta	0x11f,x
+   01FD BD 24 01      [ 5]  442 	lda	0x124,x
+   0200 85*00         [ 3]  443 	sta	*(__DPTR+0)
+   0202 BD 25 01      [ 5]  444 	lda	0x125,x
+   0205 85*01         [ 3]  445 	sta	*(__DPTR+1)
+   0207 A0 00         [ 2]  446 	ldy	#0x00
+   0209 B1*00         [ 6]  447 	lda	[__DPTR],y
+   020B A8            [ 2]  448 	tay
+   020C 85*00         [ 3]  449 	sta	*(__TEMP+0)
+   020E BD 1F 01      [ 5]  450 	lda	0x11f,x
+   0211 AA            [ 2]  451 	tax
+   0212 A5*00         [ 3]  452 	lda	*(__TEMP+0)
+   0214 20r00r00      [ 6]  453 	jsr	__isdigit
+   0217 38            [ 2]  454 	sec
+   0218 E9 00         [ 2]  455 	sbc	#0x00
+   021A 50 04         [ 4]  456 	bvc	00233$
+   021C 10 04         [ 4]  457 	bpl	00232$
+   021E 30 32         [ 4]  458 	bmi	00124$
+   0220                     459 00233$:
+   0220 10 30         [ 4]  460 	bpl	00124$
+   0222                     461 00232$:
+                            462 ;	../strtoul.c: 102: if (endptr)
+   0222 BA            [ 2]  463 	tsx
+   0223 BD 2A 01      [ 5]  464 	lda	0x12a,x
+   0226 1D 2B 01      [ 5]  465 	ora	0x12b,x
+   0229 F0 1D         [ 4]  466 	beq	00122$
+                            467 ;	../strtoul.c: 103: *endptr = (char*)nptr;
+   022B BD 2A 01      [ 5]  468 	lda	0x12a,x
+   022E 85*00         [ 3]  469 	sta	*(__TEMP+0)
+   0230 BD 2B 01      [ 5]  470 	lda	0x12b,x
+   0233 AA            [ 2]  471 	tax
+   0234 A5*00         [ 3]  472 	lda	*(__TEMP+0)
+   0236 85*00         [ 3]  473 	sta	*(__DPTR+0)
+   0238 86*01         [ 3]  474 	stx	*(__DPTR+1)
+   023A BA            [ 2]  475 	tsx
+   023B BD 26 01      [ 5]  476 	lda	0x126,x
+   023E A0 00         [ 2]  477 	ldy	#0x00
+   0240 91*00         [ 6]  478 	sta	[__DPTR],y
+   0242 BD 27 01      [ 5]  479 	lda	0x127,x
+   0245 C8            [ 2]  480 	iny
+   0246 91*00         [ 6]  481 	sta	[__DPTR],y
+   0248                     482 00122$:
+                            483 ;	../strtoul.c: 104: return (0);
+   0248 A9 00         [ 2]  484 	lda	#0x00
+   024A AA            [ 2]  485 	tax
+   024B 85*00         [ 3]  486 	sta	*___SDCC_m6502_ret2
+   024D 85*00         [ 3]  487 	sta	*___SDCC_m6502_ret3
+   024F 4Cr45r05      [ 3]  488 	jmp	00138$
+   0252                     489 00124$:
+                            490 ;	../strtoul.c: 107: for (ret = 0;; ptr++)
+   0252 BA            [ 2]  491 	tsx
+   0253 A9 00         [ 2]  492 	lda	#0x00
+   0255 9D 09 01      [ 5]  493 	sta	0x109,x
+   0258 9D 0A 01      [ 5]  494 	sta	0x10a,x
+   025B 9D 0B 01      [ 5]  495 	sta	0x10b,x
+   025E 9D 0C 01      [ 5]  496 	sta	0x10c,x
+   0261 BD 24 01      [ 5]  497 	lda	0x124,x
+   0264 9D 1D 01      [ 5]  498 	sta	0x11d,x
+   0267 BD 25 01      [ 5]  499 	lda	0x125,x
+   026A 9D 1E 01      [ 5]  500 	sta	0x11e,x
+   026D                     501 00136$:
+                            502 ;	../strtoul.c: 110: signed char digit = _isdigit (*ptr, base);
+   026D BA            [ 2]  503 	tsx
+   026E BD 1D 01      [ 5]  504 	lda	0x11d,x
+   0271 85*00         [ 3]  505 	sta	*(__DPTR+0)
+   0273 BD 1E 01      [ 5]  506 	lda	0x11e,x
+   0276 85*01         [ 3]  507 	sta	*(__DPTR+1)
+   0278 A0 00         [ 2]  508 	ldy	#0x00
+   027A B1*00         [ 6]  509 	lda	[__DPTR],y
+   027C A8            [ 2]  510 	tay
+   027D 85*00         [ 3]  511 	sta	*(__TEMP+0)
+   027F BD 1F 01      [ 5]  512 	lda	0x11f,x
+   0282 AA            [ 2]  513 	tax
+   0283 A5*00         [ 3]  514 	lda	*(__TEMP+0)
+   0285 20r00r00      [ 6]  515 	jsr	__isdigit
+                            516 ;	../strtoul.c: 112: if (digit < 0)
+   0288 A8            [ 2]  517 	tay
+   0289 38            [ 2]  518 	sec
+   028A E9 00         [ 2]  519 	sbc	#0x00
+   028C 70 04         [ 4]  520 	bvs	00237$
+   028E 10 07         [ 4]  521 	bpl	00236$
+   0290 30 02         [ 4]  522 	bmi	00238$
+   0292                     523 00237$:
+   0292 30 03         [ 4]  524 	bmi	00236$
+   0294                     525 00238$:
+   0294 4CrA9r04      [ 3]  526 	jmp	00127$
+   0297                     527 00236$:
+                            528 ;	../strtoul.c: 117: range_error |= ckd_mul(&ret, ret, base);
+   0297 BA            [ 2]  529 	tsx
+   0298 BD 2C 01      [ 5]  530 	lda	0x12c,x
+   029B 9D 15 01      [ 5]  531 	sta	0x115,x
+   029E BD 2D 01      [ 5]  532 	lda	0x12d,x
+   02A1 9D 16 01      [ 5]  533 	sta	0x116,x
+   02A4 0A            [ 2]  534 	asl	a
+   02A5 A9 00         [ 2]  535 	lda	#0x00
+   02A7 69 FF         [ 2]  536 	adc	#0xff
+   02A9 49 FF         [ 2]  537 	eor	#0xff
+   02AB 9D 17 01      [ 5]  538 	sta	0x117,x
+   02AE 9D 18 01      [ 5]  539 	sta	0x118,x
+   02B1 9D 19 01      [ 5]  540 	sta	0x119,x
+   02B4 9D 1A 01      [ 5]  541 	sta	0x11a,x
+   02B7 9D 1B 01      [ 5]  542 	sta	0x11b,x
+   02BA 9D 1C 01      [ 5]  543 	sta	0x11c,x
+   02BD BD 09 01      [ 5]  544 	lda	0x109,x
+   02C0 9D 0D 01      [ 5]  545 	sta	0x10d,x
+   02C3 BD 0A 01      [ 5]  546 	lda	0x10a,x
+   02C6 9D 0E 01      [ 5]  547 	sta	0x10e,x
+   02C9 BD 0B 01      [ 5]  548 	lda	0x10b,x
+   02CC 9D 0F 01      [ 5]  549 	sta	0x10f,x
+   02CF BD 0C 01      [ 5]  550 	lda	0x10c,x
+   02D2 9D 10 01      [ 5]  551 	sta	0x110,x
+   02D5 A9 00         [ 2]  552 	lda	#0x00
+   02D7 9D 11 01      [ 5]  553 	sta	0x111,x
+   02DA 9D 12 01      [ 5]  554 	sta	0x112,x
+   02DD 9D 13 01      [ 5]  555 	sta	0x113,x
+   02E0 9D 14 01      [ 5]  556 	sta	0x114,x
+   02E3 8A            [ 2]  557 	txa
+   02E4 18            [ 2]  558 	clc
+   02E5 69 09         [ 2]  559 	adc	#0x09
+   02E7 A2 01         [ 2]  560 	ldx	#0x01
+   02E9 48            [ 3]  561 	pha
+   02EA 8A            [ 2]  562 	txa
+   02EB BA            [ 2]  563 	tsx
+   02EC 9D 22 01      [ 5]  564 	sta	0x122,x
+   02EF 68            [ 4]  565 	pla
+   02F0 9D 21 01      [ 5]  566 	sta	0x121,x
+   02F3 BD 22 01      [ 5]  567 	lda	0x122,x
+                            568 ;	./../../include/stdckdint.h: 76: inline _Bool __ckd_mul_ulong __CKD_DEFAULT_IMPL(unsigned long, *)
+   02F6 85*00         [ 3]  569 	sta	*(__TEMP+0)
+   02F8 98            [ 2]  570 	tya
+   02F9 48            [ 3]  571 	pha
+   02FA BD 1D 01      [ 5]  572 	lda	0x11d, x
+   02FD 48            [ 3]  573 	pha
+   02FE BD 1C 01      [ 5]  574 	lda	0x11c,x
+   0301 48            [ 3]  575 	pha
+   0302 BD 1B 01      [ 5]  576 	lda	0x11b,x
+   0305 48            [ 3]  577 	pha
+   0306 BD 1A 01      [ 5]  578 	lda	0x11a,x
+   0309 48            [ 3]  579 	pha
+   030A BD 19 01      [ 5]  580 	lda	0x119,x
+   030D 48            [ 3]  581 	pha
+   030E BD 18 01      [ 5]  582 	lda	0x118,x
+   0311 48            [ 3]  583 	pha
+   0312 BD 17 01      [ 5]  584 	lda	0x117,x
+   0315 48            [ 3]  585 	pha
+   0316 BD 16 01      [ 5]  586 	lda	0x116,x
+   0319 48            [ 3]  587 	pha
+   031A BD 15 01      [ 5]  588 	lda	0x115,x
+   031D 48            [ 3]  589 	pha
+   031E BD 14 01      [ 5]  590 	lda	0x114,x
+   0321 48            [ 3]  591 	pha
+   0322 BD 13 01      [ 5]  592 	lda	0x113,x
+   0325 48            [ 3]  593 	pha
+   0326 BD 12 01      [ 5]  594 	lda	0x112,x
+   0329 48            [ 3]  595 	pha
+   032A BD 11 01      [ 5]  596 	lda	0x111,x
+   032D 48            [ 3]  597 	pha
+   032E BD 10 01      [ 5]  598 	lda	0x110,x
+   0331 48            [ 3]  599 	pha
+   0332 BD 0F 01      [ 5]  600 	lda	0x10f,x
+   0335 48            [ 3]  601 	pha
+   0336 BD 0E 01      [ 5]  602 	lda	0x10e,x
+   0339 48            [ 3]  603 	pha
+   033A 20r00r00      [ 6]  604 	jsr	__mullonglong
+   033D 86*00         [ 3]  605 	stx	*(__TEMP+0)
+   033F BA            [ 2]  606 	tsx
+   0340 9D 1E 01      [ 5]  607 	sta	0x11e,x
+   0343 A6*00         [ 3]  608 	ldx	*(__TEMP+0)
+   0345 8A            [ 2]  609 	txa
+   0346 BA            [ 2]  610 	tsx
+   0347 9D 1F 01      [ 5]  611 	sta	0x11f,x
+   034A A6*00         [ 3]  612 	ldx	*(__TEMP+0)
+   034C A5*00         [ 3]  613 	lda	*___SDCC_m6502_ret2
+   034E BA            [ 2]  614 	tsx
+   034F 9D 20 01      [ 5]  615 	sta	0x120,x
+   0352 A5*00         [ 3]  616 	lda	*___SDCC_m6502_ret3
+   0354 9D 21 01      [ 5]  617 	sta	0x121,x
+   0357 A5*00         [ 3]  618 	lda	*___SDCC_m6502_ret4
+   0359 9D 22 01      [ 5]  619 	sta	0x122,x
+   035C A5*00         [ 3]  620 	lda	*___SDCC_m6502_ret5
+   035E 9D 23 01      [ 5]  621 	sta	0x123,x
+   0361 A5*00         [ 3]  622 	lda	*___SDCC_m6502_ret6
+   0363 9D 24 01      [ 5]  623 	sta	0x124,x
+   0366 A5*00         [ 3]  624 	lda	*___SDCC_m6502_ret7
+   0368 9D 25 01      [ 5]  625 	sta	0x125,x
+   036B 85*00         [ 3]  626 	sta	*(__TEMP+0)
+   036D 86*01         [ 3]  627 	stx	*(__TEMP+1)
+   036F BA            [ 2]  628 	tsx
+   0370 8A            [ 2]  629 	txa
+   0371 18            [ 2]  630 	clc
+   0372 69 10         [ 2]  631 	adc	#0x10
+   0374 AA            [ 2]  632 	tax
+   0375 9A            [ 2]  633 	txs
+   0376 A6*01         [ 3]  634 	ldx	*(__TEMP+1)
+   0378 68            [ 4]  635 	pla
+   0379 A8            [ 2]  636 	tay
+   037A A5*00         [ 3]  637 	lda	*(__TEMP+0)
+   037C BA            [ 2]  638 	tsx
+   037D BD 0D 01      [ 5]  639 	lda	0x10d,x
+   0380 9D 01 01      [ 5]  640 	sta	0x101,x
+   0383 BD 0E 01      [ 5]  641 	lda	0x10e,x
+   0386 9D 02 01      [ 5]  642 	sta	0x102,x
+   0389 BD 0F 01      [ 5]  643 	lda	0x10f,x
+   038C 9D 03 01      [ 5]  644 	sta	0x103,x
+   038F BD 10 01      [ 5]  645 	lda	0x110,x
+   0392 9D 04 01      [ 5]  646 	sta	0x104,x
+   0395 BD 11 01      [ 5]  647 	lda	0x111,x
+   0398 9D 05 01      [ 5]  648 	sta	0x105,x
+   039B BD 12 01      [ 5]  649 	lda	0x112,x
+   039E 9D 06 01      [ 5]  650 	sta	0x106,x
+   03A1 BD 13 01      [ 5]  651 	lda	0x113,x
+   03A4 9D 07 01      [ 5]  652 	sta	0x107,x
+   03A7 BD 14 01      [ 5]  653 	lda	0x114,x
+   03AA 9D 08 01      [ 5]  654 	sta	0x108,x
+   03AD BD 0D 01      [ 5]  655 	lda	0x10d,x
+   03B0 9D 0D 01      [ 5]  656 	sta	0x10d,x
+   03B3 BD 0E 01      [ 5]  657 	lda	0x10e,x
+   03B6 9D 0E 01      [ 5]  658 	sta	0x10e,x
+   03B9 BD 0F 01      [ 5]  659 	lda	0x10f,x
+   03BC 9D 0F 01      [ 5]  660 	sta	0x10f,x
+   03BF BD 10 01      [ 5]  661 	lda	0x110,x
+   03C2 9D 10 01      [ 5]  662 	sta	0x110,x
+   03C5 84*00         [ 3]  663 	sty	*(__TEMP+0)
+   03C7 BD 20 01      [ 5]  664 	lda	0x120,x
+   03CA 85*00         [ 3]  665 	sta	*(__DPTR+0)
+   03CC BD 21 01      [ 5]  666 	lda	0x121,x
+   03CF 85*01         [ 3]  667 	sta	*(__DPTR+1)
+   03D1 BD 0D 01      [ 5]  668 	lda	0x10d,x
+   03D4 A0 00         [ 2]  669 	ldy	#0x00
+   03D6 91*00         [ 6]  670 	sta	[__DPTR],y
+   03D8 BD 0E 01      [ 5]  671 	lda	0x10e,x
+   03DB C8            [ 2]  672 	iny
+   03DC 91*00         [ 6]  673 	sta	[__DPTR],y
+   03DE BD 0F 01      [ 5]  674 	lda	0x10f,x
+   03E1 C8            [ 2]  675 	iny
+   03E2 91*00         [ 6]  676 	sta	[__DPTR],y
+   03E4 BD 10 01      [ 5]  677 	lda	0x110,x
+   03E7 C8            [ 2]  678 	iny
+   03E8 91*00         [ 6]  679 	sta	[__DPTR],y
+   03EA A4*00         [ 3]  680 	ldy	*(__TEMP+0)
+   03EC BD 0D 01      [ 5]  681 	lda	0x10d,x
+   03EF 9D 0D 01      [ 5]  682 	sta	0x10d,x
+   03F2 BD 0E 01      [ 5]  683 	lda	0x10e,x
+   03F5 9D 0E 01      [ 5]  684 	sta	0x10e,x
+   03F8 BD 0F 01      [ 5]  685 	lda	0x10f,x
+   03FB 9D 0F 01      [ 5]  686 	sta	0x10f,x
+   03FE BD 10 01      [ 5]  687 	lda	0x110,x
+   0401 9D 10 01      [ 5]  688 	sta	0x110,x
+   0404 A9 00         [ 2]  689 	lda	#0x00
+   0406 9D 11 01      [ 5]  690 	sta	0x111,x
+   0409 9D 12 01      [ 5]  691 	sta	0x112,x
+   040C 9D 13 01      [ 5]  692 	sta	0x113,x
+   040F 9D 14 01      [ 5]  693 	sta	0x114,x
+   0412 BD 0D 01      [ 5]  694 	lda	0x10d,x
+   0415 DD 01 01      [ 5]  695 	cmp	0x101,x
+   0418 D0 38         [ 4]  696 	bne	00240$
+   041A BD 0E 01      [ 5]  697 	lda	0x10e,x
+   041D DD 02 01      [ 5]  698 	cmp	0x102,x
+   0420 D0 30         [ 4]  699 	bne	00240$
+   0422 BD 0F 01      [ 5]  700 	lda	0x10f,x
+   0425 DD 03 01      [ 5]  701 	cmp	0x103,x
+   0428 D0 28         [ 4]  702 	bne	00240$
+   042A BD 10 01      [ 5]  703 	lda	0x110,x
+   042D DD 04 01      [ 5]  704 	cmp	0x104,x
+   0430 D0 20         [ 4]  705 	bne	00240$
+   0432 BD 11 01      [ 5]  706 	lda	0x111,x
+   0435 DD 05 01      [ 5]  707 	cmp	0x105,x
+   0438 D0 18         [ 4]  708 	bne	00240$
+   043A BD 12 01      [ 5]  709 	lda	0x112,x
+   043D DD 06 01      [ 5]  710 	cmp	0x106,x
+   0440 D0 10         [ 4]  711 	bne	00240$
+   0442 BD 13 01      [ 5]  712 	lda	0x113,x
+   0445 DD 07 01      [ 5]  713 	cmp	0x107,x
+   0448 D0 08         [ 4]  714 	bne	00240$
+   044A BD 14 01      [ 5]  715 	lda	0x114,x
+   044D DD 08 01      [ 5]  716 	cmp	0x108,x
+   0450 F0 05         [ 4]  717 	beq	00248$
+   0452                     718 00240$:
+   0452 A9 00         [ 2]  719 	lda	#0x00
+   0454 4Cr59r04      [ 3]  720 	jmp	00247$
+   0457                     721 00248$:
+   0457 A9 01         [ 2]  722 	lda	#0x01
+   0459                     723 00247$:
+   0459 49 01         [ 2]  724 	eor	#0x01
+                            725 ;	../strtoul.c: 117: range_error |= ckd_mul(&ret, ret, base);
+   045B 1D 23 01      [ 5]  726 	ora	0x123,x
+   045E 9D 23 01      [ 5]  727 	sta	0x123,x
+                            728 ;	../strtoul.c: 125: ret += (unsigned char)digit;
+   0461 98            [ 2]  729 	tya
+   0462 9D 0D 01      [ 5]  730 	sta	0x10d,x
+   0465 A9 00         [ 2]  731 	lda	#0x00
+   0467 9D 0E 01      [ 5]  732 	sta	0x10e,x
+   046A 9D 0F 01      [ 5]  733 	sta	0x10f,x
+   046D 9D 10 01      [ 5]  734 	sta	0x110,x
+   0470 BD 09 01      [ 5]  735 	lda	0x109,x
+   0473 18            [ 2]  736 	clc
+   0474 7D 0D 01      [ 5]  737 	adc	0x10d,x
+   0477 9D 09 01      [ 5]  738 	sta	0x109,x
+   047A BD 0A 01      [ 5]  739 	lda	0x10a,x
+   047D 7D 0E 01      [ 5]  740 	adc	0x10e,x
+   0480 9D 0A 01      [ 5]  741 	sta	0x10a,x
+   0483 BD 0B 01      [ 5]  742 	lda	0x10b,x
+   0486 7D 0F 01      [ 5]  743 	adc	0x10f,x
+   0489 9D 0B 01      [ 5]  744 	sta	0x10b,x
+   048C BD 0C 01      [ 5]  745 	lda	0x10c,x
+   048F 7D 10 01      [ 5]  746 	adc	0x110,x
+   0492 9D 0C 01      [ 5]  747 	sta	0x10c,x
+                            748 ;	../strtoul.c: 107: for (ret = 0;; ptr++)
+   0495 BD 1D 01      [ 5]  749 	lda	0x11d,x
+   0498 18            [ 2]  750 	clc
+   0499 69 01         [ 2]  751 	adc	#0x01
+   049B 9D 1D 01      [ 5]  752 	sta	0x11d,x
+   049E BD 1E 01      [ 5]  753 	lda	0x11e,x
+   04A1 69 00         [ 2]  754 	adc	#0x00
+   04A3 9D 1E 01      [ 5]  755 	sta	0x11e,x
+   04A6 4Cr6Dr02      [ 3]  756 	jmp	00136$
+   04A9                     757 00127$:
+                            758 ;	../strtoul.c: 128: if (endptr)
+   04A9 BA            [ 2]  759 	tsx
+   04AA BD 2A 01      [ 5]  760 	lda	0x12a,x
+   04AD 1D 2B 01      [ 5]  761 	ora	0x12b,x
+   04B0 F0 1D         [ 4]  762 	beq	00129$
+                            763 ;	../strtoul.c: 129: *endptr = (char*)ptr;
+   04B2 BD 2A 01      [ 5]  764 	lda	0x12a,x
+   04B5 85*00         [ 3]  765 	sta	*(__TEMP+0)
+   04B7 BD 2B 01      [ 5]  766 	lda	0x12b,x
+   04BA AA            [ 2]  767 	tax
+   04BB A5*00         [ 3]  768 	lda	*(__TEMP+0)
+   04BD 85*00         [ 3]  769 	sta	*(__DPTR+0)
+   04BF 86*01         [ 3]  770 	stx	*(__DPTR+1)
+   04C1 BA            [ 2]  771 	tsx
+   04C2 BD 1D 01      [ 5]  772 	lda	0x11d,x
+   04C5 A0 00         [ 2]  773 	ldy	#0x00
+   04C7 91*00         [ 6]  774 	sta	[__DPTR],y
+   04C9 BD 1E 01      [ 5]  775 	lda	0x11e,x
+   04CC C8            [ 2]  776 	iny
+   04CD 91*00         [ 6]  777 	sta	[__DPTR],y
+   04CF                     778 00129$:
+                            779 ;	../strtoul.c: 131: if (range_error)
+   04CF BA            [ 2]  780 	tsx
+   04D0 BD 23 01      [ 5]  781 	lda	0x123,x
+   04D3 F0 14         [ 4]  782 	beq	00131$
+                            783 ;	../strtoul.c: 133: errno = ERANGE;
+   04D5 A2 22         [ 2]  784 	ldx	#0x22
+   04D7 8Er00r00      [ 4]  785 	stx	_errno
+   04DA A2 00         [ 2]  786 	ldx	#0x00
+   04DC 8Er01r00      [ 4]  787 	stx	(_errno + 1)
+                            788 ;	../strtoul.c: 134: return (ULONG_MAX);
+   04DF A9 FF         [ 2]  789 	lda	#0xff
+   04E1 AA            [ 2]  790 	tax
+   04E2 85*00         [ 3]  791 	sta	*___SDCC_m6502_ret2
+   04E4 85*00         [ 3]  792 	sta	*___SDCC_m6502_ret3
+   04E6 4Cr45r05      [ 3]  793 	jmp	00138$
+   04E9                     794 00131$:
+                            795 ;	../strtoul.c: 137: return (neg ? -ret : ret);
+   04E9 BA            [ 2]  796 	tsx
+   04EA BD 22 01      [ 5]  797 	lda	0x122,x
+   04ED F0 24         [ 4]  798 	beq	00143$
+   04EF A9 00         [ 2]  799 	lda	#0x00
+   04F1 38            [ 2]  800 	sec
+   04F2 FD 09 01      [ 5]  801 	sbc	0x109,x
+   04F5 9D 0D 01      [ 5]  802 	sta	0x10d,x
+   04F8 A9 00         [ 2]  803 	lda	#0x00
+   04FA FD 0A 01      [ 5]  804 	sbc	0x10a,x
+   04FD 9D 0E 01      [ 5]  805 	sta	0x10e,x
+   0500 A9 00         [ 2]  806 	lda	#0x00
+   0502 FD 0B 01      [ 5]  807 	sbc	0x10b,x
+   0505 9D 0F 01      [ 5]  808 	sta	0x10f,x
+   0508 A9 00         [ 2]  809 	lda	#0x00
+   050A FD 0C 01      [ 5]  810 	sbc	0x10c,x
+   050D 9D 10 01      [ 5]  811 	sta	0x110,x
+   0510 4Cr2Cr05      [ 3]  812 	jmp	00144$
+   0513                     813 00143$:
+   0513 BA            [ 2]  814 	tsx
+   0514 BD 09 01      [ 5]  815 	lda	0x109,x
+   0517 9D 0D 01      [ 5]  816 	sta	0x10d,x
+   051A BD 0A 01      [ 5]  817 	lda	0x10a,x
+   051D 9D 0E 01      [ 5]  818 	sta	0x10e,x
+   0520 BD 0B 01      [ 5]  819 	lda	0x10b,x
+   0523 9D 0F 01      [ 5]  820 	sta	0x10f,x
+   0526 BD 0C 01      [ 5]  821 	lda	0x10c,x
+   0529 9D 10 01      [ 5]  822 	sta	0x110,x
+   052C                     823 00144$:
+   052C BA            [ 2]  824 	tsx
+   052D BD 10 01      [ 5]  825 	lda	0x110,x
+   0530 85*00         [ 3]  826 	sta	*___SDCC_m6502_ret3
+   0532 BD 0F 01      [ 5]  827 	lda	0x10f,x
+   0535 85*00         [ 3]  828 	sta	*___SDCC_m6502_ret2
+   0537 BD 0E 01      [ 5]  829 	lda	0x10e,x
+   053A AA            [ 2]  830 	tax
+   053B 86*00         [ 3]  831 	stx	*(__TEMP+0)
+   053D BA            [ 2]  832 	tsx
+   053E BD 0D 01      [ 5]  833 	lda	0x10d,x
+   0541 08            [ 3]  834 	php
+   0542 A6*00         [ 3]  835 	ldx	*(__TEMP+0)
+   0544 28            [ 4]  836 	plp
+   0545                     837 00138$:
+                            838 ;	../strtoul.c: 138: }
+   0545 85*00         [ 3]  839 	sta	*(__TEMP+0)
+   0547 86*01         [ 3]  840 	stx	*(__TEMP+1)
+   0549 BA            [ 2]  841 	tsx
+   054A 8A            [ 2]  842 	txa
+   054B 18            [ 2]  843 	clc
+   054C 69 27         [ 2]  844 	adc	#0x27
+   054E AA            [ 2]  845 	tax
+   054F 9A            [ 2]  846 	txs
+   0550 A6*01         [ 3]  847 	ldx	*(__TEMP+1)
+   0552 A5*00         [ 3]  848 	lda	*(__TEMP+0)
+   0554 60            [ 6]  849 	rts
+                            850 	.area CODE
+                            851 	.area RODATA
+                            852 	.area RODATA
+   0000                     853 ___str_0:
+   0000 30 78               854 	.ascii "0x"
+   0002 00                  855 	.db 0x00
+                            856 	.area CODE
+                            857 	.area RODATA
+   0003                     858 ___str_1:
+   0003 30 58               859 	.ascii "0X"
+   0005 00                  860 	.db 0x00
+                            861 	.area CODE
+                            862 	.area XINIT
+                            863 	.area CABS    (ABS)

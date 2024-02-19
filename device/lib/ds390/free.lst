@@ -1,0 +1,642 @@
+                                      1 ;--------------------------------------------------------
+                                      2 ; File Created by SDCC : free open source ISO C Compiler 
+                                      3 ; Version 4.2.14 #0 (Linux)
+                                      4 ;--------------------------------------------------------
+                                      5 	.module free
+                                      6 	.optsdcc -mds390 --model-flat24
+                                      7 	
+                                      8 ;--------------------------------------------------------
+                                      9 ; CPU specific extensions
+                                     10 ;--------------------------------------------------------
+                                     11 	.DS80C390
+                                     12 	.amode	2	; 24 bit flat addressing
+                           000082    13 dpl	=	0x82
+                           000083    14 dph	=	0x83
+                           000084    15 dpl1	=	0x84
+                           000085    16 dph1	=	0x85
+                           000086    17 dps	=	0x86
+                           000093    18 dpx	=	0x93
+                           000095    19 dpx1	=	0x95
+                           00009B    20 esp	=	0x9B
+                           00009C    21 ap	=	0x9C
+                           00009C    22 acc1	=	0x9C
+                           0000D1    23 mcnt0	=	0xD1
+                           0000D2    24 mcnt1	=	0xD2
+                           0000D3    25 ma	=	0xD3
+                           0000D4    26 mb	=	0xD4
+                           0000D5    27 mc	=	0xD5
+                           00009D    28 acon	=	0x9D
+                           0000C6    29 mcon	=	0xC6
+                           0000D1    30 F1	=	0xD1	; user flag
+                                     31 ;--------------------------------------------------------
+                                     32 ; Public variables in this module
+                                     33 ;--------------------------------------------------------
+                                     34 	.globl _free
+                                     35 ;--------------------------------------------------------
+                                     36 ; special function registers
+                                     37 ;--------------------------------------------------------
+                                     38 ;--------------------------------------------------------
+                                     39 ; special function bits
+                                     40 ;--------------------------------------------------------
+                                     41 ;--------------------------------------------------------
+                                     42 ; overlayable register banks
+                                     43 ;--------------------------------------------------------
+                                     44 	.area REG_BANK_0	(REL,OVR,DATA)
+      000000                         45 	.ds 8
+                                     46 ;--------------------------------------------------------
+                                     47 ; internal ram data
+                                     48 ;--------------------------------------------------------
+                                     49 	.area DSEG    (DATA)
+                                     50 ;--------------------------------------------------------
+                                     51 ; overlayable items in internal ram
+                                     52 ;--------------------------------------------------------
+                                     53 ;--------------------------------------------------------
+                                     54 ; indirectly addressable internal ram data
+                                     55 ;--------------------------------------------------------
+                                     56 	.area ISEG    (DATA)
+                                     57 ;--------------------------------------------------------
+                                     58 ; absolute internal ram data
+                                     59 ;--------------------------------------------------------
+                                     60 	.area IABS    (ABS,DATA)
+                                     61 	.area IABS    (ABS,DATA)
+                                     62 ;--------------------------------------------------------
+                                     63 ; bit data
+                                     64 ;--------------------------------------------------------
+                                     65 	.area BSEG    (BIT)
+                                     66 ;--------------------------------------------------------
+                                     67 ; paged external ram data
+                                     68 ;--------------------------------------------------------
+                                     69 	.area PSEG    (PAG,XDATA)
+                                     70 ;--------------------------------------------------------
+                                     71 ; uninitialized external ram data
+                                     72 ;--------------------------------------------------------
+                                     73 	.area XSEG    (XDATA)
+      000000                         74 _free_ptr_65536_37:
+      000000                         75 	.ds 4
+      000004                         76 _free_h_65536_38:
+      000004                         77 	.ds 3
+      000007                         78 _free_next_free_65536_38:
+      000007                         79 	.ds 3
+      00000A                         80 _free_prev_free_65536_38:
+      00000A                         81 	.ds 3
+      00000D                         82 _free_f_65536_38:
+      00000D                         83 	.ds 3
+      000010                         84 _free_sloc0_1_0:
+      000010                         85 	.ds 4
+      000014                         86 _free_sloc1_1_0:
+      000014                         87 	.ds 3
+                                     88 ;--------------------------------------------------------
+                                     89 ; absolute external ram data
+                                     90 ;--------------------------------------------------------
+                                     91 	.area XABS    (ABS,XDATA)
+                                     92 ;--------------------------------------------------------
+                                     93 ; initialized external ram data
+                                     94 ;--------------------------------------------------------
+                                     95 	.area XISEG   (XDATA)
+                                     96 ;--------------------------------------------------------
+                                     97 ; global & static initialisations
+                                     98 ;--------------------------------------------------------
+                                     99 	.area HOME    (CODE)
+                                    100 	.area GSINIT  (CODE)
+                                    101 	.area GSFINAL (CODE)
+                                    102 	.area GSINIT  (CODE)
+                                    103 ;--------------------------------------------------------
+                                    104 ; Home
+                                    105 ;--------------------------------------------------------
+                                    106 	.area HOME    (CODE)
+                                    107 	.area HOME    (CODE)
+                                    108 ;--------------------------------------------------------
+                                    109 ; code
+                                    110 ;--------------------------------------------------------
+                                    111 	.area CSEG    (CODE)
+                                    112 ;------------------------------------------------------------
+                                    113 ;Allocation info for local variables in function 'free'
+                                    114 ;------------------------------------------------------------
+                                    115 ;ptr                       Allocated with name '_free_ptr_65536_37'
+                                    116 ;h                         Allocated with name '_free_h_65536_38'
+                                    117 ;next_free                 Allocated with name '_free_next_free_65536_38'
+                                    118 ;prev_free                 Allocated with name '_free_prev_free_65536_38'
+                                    119 ;f                         Allocated with name '_free_f_65536_38'
+                                    120 ;sloc0                     Allocated with name '_free_sloc0_1_0'
+                                    121 ;sloc1                     Allocated with name '_free_sloc1_1_0'
+                                    122 ;------------------------------------------------------------
+                                    123 ;	free.c:50: void free(void *ptr)
+                                    124 ;	-----------------------------------------
+                                    125 ;	 function free
+                                    126 ;	-----------------------------------------
+      000000                        127 _free:
+                           000002   128 	ar2 = 0x02
+                           000003   129 	ar3 = 0x03
+                           000004   130 	ar4 = 0x04
+                           000005   131 	ar5 = 0x05
+                           000006   132 	ar6 = 0x06
+                           000007   133 	ar7 = 0x07
+                           000000   134 	ar0 = 0x00
+                           000001   135 	ar1 = 0x01
+      000000 75 86 01         [12]  136 	mov     dps, #1
+      000003 90s00r00r00      [12]  137 	mov     dptr, #_free_ptr_65536_37
+      000007 E5 82            [ 8]  138 	mov	a,dpl
+      000009 F0               [ 8]  139 	movx	@dptr,a
+      00000A A3               [12]  140 	inc	dptr
+      00000B E5 83            [ 8]  141 	mov	a,dph
+      00000D F0               [ 8]  142 	movx	@dptr,a
+      00000E A3               [12]  143 	inc	dptr
+      00000F E5 93            [ 8]  144 	mov	a,dpx
+      000011 F0               [ 8]  145 	movx	@dptr,a
+      000012 A3               [12]  146 	inc	dptr
+      000013 E5 F0            [ 8]  147 	mov	a,b
+      000015 F0               [ 8]  148 	movx	@dptr,a
+      000016 75 86 00         [12]  149 	mov	dps,#0
+                                    150 ;	free.c:55: if(!ptr)
+      000019 90s00r00r00      [12]  151 	mov	dptr,#_free_ptr_65536_37
+      00001D E0               [ 8]  152 	movx	a,@dptr
+      00001E F5 F0            [ 8]  153 	mov	b,a
+      000020 A3               [12]  154 	inc	dptr
+      000021 E0               [ 8]  155 	movx	a,@dptr
+      000022 42 F0            [ 8]  156 	orl	b,a
+      000024 A3               [12]  157 	inc	dptr
+      000025 E0               [ 8]  158 	movx	a,@dptr
+      000026 45 F0            [ 8]  159 	orl	a,b
+      000028 70 04            [12]  160 	jnz  00102$
+      00002A                        161 00150$:
+                                    162 ;	free.c:56: return;
+      00002A 02s00r02rC0      [16]  163 	ljmp	00113$
+      00002E                        164 00102$:
+                                    165 ;	free.c:58: prev_free = 0;
+                                    166 ;	genAssign: resultIsFar = TRUE
+      00002E 90s00r00r0A      [12]  167 	mov	dptr,#_free_prev_free_65536_38
+      000032 E4               [ 4]  168 	clr	a
+      000033 F0               [ 8]  169 	movx	@dptr,a
+      000034 A3               [12]  170 	inc	dptr
+      000035 F0               [ 8]  171 	movx	@dptr,a
+      000036 A3               [12]  172 	inc	dptr
+      000037 F0               [ 8]  173 	movx	@dptr,a
+                                    174 ;	free.c:59: for(h = __sdcc_heap_free, f = &__sdcc_heap_free; h && h < ptr; prev_free = h, f = &(h->next_free), h = h->next_free); // Find adjacent blocks in free list
+      000038 90s00r00r00      [12]  175 	mov	dptr,#___sdcc_heap_free
+                                    176 ;	genAssign: resultIsFar = FALSE
+      00003C E0               [ 8]  177 	movx	a,@dptr
+      00003D F9               [ 4]  178 	mov	r1,a
+      00003E A3               [12]  179 	inc	dptr
+      00003F E0               [ 8]  180 	movx	a,@dptr
+      000040 FA               [ 4]  181 	mov	r2,a
+      000041 A3               [12]  182 	inc	dptr
+      000042 E0               [ 8]  183 	movx	a,@dptr
+      000043 FB               [ 4]  184 	mov	r3,a
+                                    185 ;	genAssign: resultIsFar = TRUE
+      000044 90s00r00r0D      [12]  186 	mov	dptr,#_free_f_65536_38
+      000048 74r00            [ 8]  187 	mov	a,#___sdcc_heap_free
+      00004A F0               [ 8]  188 	movx	@dptr,a
+      00004B A3               [12]  189 	inc	dptr
+      00004C 74s00            [ 8]  190 	mov	a,#(___sdcc_heap_free >> 8)
+      00004E F0               [ 8]  191 	movx	@dptr,a
+      00004F A3               [12]  192 	inc	dptr
+      000050 74s00            [ 8]  193 	mov	a,#(___sdcc_heap_free >> 16)
+      000052 F0               [ 8]  194 	movx	@dptr,a
+      000053 90s00r00r00      [12]  195 	mov	dptr,#_free_ptr_65536_37
+                                    196 ;	genAssign: resultIsFar = TRUE
+      000057 75 86 21         [12]  197 	mov	dps,#0x21
+      00005A 90s00r00r10      [12]  198 	mov	dptr,#_free_sloc0_1_0
+      00005E E0               [ 8]  199 	movx	a,@dptr
+      00005F F0               [ 8]  200 	movx	@dptr,a
+      000060 A3               [12]  201 	inc	dptr
+      000061 A3               [12]  202 	inc	dptr
+      000062 E0               [ 8]  203 	movx	a,@dptr
+      000063 F0               [ 8]  204 	movx	@dptr,a
+      000064 A3               [12]  205 	inc	dptr
+      000065 A3               [12]  206 	inc	dptr
+      000066 E0               [ 8]  207 	movx	a,@dptr
+      000067 F0               [ 8]  208 	movx	@dptr,a
+      000068 A3               [12]  209 	inc	dptr
+      000069 A3               [12]  210 	inc	dptr
+      00006A E0               [ 8]  211 	movx	a,@dptr
+      00006B F0               [ 8]  212 	movx	@dptr,a
+      00006C 75 86 00         [12]  213 	mov	dps,#0
+      00006F                        214 00111$:
+      00006F E9               [ 4]  215 	mov	a,r1
+      000070 4A               [ 4]  216 	orl	a,r2
+      000071 4B               [ 4]  217 	orl	a,r3
+      000072 60 69            [12]  218 	jz  00103$
+      000074                        219 00151$:
+                                    220 ;	genAssign: resultIsFar = TRUE
+      000074 90s00r00r14      [12]  221 	mov	dptr,#_free_sloc1_1_0
+      000078 E9               [ 4]  222 	mov	a,r1
+      000079 F0               [ 8]  223 	movx	@dptr,a
+      00007A A3               [12]  224 	inc	dptr
+      00007B EA               [ 4]  225 	mov	a,r2
+      00007C F0               [ 8]  226 	movx	@dptr,a
+      00007D A3               [12]  227 	inc	dptr
+      00007E EB               [ 4]  228 	mov	a,r3
+      00007F F0               [ 8]  229 	movx	@dptr,a
+      000080 90s00r00r10      [12]  230 	mov	dptr,#_free_sloc0_1_0
+      000084 E0               [ 8]  231 	movx	a,@dptr
+      000085 FF               [ 4]  232 	mov	r7,a
+      000086 A3               [12]  233 	inc	dptr
+      000087 E0               [ 8]  234 	movx	a,@dptr
+      000088 F8               [ 4]  235 	mov	r0,a
+      000089 A3               [12]  236 	inc	dptr
+      00008A E0               [ 8]  237 	movx	a,@dptr
+      00008B FC               [ 4]  238 	mov	r4,a
+      00008C 90s00r00r14      [12]  239 	mov	dptr,#_free_sloc1_1_0
+      000090 C3               [ 4]  240 	clr	c
+      000091 E0               [ 8]  241 	movx	a,@dptr
+      000092 9F               [ 4]  242 	subb	a,r7
+      000093 A3               [12]  243 	inc	dptr
+      000094 E0               [ 8]  244 	movx	a,@dptr
+      000095 98               [ 4]  245 	subb	a,r0
+      000096 A3               [12]  246 	inc	dptr
+      000097 E0               [ 8]  247 	movx	a,@dptr
+      000098 9C               [ 4]  248 	subb	a,r4
+      000099 50 42            [12]  249 	jnc  00103$
+      00009B                        250 00152$:
+                                    251 ;	genAssign: resultIsFar = TRUE
+      00009B 90s00r00r0A      [12]  252 	mov	dptr,#_free_prev_free_65536_38
+      00009F E9               [ 4]  253 	mov	a,r1
+      0000A0 F0               [ 8]  254 	movx	@dptr,a
+      0000A1 A3               [12]  255 	inc	dptr
+      0000A2 EA               [ 4]  256 	mov	a,r2
+      0000A3 F0               [ 8]  257 	movx	@dptr,a
+      0000A4 A3               [12]  258 	inc	dptr
+      0000A5 EB               [ 4]  259 	mov	a,r3
+      0000A6 F0               [ 8]  260 	movx	@dptr,a
+      0000A7 74 03            [ 8]  261 	mov	a,#0x03
+      0000A9 29               [ 4]  262 	add	a,r1
+      0000AA F5 84            [ 8]  263 	mov	dpl1,a
+      0000AC E4               [ 4]  264 	clr	a
+      0000AD 3A               [ 4]  265 	addc	a,r2
+      0000AE F5 85            [ 8]  266 	mov	dph1,a
+      0000B0 E4               [ 4]  267 	clr	a
+      0000B1 3B               [ 4]  268 	addc	a,r3
+      0000B2 F5 95            [ 8]  269 	mov	dpx1,a
+                                    270 ;	genAssign: resultIsFar = TRUE
+      0000B4 90s00r00r0D      [12]  271 	mov	dptr,#_free_f_65536_38
+      0000B8 E5 84            [ 8]  272 	mov	a,dpl1
+      0000BA F0               [ 8]  273 	movx	@dptr,a
+      0000BB A3               [12]  274 	inc	dptr
+      0000BC E5 85            [ 8]  275 	mov	a,dph1
+      0000BE F0               [ 8]  276 	movx	@dptr,a
+      0000BF A3               [12]  277 	inc	dptr
+      0000C0 E5 95            [ 8]  278 	mov	a,dpx1
+      0000C2 F0               [ 8]  279 	movx	@dptr,a
+      0000C3 05 86            [ 8]  280 	inc	dps
+      0000C5 E0               [ 8]  281 	movx	a,@dptr
+      0000C6 A3               [12]  282 	inc	dptr
+      0000C7 F9               [ 4]  283 	mov	r1,a
+      0000C8 E0               [ 8]  284 	movx	a,@dptr
+      0000C9 A3               [12]  285 	inc	dptr
+      0000CA FA               [ 4]  286 	mov	r2,a
+      0000CB E0               [ 8]  287 	movx	a,@dptr
+      0000CC FB               [ 4]  288 	mov	r3,a
+      0000CD 75 86 01         [12]  289 	mov     dps, #1
+      0000D0 12s00r00r00      [16]  290 	lcall	__decdptr
+      0000D4 12s00r00r00      [16]  291 	lcall	__decdptr
+      0000D8 75 86 00         [12]  292 	mov	dps,#0
+      0000DB 80 92            [12]  293 	sjmp 00111$
+      0000DD                        294 00103$:
+                                    295 ;	free.c:60: next_free = h;
+                                    296 ;	genAssign: resultIsFar = TRUE
+      0000DD 90s00r00r07      [12]  297 	mov	dptr,#_free_next_free_65536_38
+      0000E1 E9               [ 4]  298 	mov	a,r1
+      0000E2 F0               [ 8]  299 	movx	@dptr,a
+      0000E3 A3               [12]  300 	inc	dptr
+      0000E4 EA               [ 4]  301 	mov	a,r2
+      0000E5 F0               [ 8]  302 	movx	@dptr,a
+      0000E6 A3               [12]  303 	inc	dptr
+      0000E7 EB               [ 4]  304 	mov	a,r3
+      0000E8 F0               [ 8]  305 	movx	@dptr,a
+                                    306 ;	free.c:62: h = (void HEAPSPACE *)((char HEAPSPACE *)(ptr) - offsetof(struct header, next_free));
+      0000E9 90s00r00r00      [12]  307 	mov	dptr,#_free_ptr_65536_37
+                                    308 ;	genAssign: resultIsFar = FALSE
+      0000ED E0               [ 8]  309 	movx	a,@dptr
+      0000EE FC               [ 4]  310 	mov	r4,a
+      0000EF A3               [12]  311 	inc	dptr
+      0000F0 E0               [ 8]  312 	movx	a,@dptr
+      0000F1 FD               [ 4]  313 	mov	r5,a
+      0000F2 A3               [12]  314 	inc	dptr
+      0000F3 E0               [ 8]  315 	movx	a,@dptr
+      0000F4 FE               [ 4]  316 	mov	r6,a
+      0000F5 A3               [12]  317 	inc	dptr
+      0000F6 E0               [ 8]  318 	movx	a,@dptr
+      0000F7 FF               [ 4]  319 	mov	r7,a
+      0000F8 EC               [ 4]  320 	mov	a,r4
+      0000F9 24 FD            [ 8]  321 	add	a,#0xfd
+      0000FB FC               [ 4]  322 	mov	r4,a
+      0000FC ED               [ 4]  323 	mov	a,r5
+      0000FD 34 FF            [ 8]  324 	addc	a,#0xff
+      0000FF FD               [ 4]  325 	mov	r5,a
+      000100 EE               [ 4]  326 	mov	a,r6
+      000101 34 FF            [ 8]  327 	addc	a,#0xff
+      000103 FE               [ 4]  328 	mov	r6,a
+      000104 90s00r00r04      [12]  329 	mov	dptr,#_free_h_65536_38
+      000108 EC               [ 4]  330 	mov	a,r4
+      000109 F0               [ 8]  331 	movx	@dptr,a
+      00010A A3               [12]  332 	inc	dptr
+      00010B ED               [ 4]  333 	mov	a,r5
+      00010C F0               [ 8]  334 	movx	@dptr,a
+      00010D A3               [12]  335 	inc	dptr
+      00010E EE               [ 4]  336 	mov	a,r6
+      00010F F0               [ 8]  337 	movx	@dptr,a
+                                    338 ;	free.c:65: h->next_free = next_free;
+      000110 90s00r00r04      [12]  339 	mov	dptr,#_free_h_65536_38
+      000114 E0               [ 8]  340 	movx	a,@dptr
+      000115 24 03            [ 8]  341 	add	a,#0x03
+      000117 FF               [ 4]  342 	mov	r7,a
+      000118 A3               [12]  343 	inc	dptr
+      000119 E0               [ 8]  344 	movx	a,@dptr
+      00011A 34 00            [ 8]  345 	addc	a,#0x00
+      00011C F8               [ 4]  346 	mov	r0,a
+      00011D A3               [12]  347 	inc	dptr
+      00011E E0               [ 8]  348 	movx	a,@dptr
+      00011F 34 00            [ 8]  349 	addc	a,#0x00
+      000121 FA               [ 4]  350 	mov	r2,a
+      000122 8F 82            [ 8]  351 	mov	dpl,r7
+      000124 88 83            [ 8]  352 	mov	dph,r0
+      000126 8A 93            [ 8]  353 	mov	dpx,r2
+      000128 75 86 01         [12]  354 	mov     dps, #1
+      00012B 90s00r00r07      [12]  355 	mov     dptr, #_free_next_free_65536_38
+      00012F E0               [ 8]  356 	movx	a,@dptr
+      000130 15 86            [ 8]  357 	dec	dps
+      000132 F0               [ 8]  358 	movx	@dptr,a
+      000133 A3               [12]  359 	inc	dptr
+      000134 05 86            [ 8]  360 	inc	dps
+      000136 A3               [12]  361 	inc	dptr
+      000137 E0               [ 8]  362 	movx	a,@dptr
+      000138 15 86            [ 8]  363 	dec	dps
+      00013A F0               [ 8]  364 	movx	@dptr,a
+      00013B A3               [12]  365 	inc	dptr
+      00013C 05 86            [ 8]  366 	inc	dps
+      00013E A3               [12]  367 	inc	dptr
+      00013F E0               [ 8]  368 	movx	a,@dptr
+      000140 15 86            [ 8]  369 	dec	dps
+      000142 F0               [ 8]  370 	movx	@dptr,a
+                                    371 ;	free.c:66: *f = h;
+      000143 90s00r00r0D      [12]  372 	mov	dptr,#_free_f_65536_38
+      000147 E0               [ 8]  373 	movx	a,@dptr
+      000148 C0 E0            [ 8]  374 	push	acc
+      00014A A3               [12]  375 	inc	dptr
+      00014B E0               [ 8]  376 	movx	a,@dptr
+      00014C C0 E0            [ 8]  377 	push	acc
+      00014E A3               [12]  378 	inc	dptr
+      00014F E0               [ 8]  379 	movx	a,@dptr
+      000150 F5 93            [ 8]  380 	mov	dpx,a
+      000152 D0 83            [ 8]  381 	pop	dph
+      000154 D0 82            [ 8]  382 	pop	dpl
+      000156 75 86 01         [12]  383 	mov     dps, #1
+      000159 90s00r00r04      [12]  384 	mov     dptr, #_free_h_65536_38
+      00015D E0               [ 8]  385 	movx	a,@dptr
+      00015E 15 86            [ 8]  386 	dec	dps
+      000160 F0               [ 8]  387 	movx	@dptr,a
+      000161 A3               [12]  388 	inc	dptr
+      000162 05 86            [ 8]  389 	inc	dps
+      000164 A3               [12]  390 	inc	dptr
+      000165 E0               [ 8]  391 	movx	a,@dptr
+      000166 15 86            [ 8]  392 	dec	dps
+      000168 F0               [ 8]  393 	movx	@dptr,a
+      000169 A3               [12]  394 	inc	dptr
+      00016A 05 86            [ 8]  395 	inc	dps
+      00016C A3               [12]  396 	inc	dptr
+      00016D E0               [ 8]  397 	movx	a,@dptr
+      00016E 15 86            [ 8]  398 	dec	dps
+      000170 F0               [ 8]  399 	movx	@dptr,a
+                                    400 ;	free.c:68: if(next_free == h->next) // Merge with next block
+      000171 90s00r00r04      [12]  401 	mov	dptr,#_free_h_65536_38
+      000175 E0               [ 8]  402 	movx	a,@dptr
+      000176 C0 E0            [ 8]  403 	push	acc
+      000178 A3               [12]  404 	inc	dptr
+      000179 E0               [ 8]  405 	movx	a,@dptr
+      00017A C0 E0            [ 8]  406 	push	acc
+      00017C A3               [12]  407 	inc	dptr
+      00017D E0               [ 8]  408 	movx	a,@dptr
+      00017E F5 93            [ 8]  409 	mov	dpx,a
+      000180 D0 83            [ 8]  410 	pop	dph
+      000182 D0 82            [ 8]  411 	pop	dpl
+      000184 E0               [ 8]  412 	movx	a,@dptr
+      000185 A3               [12]  413 	inc	dptr
+      000186 FB               [ 4]  414 	mov	r3,a
+      000187 E0               [ 8]  415 	movx	a,@dptr
+      000188 A3               [12]  416 	inc	dptr
+      000189 FC               [ 4]  417 	mov	r4,a
+      00018A E0               [ 8]  418 	movx	a,@dptr
+      00018B FD               [ 4]  419 	mov	r5,a
+      00018C 90s00r00r07      [12]  420 	mov	dptr,#_free_next_free_65536_38
+      000190 E0               [ 8]  421 	movx	a,@dptr
+      000191 B5 03 0C         [16]  422 	cjne	a,ar3,00153$
+      000194 A3               [12]  423 	inc	dptr
+      000195 E0               [ 8]  424 	movx	a,@dptr
+      000196 B5 04 07         [16]  425 	cjne	a,ar4,00153$
+      000199 A3               [12]  426 	inc	dptr
+      00019A E0               [ 8]  427 	movx	a,@dptr
+      00019B B5 05 02         [16]  428 	cjne	a,ar5,00153$
+      00019E 80 02            [12]  429 	sjmp	00154$
+      0001A0                        430 00153$:
+      0001A0 80 6C            [12]  431 	sjmp 00105$
+      0001A2                        432 00154$:
+                                    433 ;	free.c:70: h->next_free = h->next->next_free;
+      0001A2 74 03            [ 8]  434 	mov	a,#0x03
+      0001A4 2B               [ 4]  435 	add	a,r3
+      0001A5 F5 84            [ 8]  436 	mov	dpl1,a
+      0001A7 E4               [ 4]  437 	clr	a
+      0001A8 3C               [ 4]  438 	addc	a,r4
+      0001A9 F5 85            [ 8]  439 	mov	dph1,a
+      0001AB E4               [ 4]  440 	clr	a
+      0001AC 3D               [ 4]  441 	addc	a,r5
+      0001AD F5 95            [ 8]  442 	mov	dpx1,a
+      0001AF 05 86            [ 8]  443 	inc	dps
+      0001B1 E0               [ 8]  444 	movx	a,@dptr
+      0001B2 A3               [12]  445 	inc	dptr
+      0001B3 FB               [ 4]  446 	mov	r3,a
+      0001B4 E0               [ 8]  447 	movx	a,@dptr
+      0001B5 A3               [12]  448 	inc	dptr
+      0001B6 F9               [ 4]  449 	mov	r1,a
+      0001B7 E0               [ 8]  450 	movx	a,@dptr
+      0001B8 FC               [ 4]  451 	mov	r4,a
+      0001B9 75 86 00         [12]  452 	mov	dps,#0
+      0001BC 8F 82            [ 8]  453 	mov	dpl,r7
+      0001BE 88 83            [ 8]  454 	mov	dph,r0
+      0001C0 8A 93            [ 8]  455 	mov	dpx,r2
+      0001C2 EB               [ 4]  456 	mov	a,r3
+      0001C3 F0               [ 8]  457 	movx	@dptr,a
+      0001C4 A3               [12]  458 	inc	dptr
+      0001C5 E9               [ 4]  459 	mov	a,r1
+      0001C6 F0               [ 8]  460 	movx	@dptr,a
+      0001C7 A3               [12]  461 	inc	dptr
+      0001C8 EC               [ 4]  462 	mov	a,r4
+      0001C9 F0               [ 8]  463 	movx	@dptr,a
+                                    464 ;	free.c:71: h->next = h->next->next;
+      0001CA 90s00r00r04      [12]  465 	mov	dptr,#_free_h_65536_38
+      0001CE E0               [ 8]  466 	movx	a,@dptr
+      0001CF C0 E0            [ 8]  467 	push	acc
+      0001D1 A3               [12]  468 	inc	dptr
+      0001D2 E0               [ 8]  469 	movx	a,@dptr
+      0001D3 C0 E0            [ 8]  470 	push	acc
+      0001D5 A3               [12]  471 	inc	dptr
+      0001D6 E0               [ 8]  472 	movx	a,@dptr
+      0001D7 F5 93            [ 8]  473 	mov	dpx,a
+      0001D9 D0 83            [ 8]  474 	pop	dph
+      0001DB D0 82            [ 8]  475 	pop	dpl
+      0001DD E0               [ 8]  476 	movx	a,@dptr
+      0001DE A3               [12]  477 	inc	dptr
+      0001DF FB               [ 4]  478 	mov	r3,a
+      0001E0 E0               [ 8]  479 	movx	a,@dptr
+      0001E1 A3               [12]  480 	inc	dptr
+      0001E2 FC               [ 4]  481 	mov	r4,a
+      0001E3 E0               [ 8]  482 	movx	a,@dptr
+      0001E4 FD               [ 4]  483 	mov	r5,a
+      0001E5 8B 82            [ 8]  484 	mov	dpl,r3
+      0001E7 8C 83            [ 8]  485 	mov	dph,r4
+      0001E9 8D 93            [ 8]  486 	mov	dpx,r5
+      0001EB E0               [ 8]  487 	movx	a,@dptr
+      0001EC A3               [12]  488 	inc	dptr
+      0001ED FB               [ 4]  489 	mov	r3,a
+      0001EE E0               [ 8]  490 	movx	a,@dptr
+      0001EF A3               [12]  491 	inc	dptr
+      0001F0 FC               [ 4]  492 	mov	r4,a
+      0001F1 E0               [ 8]  493 	movx	a,@dptr
+      0001F2 FD               [ 4]  494 	mov	r5,a
+      0001F3 90s00r00r04      [12]  495 	mov	dptr,#_free_h_65536_38
+      0001F7 E0               [ 8]  496 	movx	a,@dptr
+      0001F8 C0 E0            [ 8]  497 	push	acc
+      0001FA A3               [12]  498 	inc	dptr
+      0001FB E0               [ 8]  499 	movx	a,@dptr
+      0001FC C0 E0            [ 8]  500 	push	acc
+      0001FE A3               [12]  501 	inc	dptr
+      0001FF E0               [ 8]  502 	movx	a,@dptr
+      000200 F5 93            [ 8]  503 	mov	dpx,a
+      000202 D0 83            [ 8]  504 	pop	dph
+      000204 D0 82            [ 8]  505 	pop	dpl
+      000206 EB               [ 4]  506 	mov	a,r3
+      000207 F0               [ 8]  507 	movx	@dptr,a
+      000208 A3               [12]  508 	inc	dptr
+      000209 EC               [ 4]  509 	mov	a,r4
+      00020A F0               [ 8]  510 	movx	@dptr,a
+      00020B A3               [12]  511 	inc	dptr
+      00020C ED               [ 4]  512 	mov	a,r5
+      00020D F0               [ 8]  513 	movx	@dptr,a
+      00020E                        514 00105$:
+                                    515 ;	free.c:74: if (prev_free && prev_free->next == h) // Merge with previous block
+      00020E 90s00r00r0A      [12]  516 	mov	dptr,#_free_prev_free_65536_38
+      000212 E0               [ 8]  517 	movx	a,@dptr
+      000213 F5 F0            [ 8]  518 	mov	b,a
+      000215 A3               [12]  519 	inc	dptr
+      000216 E0               [ 8]  520 	movx	a,@dptr
+      000217 42 F0            [ 8]  521 	orl	b,a
+      000219 A3               [12]  522 	inc	dptr
+      00021A E0               [ 8]  523 	movx	a,@dptr
+      00021B 45 F0            [ 8]  524 	orl	a,b
+      00021D 70 04            [12]  525 	jnz	00155$
+      00021F 02s00r02rC0      [16]  526 	ljmp	00113$
+      000223                        527 00155$:
+      000223 90s00r00r0A      [12]  528 	mov	dptr,#_free_prev_free_65536_38
+      000227 E0               [ 8]  529 	movx	a,@dptr
+      000228 C0 E0            [ 8]  530 	push	acc
+      00022A A3               [12]  531 	inc	dptr
+      00022B E0               [ 8]  532 	movx	a,@dptr
+      00022C C0 E0            [ 8]  533 	push	acc
+      00022E A3               [12]  534 	inc	dptr
+      00022F E0               [ 8]  535 	movx	a,@dptr
+      000230 F5 93            [ 8]  536 	mov	dpx,a
+      000232 D0 83            [ 8]  537 	pop	dph
+      000234 D0 82            [ 8]  538 	pop	dpl
+      000236 E0               [ 8]  539 	movx	a,@dptr
+      000237 A3               [12]  540 	inc	dptr
+      000238 FB               [ 4]  541 	mov	r3,a
+      000239 E0               [ 8]  542 	movx	a,@dptr
+      00023A A3               [12]  543 	inc	dptr
+      00023B FC               [ 4]  544 	mov	r4,a
+      00023C E0               [ 8]  545 	movx	a,@dptr
+      00023D FD               [ 4]  546 	mov	r5,a
+      00023E 90s00r00r04      [12]  547 	mov	dptr,#_free_h_65536_38
+      000242 8B F0            [ 8]  548 	mov	b,r3
+      000244 E0               [ 8]  549 	movx	a,@dptr
+      000245 B5 F0 10         [16]  550 	cjne	a,b,00156$
+      000248 8C F0            [ 8]  551 	mov	b,r4
+      00024A A3               [12]  552 	inc	dptr
+      00024B E0               [ 8]  553 	movx	a,@dptr
+      00024C B5 F0 09         [16]  554 	cjne	a,b,00156$
+      00024F 8D F0            [ 8]  555 	mov	b,r5
+      000251 A3               [12]  556 	inc	dptr
+      000252 E0               [ 8]  557 	movx	a,@dptr
+      000253 B5 F0 02         [16]  558 	cjne	a,b,00156$
+      000256 80 02            [12]  559 	sjmp	00157$
+      000258                        560 00156$:
+      000258 80 66            [12]  561 	sjmp 00113$
+      00025A                        562 00157$:
+                                    563 ;	free.c:76: prev_free->next = h->next;
+      00025A 90s00r00r04      [12]  564 	mov	dptr,#_free_h_65536_38
+      00025E E0               [ 8]  565 	movx	a,@dptr
+      00025F C0 E0            [ 8]  566 	push	acc
+      000261 A3               [12]  567 	inc	dptr
+      000262 E0               [ 8]  568 	movx	a,@dptr
+      000263 C0 E0            [ 8]  569 	push	acc
+      000265 A3               [12]  570 	inc	dptr
+      000266 E0               [ 8]  571 	movx	a,@dptr
+      000267 F5 93            [ 8]  572 	mov	dpx,a
+      000269 D0 83            [ 8]  573 	pop	dph
+      00026B D0 82            [ 8]  574 	pop	dpl
+      00026D E0               [ 8]  575 	movx	a,@dptr
+      00026E A3               [12]  576 	inc	dptr
+      00026F FB               [ 4]  577 	mov	r3,a
+      000270 E0               [ 8]  578 	movx	a,@dptr
+      000271 A3               [12]  579 	inc	dptr
+      000272 FC               [ 4]  580 	mov	r4,a
+      000273 E0               [ 8]  581 	movx	a,@dptr
+      000274 FD               [ 4]  582 	mov	r5,a
+      000275 90s00r00r0A      [12]  583 	mov	dptr,#_free_prev_free_65536_38
+      000279 E0               [ 8]  584 	movx	a,@dptr
+      00027A C0 E0            [ 8]  585 	push	acc
+      00027C A3               [12]  586 	inc	dptr
+      00027D E0               [ 8]  587 	movx	a,@dptr
+      00027E C0 E0            [ 8]  588 	push	acc
+      000280 A3               [12]  589 	inc	dptr
+      000281 E0               [ 8]  590 	movx	a,@dptr
+      000282 F5 93            [ 8]  591 	mov	dpx,a
+      000284 D0 83            [ 8]  592 	pop	dph
+      000286 D0 82            [ 8]  593 	pop	dpl
+      000288 EB               [ 4]  594 	mov	a,r3
+      000289 F0               [ 8]  595 	movx	@dptr,a
+      00028A A3               [12]  596 	inc	dptr
+      00028B EC               [ 4]  597 	mov	a,r4
+      00028C F0               [ 8]  598 	movx	@dptr,a
+      00028D A3               [12]  599 	inc	dptr
+      00028E ED               [ 4]  600 	mov	a,r5
+      00028F F0               [ 8]  601 	movx	@dptr,a
+                                    602 ;	free.c:77: prev_free->next_free = h->next_free;
+      000290 90s00r00r0A      [12]  603 	mov	dptr,#_free_prev_free_65536_38
+      000294 E0               [ 8]  604 	movx	a,@dptr
+      000295 24 03            [ 8]  605 	add	a,#0x03
+      000297 F5 84            [ 8]  606 	mov	dpl1,a
+      000299 A3               [12]  607 	inc	dptr
+      00029A E0               [ 8]  608 	movx	a,@dptr
+      00029B 34 00            [ 8]  609 	addc	a,#0x00
+      00029D F5 85            [ 8]  610 	mov	dph1,a
+      00029F A3               [12]  611 	inc	dptr
+      0002A0 E0               [ 8]  612 	movx	a,@dptr
+      0002A1 34 00            [ 8]  613 	addc	a,#0x00
+      0002A3 F5 95            [ 8]  614 	mov	dpx1,a
+      0002A5 8F 82            [ 8]  615 	mov	dpl,r7
+      0002A7 88 83            [ 8]  616 	mov	dph,r0
+      0002A9 8A 93            [ 8]  617 	mov	dpx,r2
+      0002AB E0               [ 8]  618 	movx	a,@dptr
+      0002AC A3               [12]  619 	inc	dptr
+      0002AD FF               [ 4]  620 	mov	r7,a
+      0002AE E0               [ 8]  621 	movx	a,@dptr
+      0002AF A3               [12]  622 	inc	dptr
+      0002B0 F8               [ 4]  623 	mov	r0,a
+      0002B1 E0               [ 8]  624 	movx	a,@dptr
+      0002B2 FA               [ 4]  625 	mov	r2,a
+      0002B3 EF               [ 4]  626 	mov	a,r7
+      0002B4 05 86            [ 8]  627 	inc	dps
+      0002B6 F0               [ 8]  628 	movx	@dptr,a
+      0002B7 A3               [12]  629 	inc	dptr
+      0002B8 E8               [ 4]  630 	mov	a,r0
+      0002B9 F0               [ 8]  631 	movx	@dptr,a
+      0002BA A3               [12]  632 	inc	dptr
+      0002BB EA               [ 4]  633 	mov	a,r2
+      0002BC F0               [ 8]  634 	movx	@dptr,a
+      0002BD 75 86 00         [12]  635 	mov	dps,#0
+      0002C0                        636 00113$:
+                                    637 ;	free.c:79: }
+      0002C0 22               [16]  638 	ret
+                                    639 	.area CSEG    (CODE)
+                                    640 	.area CONST   (CODE)
+                                    641 	.area XINIT   (CODE)
+                                    642 	.area CABS    (ABS,CODE)

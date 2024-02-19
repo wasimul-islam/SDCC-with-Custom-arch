@@ -1,0 +1,224 @@
+                                      1 ;--------------------------------------------------------
+                                      2 ; File Created by SDCC : free open source ISO C Compiler 
+                                      3 ; Version 4.2.14 #0 (Linux)
+                                      4 ;--------------------------------------------------------
+                                      5 	.module _gptrput
+                                      6 	.optsdcc -mds400 --model-flat24
+                                      7 	
+                                      8 ;--------------------------------------------------------
+                                      9 ; CPU specific extensions
+                                     10 ;--------------------------------------------------------
+                                     11 	.DS80C390
+                                     12 	.amode	2	; 24 bit flat addressing
+                           000082    13 dpl	=	0x82
+                           000083    14 dph	=	0x83
+                           000084    15 dpl1	=	0x84
+                           000085    16 dph1	=	0x85
+                           000086    17 dps	=	0x86
+                           000093    18 dpx	=	0x93
+                           000095    19 dpx1	=	0x95
+                           00009B    20 esp	=	0x9B
+                           00009C    21 ap	=	0x9C
+                           00009C    22 acc1	=	0x9C
+                           0000D1    23 mcnt0	=	0xD1
+                           0000D2    24 mcnt1	=	0xD2
+                           0000D3    25 ma	=	0xD3
+                           0000D4    26 mb	=	0xD4
+                           0000D5    27 mc	=	0xD5
+                           00009D    28 acon	=	0x9D
+                           0000C6    29 mcon	=	0xC6
+                           0000D1    30 F1	=	0xD1	; user flag
+                                     31 ;--------------------------------------------------------
+                                     32 ; Public variables in this module
+                                     33 ;--------------------------------------------------------
+                                     34 	.globl __gptrputWord
+                                     35 	.globl __gptrput
+                                     36 	.globl __gptrputWord_PARM_2
+                                     37 	.globl __gptrput_PARM_2
+                                     38 ;--------------------------------------------------------
+                                     39 ; special function registers
+                                     40 ;--------------------------------------------------------
+                                     41 ;--------------------------------------------------------
+                                     42 ; special function bits
+                                     43 ;--------------------------------------------------------
+                           0000F7    44 _B_7	=	0x00f7
+                           0000F6    45 _B_6	=	0x00f6
+                           0000F5    46 _B_5	=	0x00f5
+                                     47 ;--------------------------------------------------------
+                                     48 ; overlayable register banks
+                                     49 ;--------------------------------------------------------
+                                     50 	.area REG_BANK_0	(REL,OVR,DATA)
+      000000                         51 	.ds 8
+                                     52 	.area REG_BANK_3	(REL,OVR,DATA)
+      000000                         53 	.ds 8
+                                     54 ;--------------------------------------------------------
+                                     55 ; internal ram data
+                                     56 ;--------------------------------------------------------
+                                     57 	.area DSEG    (DATA)
+                                     58 ;--------------------------------------------------------
+                                     59 ; overlayable items in internal ram
+                                     60 ;--------------------------------------------------------
+                                     61 ;--------------------------------------------------------
+                                     62 ; indirectly addressable internal ram data
+                                     63 ;--------------------------------------------------------
+                                     64 	.area ISEG    (DATA)
+                                     65 ;--------------------------------------------------------
+                                     66 ; absolute internal ram data
+                                     67 ;--------------------------------------------------------
+                                     68 	.area IABS    (ABS,DATA)
+                                     69 	.area IABS    (ABS,DATA)
+                                     70 ;--------------------------------------------------------
+                                     71 ; bit data
+                                     72 ;--------------------------------------------------------
+                                     73 	.area BSEG    (BIT)
+                                     74 ;--------------------------------------------------------
+                                     75 ; paged external ram data
+                                     76 ;--------------------------------------------------------
+                                     77 	.area PSEG    (PAG,XDATA)
+                                     78 ;--------------------------------------------------------
+                                     79 ; uninitialized external ram data
+                                     80 ;--------------------------------------------------------
+                                     81 	.area XSEG    (XDATA)
+      000000                         82 __gptrput_PARM_2:
+      000000                         83 	.ds 1
+      000001                         84 __gptrputWord_PARM_2:
+      000001                         85 	.ds 2
+                                     86 ;--------------------------------------------------------
+                                     87 ; absolute external ram data
+                                     88 ;--------------------------------------------------------
+                                     89 	.area XABS    (ABS,XDATA)
+                                     90 ;--------------------------------------------------------
+                                     91 ; initialized external ram data
+                                     92 ;--------------------------------------------------------
+                                     93 	.area XISEG   (XDATA)
+                                     94 ;--------------------------------------------------------
+                                     95 ; global & static initialisations
+                                     96 ;--------------------------------------------------------
+                                     97 	.area HOME    (CODE)
+                                     98 	.area GSINIT  (CODE)
+                                     99 	.area GSFINAL (CODE)
+                                    100 	.area GSINIT  (CODE)
+                                    101 ;--------------------------------------------------------
+                                    102 ; Home
+                                    103 ;--------------------------------------------------------
+                                    104 	.area HOME    (CODE)
+                                    105 	.area HOME    (CODE)
+                                    106 ;--------------------------------------------------------
+                                    107 ; code
+                                    108 ;--------------------------------------------------------
+                                    109 	.area CSEG    (CODE)
+                                    110 ;------------------------------------------------------------
+                                    111 ;Allocation info for local variables in function '_gptrput'
+                                    112 ;------------------------------------------------------------
+                                    113 ;c                         Allocated with name '__gptrput_PARM_2'
+                                    114 ;gptr                      Allocated to registers 
+                                    115 ;------------------------------------------------------------
+                                    116 ;	_gptrput.c:148: _gptrput (char *gptr, char c) __naked
+                                    117 ;	-----------------------------------------
+                                    118 ;	 function _gptrput
+                                    119 ;	-----------------------------------------
+      000000                        120 __gptrput:
+                                    121 ;	naked function: no prologue.
+                                    122 ;	_gptrput.c:194: __endasm;
+                                    123 ;
+                                    124 ;	depending on the pointer type according to SDCCsymt.h
+                                    125 ;
+      000000 20 F7 11         [12]  126 	jb	_B_7,codeptr$ ; >0x80 code ; 3
+      000003 30 F6 13         [12]  127 	jnb	_B_6,xdataptr$ ; <0x40 far ; 3
+      000006 88 83            [ 8]  128 	mov	dph,r0 ; save r0 independant of regbank ; 2
+      000008 A8 82            [ 8]  129 	mov	r0,dpl ; use only low order address ; 2
+      00000A 20 F5 09         [12]  130 	jb	_B_5,pdataptr$ ; >0x60 pdata ; 3
+                                    131 ;
+                                    132 ;	store into near/idata space
+                                    133 ;
+      00000D F6               [ 4]  134 	mov	@r0,a ; 1
+      00000E                        135 dataptrrestore$:
+      00000E A8 83            [ 8]  136 	mov	r0,dph ; restore r0 ; 2
+      000010 75 83 00         [12]  137 	mov	dph,#0 ; restore dph ; 2
+      000013 22               [16]  138 	ret	; 1
+                                    139 ;
+                                    140 ;	cannot store into code space, lock up
+                                    141 ;
+      000014                        142 codeptr$:
+      000014 80 FE            [12]  143 	sjmp	. ; 2
+                                    144 ;
+                                    145 ;	store into external stack/pdata space
+                                    146 ;
+      000016                        147 pdataptr$:
+      000016 F2               [ 8]  148 	movx	@r0,a ; 1
+      000017 80 F5            [12]  149 	sjmp	dataptrrestore$ ; 2
+                                    150 ;
+                                    151 ;	store into far space
+                                    152 ;
+      000019                        153 xdataptr$:
+      000019 F0               [ 8]  154 	movx	@dptr,a ; 1
+      00001A 22               [16]  155 	ret	; 1
+                                    156 ;===
+                                    157 ;26	bytes
+      00001B                        158 00101$:
+                                    159 ;	_gptrput.c:195: }
+                                    160 ;	naked function: no epilogue.
+                                    161 ;------------------------------------------------------------
+                                    162 ;Allocation info for local variables in function '_gptrputWord'
+                                    163 ;------------------------------------------------------------
+                                    164 ;w                         Allocated with name '__gptrputWord_PARM_2'
+                                    165 ;gptr                      Allocated to registers 
+                                    166 ;------------------------------------------------------------
+                                    167 ;	_gptrput.c:202: _gptrputWord (int *gptr, int w) __naked
+                                    168 ;	-----------------------------------------
+                                    169 ;	 function _gptrputWord
+                                    170 ;	-----------------------------------------
+      00001B                        171 __gptrputWord:
+                                    172 ;	naked function: no prologue.
+                                    173 ;	_gptrput.c:256: __endasm;
+                                    174 ;
+                                    175 ;	depending on the pointer type acc. to SDCCsymt.h
+                                    176 ;
+      00001B 20 F7 16         [12]  177 	jb	_B_7,codeptr_w$ ; >0x80 code
+      00001E 30 F6 1E         [12]  178 	jnb	_B_6,xdataptr_w$ ; <0x40 far
+      000021 88 83            [ 8]  179 	mov	dph,r0 ; save r0 independant of regbank
+      000023 A8 82            [ 8]  180 	mov	r0,dpl ; use only low order address
+      000025 20 F5 0E         [12]  181 	jb	_B_5,pdataptr_w$ ; >0x60 pdata
+                                    182 ;
+                                    183 ;	store into near space
+                                    184 ;
+      000028 A6 9C            [ 8]  185 	mov	@r0,acc1
+      00002A 08               [ 4]  186 	inc	r0
+      00002B F6               [ 4]  187 	mov	@r0,a
+      00002C                        188 dataptrrestore_w$:
+      00002C 88 82            [ 8]  189 	mov	dpl,r0
+      00002E A8 83            [ 8]  190 	mov	r0,dph ; restore r0
+      000030 75 83 00         [12]  191 	mov	dph,#0 ; restore dph
+      000033 22               [16]  192 	ret
+                                    193 ;
+                                    194 ;	cannot store into code space, lock up
+                                    195 ;
+      000034                        196 codeptr_w$:
+      000034 80 FE            [12]  197 	sjmp	.
+                                    198 ;
+                                    199 ;	store into xstack space
+                                    200 ;
+      000036                        201 pdataptr_w$:
+      000036 C5 9C            [ 8]  202 	xch	a,acc1
+      000038 F2               [ 8]  203 	movx	@r0,a
+      000039 08               [ 4]  204 	inc	r0
+      00003A C5 9C            [ 8]  205 	xch	a,acc1
+      00003C F2               [ 8]  206 	movx	@r0, a
+      00003D 80 ED            [12]  207 	sjmp	dataptrrestore_w$
+                                    208 ;
+                                    209 ;	store into far space
+                                    210 ;
+      00003F                        211 xdataptr_w$:
+      00003F C5 9C            [ 8]  212 	xch	a,acc1
+      000041 F0               [ 8]  213 	movx	@dptr,a
+      000042 A3               [12]  214 	inc	dptr
+      000043 C5 9C            [ 8]  215 	xch	a,acc1
+      000045 F0               [ 8]  216 	movx	@dptr,a
+      000046 22               [16]  217 	ret
+      000047                        218 00101$:
+                                    219 ;	_gptrput.c:257: }
+                                    220 ;	naked function: no epilogue.
+                                    221 	.area CSEG    (CODE)
+                                    222 	.area CONST   (CODE)
+                                    223 	.area XINIT   (CODE)
+                                    224 	.area CABS    (ABS,CODE)

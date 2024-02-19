@@ -1,0 +1,136 @@
+                              1 ;-------------------------------------------------------------------------
+                              2 ;   _divulong.s - routine for 32 bit unsigned long division
+                              3 ;
+                              4 ;   Copyright (C) 1998, Ullrich von Bassewitz
+                              5 ;   Copyright (C) 2022, Gabriele Gorla
+                              6 ;
+                              7 ;   This library is free software; you can redistribute it and/or modify it
+                              8 ;   under the terms of the GNU General Public License as published by the
+                              9 ;   Free Software Foundation; either version 2, or (at your option) any
+                             10 ;   later version.
+                             11 ;
+                             12 ;   This library is distributed in the hope that it will be useful,
+                             13 ;   but WITHOUT ANY WARRANTY; without even the implied warranty of
+                             14 ;   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+                             15 ;   GNU General Public License for more details.
+                             16 ;
+                             17 ;   You should have received a copy of the GNU General Public License
+                             18 ;   along with this library; see the file COPYING. If not, write to the
+                             19 ;   Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
+                             20 ;   MA 02110-1301, USA.
+                             21 ;
+                             22 ;   As a special exception, if you link this library with other files,
+                             23 ;   some of which are compiled with SDCC, to produce an executable,
+                             24 ;   this library does not by itself cause the resulting executable to
+                             25 ;   be covered by the GNU General Public License. This exception does
+                             26 ;   not however invalidate any other reasons why the executable file
+                             27 ;   might be covered by the GNU General Public License.
+                             28 ;-------------------------------------------------------------------------
+                             29 
+                             30 	.module _divulong
+                             31 
+                             32 ;--------------------------------------------------------
+                             33 ; exported symbols
+                             34 ;--------------------------------------------------------
+                             35 	.globl __divulong_PARM_2
+                             36 	.globl __divulong_PARM_1
+                             37 	.globl __divslong_PARM_2
+                             38 	.globl __divslong_PARM_1
+                             39 	.globl __modulong_PARM_2
+                             40 	.globl __modulong_PARM_1
+                             41 	.globl __modslong_PARM_2
+                             42 	.globl __modslong_PARM_1
+                             43 	.globl __divulong
+                             44 	.globl ___udivmod32
+                             45 
+                             46 ;--------------------------------------------------------
+                             47 ; overlayable function paramters in zero page
+                             48 ;--------------------------------------------------------
+                             49 	.area	OSEG    (PAG, OVR)
+   0000                      50 __divulong_PARM_1:
+   0000                      51 __divslong_PARM_1:
+   0000                      52 __modulong_PARM_1:
+   0000                      53 __modslong_PARM_1:
+   0000                      54 	.ds 4
+   0004                      55 __divulong_PARM_2:
+   0004                      56 __divslong_PARM_2:
+   0004                      57 __modulong_PARM_2:
+   0004                      58 __modslong_PARM_2:
+   0004                      59 	.ds 4
+                             60 
+                             61 ;--------------------------------------------------------
+                             62 ; local aliases
+                             63 ;--------------------------------------------------------
+                             64 	.define res0 "__divulong_PARM_1+0"
+                             65 	.define res1 "__divulong_PARM_1+1"
+                             66 	.define res2 "___SDCC_m6502_ret2"
+                             67 	.define res3 "___SDCC_m6502_ret3"
+                             68 	.define den  "__divulong_PARM_2"
+                             69 	.define rem  "___SDCC_m6502_ret4"
+                             70 	.define s1  "___SDCC_m6502_ret0"
+                             71 	.define s2  "___SDCC_m6502_ret1"
+                             72 	
+                             73 ;--------------------------------------------------------
+                             74 ; code
+                             75 ;--------------------------------------------------------
+                             76 	.area CODE
+                             77 
+   0000                      78 __divulong:
+   0000 20r08r00      [ 6]   79 	jsr	___udivmod32
+   0003 A5*00         [ 3]   80 	lda	*res0
+   0005 A6*01         [ 3]   81 	ldx	*res1
+   0007 60            [ 6]   82 	rts
+                             83 
+   0008                      84 ___udivmod32:
+   0008 AEr03r00      [ 4]   85         ldx	__divulong_PARM_1+3
+   000B 86*00         [ 3]   86         stx	*res3
+   000D AEr02r00      [ 4]   87         ldx	__divulong_PARM_1+2
+   0010 86*00         [ 3]   88         stx	*res2
+                             89 
+   0012 A9 00         [ 2]   90 	lda     #0
+   0014 85*00         [ 3]   91         sta     *rem+0
+   0016 85*01         [ 3]   92         sta     *rem+1
+   0018 85*02         [ 3]   93         sta     *rem+2
+   001A 85*03         [ 3]   94         sta     *rem+3
+   001C A0 20         [ 2]   95         ldy     #32
+   001E                      96 L0:
+   001E 06*00         [ 5]   97 	asl     *res0
+   0020 26*01         [ 5]   98         rol     *res1
+   0022 26*00         [ 5]   99         rol     *res2
+   0024 26*00         [ 5]  100         rol     *res3
+   0026 2A            [ 2]  101         rol     a
+   0027 26*01         [ 5]  102         rol     *rem+1
+   0029 26*02         [ 5]  103         rol     *rem+2
+   002B 26*03         [ 5]  104         rol     *rem+3
+                            105 
+                            106 ; Do a subtraction. we do not have enough space to store the intermediate
+                            107 ; result, so we may have to do the subtraction twice.
+   002D AA            [ 2]  108         tax
+   002E C5*04         [ 3]  109         cmp     *den+0
+   0030 A5*01         [ 3]  110         lda     *rem+1
+   0032 E5*05         [ 3]  111         sbc     *den+1
+   0034 A5*02         [ 3]  112         lda     *rem+2
+   0036 E5*06         [ 3]  113         sbc     *den+2
+   0038 A5*03         [ 3]  114         lda     *rem+3
+   003A E5*07         [ 3]  115         sbc     *den+3
+   003C 90 14         [ 4]  116         bcc     L1
+                            117 
+                            118 ; Overflow, do the subtraction again, this time store the result
+   003E 85*03         [ 3]  119         sta     *rem+3	; We have the high byte already
+   0040 8A            [ 2]  120         txa
+   0041 E5*04         [ 3]  121         sbc     *den+0	; byte 0
+   0043 AA            [ 2]  122         tax
+   0044 A5*01         [ 3]  123         lda     *rem+1
+   0046 E5*05         [ 3]  124         sbc     *den+1
+   0048 85*01         [ 3]  125         sta     *rem+1	; byte 1
+   004A A5*02         [ 3]  126         lda     *rem+2
+   004C E5*06         [ 3]  127         sbc     *den+2
+   004E 85*02         [ 3]  128         sta     *rem+2 	; byte 2
+   0050 E6*00         [ 5]  129         inc     *res0	; Set result bit
+   0052                     130 L1:
+   0052 8A            [ 2]  131 	txa
+   0053 88            [ 2]  132         dey
+   0054 D0 C8         [ 4]  133         bne     L0
+   0056 85*00         [ 3]  134         sta     *rem+0
+   0058 60            [ 6]  135         rts
+                            136 

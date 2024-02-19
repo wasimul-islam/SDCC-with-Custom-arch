@@ -1,0 +1,414 @@
+                              1 ;--------------------------------------------------------
+                              2 ; File Created by SDCC : free open source ISO C Compiler 
+                              3 ; Version 4.2.14 #0 (Linux)
+                              4 ;--------------------------------------------------------
+                              5 	.module malloc
+                              6 	.optsdcc -mmos6502
+                              7 	
+                              8 ;--------------------------------------------------------
+                              9 ; Public variables in this module
+                             10 ;--------------------------------------------------------
+                             11 	.globl ___sdcc_heap_init
+                             12 	.globl ___sdcc_heap_free
+                             13 	.globl _malloc
+                             14 ;--------------------------------------------------------
+                             15 ; ZP ram data
+                             16 ;--------------------------------------------------------
+                             17 	.area ZP      (PAG)
+                             18 ;--------------------------------------------------------
+                             19 ; overlayable items in ram
+                             20 ;--------------------------------------------------------
+                             21 ;--------------------------------------------------------
+                             22 ; uninitialized external ram data
+                             23 ;--------------------------------------------------------
+                             24 	.area BSS
+   0000                      25 ___sdcc_heap_free::
+   0000                      26 	.ds 2
+                             27 ;--------------------------------------------------------
+                             28 ; absolute external ram data
+                             29 ;--------------------------------------------------------
+                             30 	.area DABS    (ABS)
+                             31 ;--------------------------------------------------------
+                             32 ; initialized external ram data
+                             33 ;--------------------------------------------------------
+                             34 	.area DATA
+                             35 ;--------------------------------------------------------
+                             36 ; global & static initialisations
+                             37 ;--------------------------------------------------------
+                             38 	.area _CODE
+                             39 	.area GSINIT
+                             40 	.area GSFINAL
+                             41 	.area GSINIT
+                             42 ;--------------------------------------------------------
+                             43 ; Home
+                             44 ;--------------------------------------------------------
+                             45 	.area _CODE
+                             46 	.area _CODE
+                             47 ;--------------------------------------------------------
+                             48 ; code
+                             49 ;--------------------------------------------------------
+                             50 	.area CODE
+                             51 ;------------------------------------------------------------
+                             52 ;Allocation info for local variables in function '__sdcc_heap_init'
+                             53 ;------------------------------------------------------------
+                             54 ;	../malloc.c: 65: void __sdcc_heap_init(void)
+                             55 ;	-----------------------------------------
+                             56 ;	 function __sdcc_heap_init
+                             57 ;	-----------------------------------------
+                             58 ;	Register assignment is optimal.
+                             59 ;	Stack space usage: 0 bytes.
+   0000                      60 ___sdcc_heap_init:
+                             61 ;	../malloc.c: 67: __sdcc_heap_free = HEAP_START;
+   0000 A9r00         [ 2]   62 	lda	#___sdcc_heap
+   0002 8Dr00r00      [ 4]   63 	sta	___sdcc_heap_free
+   0005 A9s00         [ 2]   64 	lda	#>___sdcc_heap
+   0007 8Dr01r00      [ 4]   65 	sta	(___sdcc_heap_free + 1)
+                             66 ;	../malloc.c: 68: __sdcc_heap_free->next = HEAP_END;
+   000A ADr00r00      [ 4]   67 	lda	___sdcc_heap_size
+   000D AEr01r00      [ 4]   68 	ldx	(___sdcc_heap_size + 1)
+   0010 38            [ 2]   69 	sec
+   0011 E9 01         [ 2]   70 	sbc	#0x01
+   0013 B0 01         [ 4]   71 	bcs	00103$
+   0015 CA            [ 2]   72 	dex
+   0016                      73 00103$:
+   0016 18            [ 2]   74 	clc
+   0017 69r00         [ 2]   75 	adc	#___sdcc_heap
+   0019 48            [ 3]   76 	pha
+   001A 8A            [ 2]   77 	txa
+   001B 69s00         [ 2]   78 	adc	#>___sdcc_heap
+   001D AA            [ 2]   79 	tax
+   001E 68            [ 4]   80 	pla
+   001F 8Er01r00      [ 4]   81 	stx	(___sdcc_heap + 1)
+   0022 8Dr00r00      [ 4]   82 	sta	___sdcc_heap
+                             83 ;	../malloc.c: 69: __sdcc_heap_free->next_free = 0;
+   0025 ADr00r00      [ 4]   84 	lda	___sdcc_heap_free
+   0028 AEr01r00      [ 4]   85 	ldx	(___sdcc_heap_free + 1)
+   002B 85*00         [ 3]   86 	sta	*(__DPTR+0)
+   002D 86*01         [ 3]   87 	stx	*(__DPTR+1)
+   002F A9 00         [ 2]   88 	lda	#0x00
+   0031 A0 02         [ 2]   89 	ldy	#0x02
+   0033 91*00         [ 6]   90 	sta	[__DPTR],y
+   0035 C8            [ 2]   91 	iny
+   0036 91*00         [ 6]   92 	sta	[__DPTR],y
+                             93 ;	../malloc.c: 70: }
+   0038 60            [ 6]   94 	rts
+                             95 ;------------------------------------------------------------
+                             96 ;Allocation info for local variables in function 'malloc'
+                             97 ;------------------------------------------------------------
+                             98 ;size                      Allocated to stack - sp +17
+                             99 ;h                         Allocated to stack - sp +15
+                            100 ;f                         Allocated to stack - sp +13
+                            101 ;blocksize                 Allocated to stack - sp +11
+                            102 ;newheader                 Allocated to stack - sp +9
+                            103 ;sloc0                     Allocated to stack - sp +7
+                            104 ;sloc1                     Allocated to stack - sp +5
+                            105 ;sloc2                     Allocated to stack - sp +3
+                            106 ;sloc3                     Allocated to stack - sp +1
+                            107 ;------------------------------------------------------------
+                            108 ;	../malloc.c: 75: void *malloc(size_t size)
+                            109 ;	-----------------------------------------
+                            110 ;	 function malloc
+                            111 ;	-----------------------------------------
+                            112 ;	Register assignment is optimal.
+                            113 ;	Stack space usage: 18 bytes.
+   0039                     114 _malloc:
+   0039 85*00         [ 3]  115 	sta	*(__TEMP+0)
+   003B 86*01         [ 3]  116 	stx	*(__TEMP+1)
+   003D BA            [ 2]  117 	tsx
+   003E 8A            [ 2]  118 	txa
+   003F 18            [ 2]  119 	clc
+   0040 69 EE         [ 2]  120 	adc	#0xee
+   0042 AA            [ 2]  121 	tax
+   0043 9A            [ 2]  122 	txs
+   0044 A6*01         [ 3]  123 	ldx	*(__TEMP+1)
+   0046 A5*00         [ 3]  124 	lda	*(__TEMP+0)
+   0048 86*00         [ 3]  125 	stx	*(__TEMP+0)
+   004A BA            [ 2]  126 	tsx
+   004B 9D 07 01      [ 5]  127 	sta	0x107,x
+   004E A6*00         [ 3]  128 	ldx	*(__TEMP+0)
+   0050 8A            [ 2]  129 	txa
+   0051 BA            [ 2]  130 	tsx
+   0052 9D 08 01      [ 5]  131 	sta	0x108,x
+   0055 A6*00         [ 3]  132 	ldx	*(__TEMP+0)
+                            133 ;	../malloc.c: 82: if(!__sdcc_heap_free)
+   0057 ADr01r00      [ 4]  134 	lda	(___sdcc_heap_free + 1)
+   005A 0Dr00r00      [ 4]  135 	ora	___sdcc_heap_free
+   005D D0 03         [ 4]  136 	bne	00102$
+                            137 ;	../malloc.c: 83: __sdcc_heap_init();
+   005F 20r00r00      [ 6]  138 	jsr	___sdcc_heap_init
+   0062                     139 00102$:
+                            140 ;	../malloc.c: 86: if(!size || size + offsetof(struct header, next_free) < size)
+   0062 BA            [ 2]  141 	tsx
+   0063 BD 07 01      [ 5]  142 	lda	0x107,x
+   0066 1D 08 01      [ 5]  143 	ora	0x108,x
+   0069 F0 20         [ 4]  144 	beq	00103$
+   006B BD 07 01      [ 5]  145 	lda	0x107,x
+   006E 18            [ 2]  146 	clc
+   006F 69 02         [ 2]  147 	adc	#0x02
+   0071 9D 05 01      [ 5]  148 	sta	0x105,x
+   0074 BD 08 01      [ 5]  149 	lda	0x108,x
+   0077 69 00         [ 2]  150 	adc	#0x00
+   0079 9D 06 01      [ 5]  151 	sta	0x106,x
+   007C BD 05 01      [ 5]  152 	lda	0x105,x
+   007F 38            [ 2]  153 	sec
+   0080 FD 07 01      [ 5]  154 	sbc	0x107,x
+   0083 BD 06 01      [ 5]  155 	lda	0x106,x
+   0086 FD 08 01      [ 5]  156 	sbc	0x108,x
+   0089 B0 06         [ 4]  157 	bcs	00104$
+   008B                     158 00103$:
+                            159 ;	../malloc.c: 87: return(0);
+   008B A9 00         [ 2]  160 	lda	#0x00
+   008D AA            [ 2]  161 	tax
+   008E 4Cr88r02      [ 3]  162 	jmp	00117$
+   0091                     163 00104$:
+                            164 ;	../malloc.c: 88: size += offsetof(struct header, next_free);
+   0091 BA            [ 2]  165 	tsx
+   0092 BD 07 01      [ 5]  166 	lda	0x107,x
+   0095 18            [ 2]  167 	clc
+   0096 69 02         [ 2]  168 	adc	#0x02
+   0098 9D 11 01      [ 5]  169 	sta	0x111,x
+   009B BD 08 01      [ 5]  170 	lda	0x108,x
+   009E 69 00         [ 2]  171 	adc	#0x00
+   00A0 9D 12 01      [ 5]  172 	sta	0x112,x
+                            173 ;	../malloc.c: 89: if(size < sizeof(struct header)) // Requiring a minimum size makes it easier to implement free(), and avoid memory leaks.
+   00A3 BD 11 01      [ 5]  174 	lda	0x111,x
+   00A6 38            [ 2]  175 	sec
+   00A7 E9 04         [ 2]  176 	sbc	#0x04
+   00A9 BD 12 01      [ 5]  177 	lda	0x112,x
+   00AC E9 00         [ 2]  178 	sbc	#0x00
+   00AE B0 0A         [ 4]  179 	bcs	00107$
+                            180 ;	../malloc.c: 90: size = sizeof(struct header);
+   00B0 A9 04         [ 2]  181 	lda	#0x04
+   00B2 9D 11 01      [ 5]  182 	sta	0x111,x
+   00B5 A9 00         [ 2]  183 	lda	#0x00
+   00B7 9D 12 01      [ 5]  184 	sta	0x112,x
+   00BA                     185 00107$:
+                            186 ;	../malloc.c: 92: for(h = __sdcc_heap_free, f = &__sdcc_heap_free; h; f = &(h->next_free), h = h->next_free)
+   00BA BA            [ 2]  187 	tsx
+   00BB ADr00r00      [ 4]  188 	lda	___sdcc_heap_free
+   00BE 9D 0F 01      [ 5]  189 	sta	0x10f,x
+   00C1 ADr01r00      [ 4]  190 	lda	(___sdcc_heap_free + 1)
+   00C4 9D 10 01      [ 5]  191 	sta	0x110,x
+   00C7 A9r00         [ 2]  192 	lda	#___sdcc_heap_free
+   00C9 9D 05 01      [ 5]  193 	sta	0x105,x
+   00CC A9s00         [ 2]  194 	lda	#>___sdcc_heap_free
+   00CE 9D 06 01      [ 5]  195 	sta	0x106,x
+   00D1                     196 00115$:
+   00D1 BA            [ 2]  197 	tsx
+   00D2 BD 0F 01      [ 5]  198 	lda	0x10f,x
+   00D5 1D 10 01      [ 5]  199 	ora	0x110,x
+   00D8 D0 03         [ 4]  200 	bne	00158$
+   00DA 4Cr85r02      [ 3]  201 	jmp	00113$
+   00DD                     202 00158$:
+                            203 ;	../malloc.c: 94: size_t blocksize = (char HEAPSPACE *)(h->next) - (char HEAPSPACE *)h;
+   00DD BD 0F 01      [ 5]  204 	lda	0x10f,x
+   00E0 85*00         [ 3]  205 	sta	*(__DPTR+0)
+   00E2 BD 10 01      [ 5]  206 	lda	0x110,x
+   00E5 85*01         [ 3]  207 	sta	*(__DPTR+1)
+   00E7 A0 00         [ 2]  208 	ldy	#0x00
+   00E9 B1*00         [ 6]  209 	lda	[__DPTR],y
+   00EB 9D 07 01      [ 5]  210 	sta	0x107,x
+   00EE C8            [ 2]  211 	iny
+   00EF B1*00         [ 6]  212 	lda	[__DPTR],y
+   00F1 9D 08 01      [ 5]  213 	sta	0x108,x
+   00F4 BD 07 01      [ 5]  214 	lda	0x107,x
+   00F7 9D 03 01      [ 5]  215 	sta	0x103,x
+   00FA BD 08 01      [ 5]  216 	lda	0x108,x
+   00FD 9D 04 01      [ 5]  217 	sta	0x104,x
+   0100 BD 0F 01      [ 5]  218 	lda	0x10f,x
+   0103 9D 01 01      [ 5]  219 	sta	0x101,x
+   0106 BD 10 01      [ 5]  220 	lda	0x110,x
+   0109 9D 02 01      [ 5]  221 	sta	0x102,x
+   010C BD 03 01      [ 5]  222 	lda	0x103,x
+   010F 38            [ 2]  223 	sec
+   0110 FD 01 01      [ 5]  224 	sbc	0x101,x
+   0113 9D 0B 01      [ 5]  225 	sta	0x10b,x
+   0116 BD 04 01      [ 5]  226 	lda	0x104,x
+   0119 FD 02 01      [ 5]  227 	sbc	0x102,x
+   011C 9D 0C 01      [ 5]  228 	sta	0x10c,x
+                            229 ;	../malloc.c: 95: if(blocksize >= size) // Found free block of sufficient size.
+   011F BD 0B 01      [ 5]  230 	lda	0x10b,x
+   0122 38            [ 2]  231 	sec
+   0123 FD 11 01      [ 5]  232 	sbc	0x111,x
+   0126 BD 0C 01      [ 5]  233 	lda	0x10c,x
+   0129 FD 12 01      [ 5]  234 	sbc	0x112,x
+   012C B0 03         [ 4]  235 	bcs	00159$
+   012E 4Cr4Dr02      [ 3]  236 	jmp	00116$
+   0131                     237 00159$:
+                            238 ;	../malloc.c: 97: if(blocksize >= size + sizeof(struct header)) // It is worth creating a new free block
+   0131 BD 11 01      [ 5]  239 	lda	0x111,x
+   0134 18            [ 2]  240 	clc
+   0135 69 04         [ 2]  241 	adc	#0x04
+   0137 9D 03 01      [ 5]  242 	sta	0x103,x
+   013A BD 12 01      [ 5]  243 	lda	0x112,x
+   013D 69 00         [ 2]  244 	adc	#0x00
+   013F 9D 04 01      [ 5]  245 	sta	0x104,x
+   0142 BD 0B 01      [ 5]  246 	lda	0x10b,x
+   0145 38            [ 2]  247 	sec
+   0146 FD 03 01      [ 5]  248 	sbc	0x103,x
+   0149 BD 0C 01      [ 5]  249 	lda	0x10c,x
+   014C FD 04 01      [ 5]  250 	sbc	0x104,x
+   014F B0 03         [ 4]  251 	bcs	00160$
+   0151 4CrFDr01      [ 3]  252 	jmp	00109$
+   0154                     253 00160$:
+                            254 ;	../malloc.c: 99: header_t *const newheader = (header_t *const)((char HEAPSPACE *)h + size);
+   0154 BD 01 01      [ 5]  255 	lda	0x101,x
+   0157 18            [ 2]  256 	clc
+   0158 7D 11 01      [ 5]  257 	adc	0x111,x
+   015B 9D 01 01      [ 5]  258 	sta	0x101,x
+   015E BD 02 01      [ 5]  259 	lda	0x102,x
+   0161 7D 12 01      [ 5]  260 	adc	0x112,x
+   0164 9D 02 01      [ 5]  261 	sta	0x102,x
+   0167 BD 01 01      [ 5]  262 	lda	0x101,x
+   016A 9D 09 01      [ 5]  263 	sta	0x109,x
+   016D BD 02 01      [ 5]  264 	lda	0x102,x
+   0170 9D 0A 01      [ 5]  265 	sta	0x10a,x
+                            266 ;	../malloc.c: 100: newheader->next = h->next;
+   0173 BD 09 01      [ 5]  267 	lda	0x109,x
+   0176 85*00         [ 3]  268 	sta	*(__DPTR+0)
+   0178 BD 0A 01      [ 5]  269 	lda	0x10a,x
+   017B 85*01         [ 3]  270 	sta	*(__DPTR+1)
+   017D BD 07 01      [ 5]  271 	lda	0x107,x
+   0180 88            [ 2]  272 	dey
+   0181 91*00         [ 6]  273 	sta	[__DPTR],y
+   0183 BD 08 01      [ 5]  274 	lda	0x108,x
+   0186 C8            [ 2]  275 	iny
+   0187 91*00         [ 6]  276 	sta	[__DPTR],y
+                            277 ;	../malloc.c: 101: newheader->next_free = h->next_free;
+   0189 BD 09 01      [ 5]  278 	lda	0x109,x
+   018C 9D 01 01      [ 5]  279 	sta	0x101,x
+   018F BD 0A 01      [ 5]  280 	lda	0x10a,x
+   0192 9D 02 01      [ 5]  281 	sta	0x102,x
+   0195 BD 0F 01      [ 5]  282 	lda	0x10f,x
+   0198 9D 03 01      [ 5]  283 	sta	0x103,x
+   019B BD 10 01      [ 5]  284 	lda	0x110,x
+   019E 9D 04 01      [ 5]  285 	sta	0x104,x
+   01A1 BD 03 01      [ 5]  286 	lda	0x103,x
+   01A4 85*00         [ 3]  287 	sta	*(__DPTR+0)
+   01A6 BD 04 01      [ 5]  288 	lda	0x104,x
+   01A9 85*01         [ 3]  289 	sta	*(__DPTR+1)
+   01AB C8            [ 2]  290 	iny
+   01AC B1*00         [ 6]  291 	lda	[__DPTR],y
+   01AE 9D 03 01      [ 5]  292 	sta	0x103,x
+   01B1 C8            [ 2]  293 	iny
+   01B2 B1*00         [ 6]  294 	lda	[__DPTR],y
+   01B4 9D 04 01      [ 5]  295 	sta	0x104,x
+   01B7 BD 01 01      [ 5]  296 	lda	0x101,x
+   01BA 85*00         [ 3]  297 	sta	*(__DPTR+0)
+   01BC BD 02 01      [ 5]  298 	lda	0x102,x
+   01BF 85*01         [ 3]  299 	sta	*(__DPTR+1)
+   01C1 BD 03 01      [ 5]  300 	lda	0x103,x
+   01C4 88            [ 2]  301 	dey
+   01C5 91*00         [ 6]  302 	sta	[__DPTR],y
+   01C7 BD 04 01      [ 5]  303 	lda	0x104,x
+   01CA C8            [ 2]  304 	iny
+   01CB 91*00         [ 6]  305 	sta	[__DPTR],y
+                            306 ;	../malloc.c: 102: *f = newheader;
+   01CD BD 05 01      [ 5]  307 	lda	0x105,x
+   01D0 85*00         [ 3]  308 	sta	*(__DPTR+0)
+   01D2 BD 06 01      [ 5]  309 	lda	0x106,x
+   01D5 85*01         [ 3]  310 	sta	*(__DPTR+1)
+   01D7 BD 09 01      [ 5]  311 	lda	0x109,x
+   01DA A0 00         [ 2]  312 	ldy	#0x00
+   01DC 91*00         [ 6]  313 	sta	[__DPTR],y
+   01DE BD 0A 01      [ 5]  314 	lda	0x10a,x
+   01E1 C8            [ 2]  315 	iny
+   01E2 91*00         [ 6]  316 	sta	[__DPTR],y
+                            317 ;	../malloc.c: 103: h->next = newheader;
+   01E4 BD 0F 01      [ 5]  318 	lda	0x10f,x
+   01E7 85*00         [ 3]  319 	sta	*(__DPTR+0)
+   01E9 BD 10 01      [ 5]  320 	lda	0x110,x
+   01EC 85*01         [ 3]  321 	sta	*(__DPTR+1)
+   01EE BD 09 01      [ 5]  322 	lda	0x109,x
+   01F1 88            [ 2]  323 	dey
+   01F2 91*00         [ 6]  324 	sta	[__DPTR],y
+   01F4 BD 0A 01      [ 5]  325 	lda	0x10a,x
+   01F7 C8            [ 2]  326 	iny
+   01F8 91*00         [ 6]  327 	sta	[__DPTR],y
+   01FA 4Cr38r02      [ 3]  328 	jmp	00110$
+   01FD                     329 00109$:
+                            330 ;	../malloc.c: 106: *f = h->next_free;
+   01FD BA            [ 2]  331 	tsx
+   01FE BD 0F 01      [ 5]  332 	lda	0x10f,x
+   0201 9D 01 01      [ 5]  333 	sta	0x101,x
+   0204 BD 10 01      [ 5]  334 	lda	0x110,x
+   0207 9D 02 01      [ 5]  335 	sta	0x102,x
+   020A BD 01 01      [ 5]  336 	lda	0x101,x
+   020D 85*00         [ 3]  337 	sta	*(__DPTR+0)
+   020F BD 02 01      [ 5]  338 	lda	0x102,x
+   0212 85*01         [ 3]  339 	sta	*(__DPTR+1)
+   0214 A0 02         [ 2]  340 	ldy	#0x02
+   0216 B1*00         [ 6]  341 	lda	[__DPTR],y
+   0218 9D 01 01      [ 5]  342 	sta	0x101,x
+   021B C8            [ 2]  343 	iny
+   021C B1*00         [ 6]  344 	lda	[__DPTR],y
+   021E 9D 02 01      [ 5]  345 	sta	0x102,x
+   0221 BD 05 01      [ 5]  346 	lda	0x105,x
+   0224 85*00         [ 3]  347 	sta	*(__DPTR+0)
+   0226 BD 06 01      [ 5]  348 	lda	0x106,x
+   0229 85*01         [ 3]  349 	sta	*(__DPTR+1)
+   022B BD 01 01      [ 5]  350 	lda	0x101,x
+   022E A0 00         [ 2]  351 	ldy	#0x00
+   0230 91*00         [ 6]  352 	sta	[__DPTR],y
+   0232 BD 02 01      [ 5]  353 	lda	0x102,x
+   0235 C8            [ 2]  354 	iny
+   0236 91*00         [ 6]  355 	sta	[__DPTR],y
+   0238                     356 00110$:
+                            357 ;	../malloc.c: 108: return(&(h->next_free));
+   0238 BA            [ 2]  358 	tsx
+   0239 BD 0F 01      [ 5]  359 	lda	0x10f,x
+   023C 85*00         [ 3]  360 	sta	*(__TEMP+0)
+   023E BD 10 01      [ 5]  361 	lda	0x110,x
+   0241 AA            [ 2]  362 	tax
+   0242 A5*00         [ 3]  363 	lda	*(__TEMP+0)
+   0244 18            [ 2]  364 	clc
+   0245 69 02         [ 2]  365 	adc	#0x02
+   0247 90 3F         [ 4]  366 	bcc	00117$
+   0249 E8            [ 2]  367 	inx
+   024A 4Cr88r02      [ 3]  368 	jmp	00117$
+   024D                     369 00116$:
+                            370 ;	../malloc.c: 92: for(h = __sdcc_heap_free, f = &__sdcc_heap_free; h; f = &(h->next_free), h = h->next_free)
+   024D BA            [ 2]  371 	tsx
+   024E BD 0F 01      [ 5]  372 	lda	0x10f,x
+   0251 18            [ 2]  373 	clc
+   0252 69 02         [ 2]  374 	adc	#0x02
+   0254 9D 0D 01      [ 5]  375 	sta	0x10d,x
+   0257 BD 10 01      [ 5]  376 	lda	0x110,x
+   025A 69 00         [ 2]  377 	adc	#0x00
+   025C 9D 0E 01      [ 5]  378 	sta	0x10e,x
+   025F BD 0D 01      [ 5]  379 	lda	0x10d,x
+   0262 9D 05 01      [ 5]  380 	sta	0x105,x
+   0265 BD 0E 01      [ 5]  381 	lda	0x10e,x
+   0268 9D 06 01      [ 5]  382 	sta	0x106,x
+   026B BD 0D 01      [ 5]  383 	lda	0x10d,x
+   026E 85*00         [ 3]  384 	sta	*(__DPTR+0)
+   0270 BD 0E 01      [ 5]  385 	lda	0x10e,x
+   0273 85*01         [ 3]  386 	sta	*(__DPTR+1)
+   0275 A0 00         [ 2]  387 	ldy	#0x00
+   0277 B1*00         [ 6]  388 	lda	[__DPTR],y
+   0279 9D 0F 01      [ 5]  389 	sta	0x10f,x
+   027C C8            [ 2]  390 	iny
+   027D B1*00         [ 6]  391 	lda	[__DPTR],y
+   027F 9D 10 01      [ 5]  392 	sta	0x110,x
+   0282 4CrD1r00      [ 3]  393 	jmp	00115$
+   0285                     394 00113$:
+                            395 ;	../malloc.c: 112: return(0);
+   0285 A9 00         [ 2]  396 	lda	#0x00
+   0287 AA            [ 2]  397 	tax
+   0288                     398 00117$:
+                            399 ;	../malloc.c: 113: }
+   0288 85*00         [ 3]  400 	sta	*(__TEMP+0)
+   028A 86*01         [ 3]  401 	stx	*(__TEMP+1)
+   028C BA            [ 2]  402 	tsx
+   028D 8A            [ 2]  403 	txa
+   028E 18            [ 2]  404 	clc
+   028F 69 12         [ 2]  405 	adc	#0x12
+   0291 AA            [ 2]  406 	tax
+   0292 9A            [ 2]  407 	txs
+   0293 A6*01         [ 3]  408 	ldx	*(__TEMP+1)
+   0295 A5*00         [ 3]  409 	lda	*(__TEMP+0)
+   0297 60            [ 6]  410 	rts
+                            411 	.area CODE
+                            412 	.area RODATA
+                            413 	.area XINIT
+                            414 	.area CABS    (ABS)

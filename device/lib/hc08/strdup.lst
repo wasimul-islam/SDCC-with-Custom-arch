@@ -1,0 +1,117 @@
+                              1 ;--------------------------------------------------------
+                              2 ; File Created by SDCC : free open source ISO C Compiler 
+                              3 ; Version 4.2.14 #0 (Linux)
+                              4 ;--------------------------------------------------------
+                              5 	.module strdup
+                              6 	.optsdcc -mhc08
+                              7 	
+                              8 	.area HOME    (CODE)
+                              9 	.area GSINIT0 (CODE)
+                             10 	.area GSINIT  (CODE)
+                             11 	.area GSFINAL (CODE)
+                             12 	.area CSEG    (CODE)
+                             13 	.area XINIT   (CODE)
+                             14 	.area CONST   (CODE)
+                             15 	.area DSEG    (PAG)
+                             16 	.area OSEG    (PAG, OVR)
+                             17 	.area XSEG
+                             18 	.area XISEG
+                             19 ;--------------------------------------------------------
+                             20 ; Public variables in this module
+                             21 ;--------------------------------------------------------
+                             22 	.globl _malloc
+                             23 	.globl _strlen
+                             24 	.globl _strcpy
+                             25 	.globl _strdup
+                             26 ;--------------------------------------------------------
+                             27 ; ram data
+                             28 ;--------------------------------------------------------
+                             29 	.area DSEG    (PAG)
+                             30 ;--------------------------------------------------------
+                             31 ; overlayable items in ram
+                             32 ;--------------------------------------------------------
+                             33 ;--------------------------------------------------------
+                             34 ; absolute ram data
+                             35 ;--------------------------------------------------------
+                             36 	.area IABS    (ABS)
+                             37 	.area IABS    (ABS)
+                             38 ;--------------------------------------------------------
+                             39 ; absolute external ram data
+                             40 ;--------------------------------------------------------
+                             41 	.area XABS    (ABS)
+                             42 ;--------------------------------------------------------
+                             43 ; initialized external ram data
+                             44 ;--------------------------------------------------------
+                             45 	.area XISEG
+                             46 ;--------------------------------------------------------
+                             47 ; extended address mode data
+                             48 ;--------------------------------------------------------
+                             49 	.area XSEG
+   0000                      50 _strdup_s_65536_61:
+   0000                      51 	.ds 2
+                             52 ;--------------------------------------------------------
+                             53 ; global & static initialisations
+                             54 ;--------------------------------------------------------
+                             55 	.area HOME    (CODE)
+                             56 	.area GSINIT  (CODE)
+                             57 	.area GSFINAL (CODE)
+                             58 	.area GSINIT  (CODE)
+                             59 ;--------------------------------------------------------
+                             60 ; Home
+                             61 ;--------------------------------------------------------
+                             62 	.area HOME    (CODE)
+                             63 	.area HOME    (CODE)
+                             64 ;--------------------------------------------------------
+                             65 ; code
+                             66 ;--------------------------------------------------------
+                             67 	.area CSEG    (CODE)
+                             68 ;------------------------------------------------------------
+                             69 ;Allocation info for local variables in function 'strdup'
+                             70 ;------------------------------------------------------------
+                             71 ;s                         Allocated with name '_strdup_s_65536_61'
+                             72 ;r                         Allocated to registers a x 
+                             73 ;------------------------------------------------------------
+                             74 ;../strdup.c:33: char *strdup (const char *s)
+                             75 ;	-----------------------------------------
+                             76 ;	 function strdup
+                             77 ;	-----------------------------------------
+                             78 ;	Register assignment is optimal.
+                             79 ;	Stack space usage: 0 bytes.
+   0000                      80 _strdup:
+   0000 C7r00r01      [ 4]   81 	sta	(_strdup_s_65536_61 + 1)
+   0003 CFr00r00      [ 4]   82 	stx	_strdup_s_65536_61
+                             83 ;../strdup.c:35: char *r = malloc(strlen(s) + 1);
+   0006 C6r00r01      [ 4]   84 	lda	(_strdup_s_65536_61 + 1)
+   0009 CEr00r00      [ 4]   85 	ldx	_strdup_s_65536_61
+   000C CDr00r00      [ 5]   86 	jsr	_strlen
+   000F 4C            [ 1]   87 	inca
+   0010 26 01         [ 3]   88 	bne	00110$
+   0012 5C            [ 1]   89 	incx
+   0013                      90 00110$:
+   0013 CDr00r00      [ 5]   91 	jsr	_malloc
+                             92 ;../strdup.c:36: if (r)
+   0016 4D            [ 1]   93 	tsta
+   0017 26 01         [ 3]   94 	bne	00111$
+   0019 5D            [ 1]   95 	tstx
+   001A                      96 00111$:
+   001A 27 15         [ 3]   97 	beq	00102$
+                             98 ;../strdup.c:37: strcpy(r, s);
+   001C 87            [ 2]   99 	psha
+   001D C6r00r00      [ 4]  100 	lda	_strdup_s_65536_61
+   0020 C7r00r00      [ 4]  101 	sta	_strcpy_PARM_2
+   0023 C6r00r01      [ 4]  102 	lda	(_strdup_s_65536_61 + 1)
+   0026 C7r00r01      [ 4]  103 	sta	(_strcpy_PARM_2 + 1)
+   0029 86            [ 2]  104 	pula
+   002A 87            [ 2]  105 	psha
+   002B 89            [ 2]  106 	pshx
+   002C CDr00r00      [ 5]  107 	jsr	_strcpy
+   002F 88            [ 2]  108 	pulx
+   0030 86            [ 2]  109 	pula
+   0031                     110 00102$:
+                            111 ;../strdup.c:38: return (r);
+                            112 ;../strdup.c:39: }
+   0031 81            [ 4]  113 	rts
+                            114 	.area CSEG    (CODE)
+                            115 	.area CONST   (CODE)
+                            116 	.area XINIT   (CODE)
+                            117 	.area CABS    (ABS,CODE)

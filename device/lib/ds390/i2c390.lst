@@ -1,0 +1,1121 @@
+                                      1 ;--------------------------------------------------------
+                                      2 ; File Created by SDCC : free open source ISO C Compiler 
+                                      3 ; Version 4.2.14 #0 (Linux)
+                                      4 ;--------------------------------------------------------
+                                      5 	.module i2c390
+                                      6 	.optsdcc -mds390 --model-flat24
+                                      7 	
+                                      8 ;--------------------------------------------------------
+                                      9 ; CPU specific extensions
+                                     10 ;--------------------------------------------------------
+                                     11 	.DS80C390
+                                     12 	.amode	2	; 24 bit flat addressing
+                           000082    13 dpl	=	0x82
+                           000083    14 dph	=	0x83
+                           000084    15 dpl1	=	0x84
+                           000085    16 dph1	=	0x85
+                           000086    17 dps	=	0x86
+                           000093    18 dpx	=	0x93
+                           000095    19 dpx1	=	0x95
+                           00009B    20 esp	=	0x9B
+                           00009C    21 ap	=	0x9C
+                           00009C    22 acc1	=	0x9C
+                           0000D1    23 mcnt0	=	0xD1
+                           0000D2    24 mcnt1	=	0xD2
+                           0000D3    25 ma	=	0xD3
+                           0000D4    26 mb	=	0xD4
+                           0000D5    27 mc	=	0xD5
+                           00009D    28 acon	=	0x9D
+                           0000C6    29 mcon	=	0xC6
+                           0000D1    30 F1	=	0xD1	; user flag
+                                     31 ;--------------------------------------------------------
+                                     32 ; Public variables in this module
+                                     33 ;--------------------------------------------------------
+                                     34 	.globl _i2c_recv
+                                     35 	.globl _I2CByteIn
+                                     36 	.globl _ByteOutI2C
+                                     37 	.globl _BitInI2C
+                                     38 	.globl _BitOutI2C
+                                     39 	.globl _I2CDelay
+                                     40 	.globl _I2CSendReceive_PARM_3
+                                     41 	.globl _I2CSendReceive_PARM_2
+                                     42 	.globl _i2c_recv_PARM_2
+                                     43 	.globl _I2CSendStop_PARM_3
+                                     44 	.globl _I2CSendStop_PARM_2
+                                     45 	.globl _i2cReceiveBuffer
+                                     46 	.globl _i2cTransmitBuffer
+                                     47 	.globl _I2CReset
+                                     48 	.globl _I2CStart
+                                     49 	.globl _I2CStop
+                                     50 	.globl _I2CSendStop
+                                     51 	.globl _I2CSendReceive
+                                     52 	.globl _I2CDumpError
+                                     53 ;--------------------------------------------------------
+                                     54 ; special function registers
+                                     55 ;--------------------------------------------------------
+                           000080    56 _P4	=	0x0080
+                           000081    57 _SP	=	0x0081
+                           000082    58 _DPL	=	0x0082
+                           000083    59 _DPH	=	0x0083
+                           000084    60 _DPL1	=	0x0084
+                           000085    61 _DPH1	=	0x0085
+                           000086    62 _DPS	=	0x0086
+                           000087    63 _PCON	=	0x0087
+                           000088    64 _TCON	=	0x0088
+                           000089    65 _TMOD	=	0x0089
+                           00008A    66 _TL0	=	0x008a
+                           00008B    67 _TL1	=	0x008b
+                           00008C    68 _TH0	=	0x008c
+                           00008D    69 _TH1	=	0x008d
+                           00008E    70 _CKCON	=	0x008e
+                           000090    71 _P1	=	0x0090
+                           000091    72 _EXIF	=	0x0091
+                           000092    73 _P4CNT	=	0x0092
+                           000093    74 _DPX	=	0x0093
+                           000095    75 _DPX1	=	0x0095
+                           000098    76 _SCON0	=	0x0098
+                           000099    77 _SBUF0	=	0x0099
+                           00009B    78 _ESP	=	0x009b
+                           00009C    79 _AP	=	0x009c
+                           00009D    80 _ACON	=	0x009d
+                           0000A0    81 _P2	=	0x00a0
+                           0000A1    82 _P5	=	0x00a1
+                           0000A2    83 _P5CNT	=	0x00a2
+                           0000A8    84 _IE	=	0x00a8
+                           0000B0    85 _P3	=	0x00b0
+                           0000B8    86 _IP	=	0x00b8
+                           0000C0    87 _SCON1	=	0x00c0
+                           0000C1    88 _SBUF1	=	0x00c1
+                           0000C4    89 _PMR	=	0x00c4
+                           0000C6    90 _MCON	=	0x00c6
+                           0000C7    91 _TA	=	0x00c7
+                           0000C8    92 _T2CON	=	0x00c8
+                           0000C9    93 _T2MOD	=	0x00c9
+                           0000CA    94 _RCAP2L	=	0x00ca
+                           0000CA    95 _RTL2	=	0x00ca
+                           0000CB    96 _RCAP2H	=	0x00cb
+                           0000CB    97 _RTH2	=	0x00cb
+                           0000CC    98 _TL2	=	0x00cc
+                           0000CD    99 _TH2	=	0x00cd
+                           0000D0   100 _PSW	=	0x00d0
+                           0000D1   101 _MCNT0	=	0x00d1
+                           0000D2   102 _MCNT1	=	0x00d2
+                           0000D3   103 _MA	=	0x00d3
+                           0000D4   104 _MB	=	0x00d4
+                           0000D5   105 _MC	=	0x00d5
+                           0000D8   106 _WDCON	=	0x00d8
+                           0000E0   107 _ACC	=	0x00e0
+                           0000E8   108 _EIE	=	0x00e8
+                           0000EA   109 _MXAX	=	0x00ea
+                           0000F0   110 _B	=	0x00f0
+                           0000F8   111 _EIP	=	0x00f8
+                           008C8A   112 _TMR0	=	0x8c8a
+                           008D8B   113 _TMR1	=	0x8d8b
+                           00CDCC   114 _TMR2	=	0xcdcc
+                           00CBCA   115 _RCAP2	=	0xcbca
+                                    116 ;--------------------------------------------------------
+                                    117 ; special function bits
+                                    118 ;--------------------------------------------------------
+                           000088   119 _IT0	=	0x0088
+                           000089   120 _IE0	=	0x0089
+                           00008A   121 _IT1	=	0x008a
+                           00008B   122 _IE1	=	0x008b
+                           00008C   123 _TR0	=	0x008c
+                           00008D   124 _TF0	=	0x008d
+                           00008E   125 _TR1	=	0x008e
+                           00008F   126 _TF1	=	0x008f
+                           000090   127 _T2	=	0x0090
+                           000091   128 _T2EX	=	0x0091
+                           000092   129 _RXD1	=	0x0092
+                           000093   130 _TXD1	=	0x0093
+                           000094   131 _INT2	=	0x0094
+                           000095   132 _INT3	=	0x0095
+                           000096   133 _INT4	=	0x0096
+                           000097   134 _INT5	=	0x0097
+                           000098   135 _RI_0	=	0x0098
+                           000099   136 _TI_0	=	0x0099
+                           00009A   137 _RB8_0	=	0x009a
+                           00009B   138 _TB8_0	=	0x009b
+                           00009C   139 _REN_0	=	0x009c
+                           00009D   140 _SM2_0	=	0x009d
+                           00009E   141 _SM1_0	=	0x009e
+                           00009F   142 _SM0_0	=	0x009f
+                           00009F   143 _FE_0	=	0x009f
+                           0000A8   144 _EX0	=	0x00a8
+                           0000A9   145 _ET0	=	0x00a9
+                           0000AA   146 _EX1	=	0x00aa
+                           0000AB   147 _ET1	=	0x00ab
+                           0000AC   148 _ES0	=	0x00ac
+                           0000AD   149 _ET2	=	0x00ad
+                           0000AE   150 _ES1	=	0x00ae
+                           0000AF   151 _EA	=	0x00af
+                           0000B0   152 _RXD0	=	0x00b0
+                           0000B1   153 _TXD0	=	0x00b1
+                           0000B2   154 _INT0	=	0x00b2
+                           0000B3   155 _INT1	=	0x00b3
+                           0000B4   156 _T0	=	0x00b4
+                           0000B5   157 _T1	=	0x00b5
+                           0000B6   158 _WR	=	0x00b6
+                           0000B7   159 _RD	=	0x00b7
+                           0000B8   160 _PX0	=	0x00b8
+                           0000B9   161 _PT0	=	0x00b9
+                           0000BA   162 _PX1	=	0x00ba
+                           0000BB   163 _PT1	=	0x00bb
+                           0000BC   164 _PS0	=	0x00bc
+                           0000BD   165 _PT2	=	0x00bd
+                           0000BE   166 _PS1	=	0x00be
+                           0000C0   167 _RI_1	=	0x00c0
+                           0000C1   168 _TI_1	=	0x00c1
+                           0000C2   169 _RB8_1	=	0x00c2
+                           0000C3   170 _TB8_1	=	0x00c3
+                           0000C4   171 _REN_1	=	0x00c4
+                           0000C5   172 _SM2_1	=	0x00c5
+                           0000C6   173 _SM1_1	=	0x00c6
+                           0000C7   174 _SM0_1	=	0x00c7
+                           0000C7   175 _FE_1	=	0x00c7
+                           0000C8   176 _CP_RL	=	0x00c8
+                           0000C9   177 _C_T	=	0x00c9
+                           0000CA   178 _TR2	=	0x00ca
+                           0000CB   179 _EXEN2	=	0x00cb
+                           0000CC   180 _TCLK	=	0x00cc
+                           0000CD   181 _RCLK	=	0x00cd
+                           0000CE   182 _EXF2	=	0x00ce
+                           0000CF   183 _TF2	=	0x00cf
+                           0000D0   184 _P	=	0x00d0
+                           0000D1   185 _F1	=	0x00d1
+                           0000D2   186 _OV	=	0x00d2
+                           0000D3   187 _RS0	=	0x00d3
+                           0000D4   188 _RS1	=	0x00d4
+                           0000D5   189 _F0	=	0x00d5
+                           0000D6   190 _AC	=	0x00d6
+                           0000D7   191 _CY	=	0x00d7
+                           0000D8   192 _RWT	=	0x00d8
+                           0000D9   193 _EWT	=	0x00d9
+                           0000DA   194 _WDRF	=	0x00da
+                           0000DB   195 _WDIF	=	0x00db
+                           0000DC   196 _PFI	=	0x00dc
+                           0000DD   197 _EPFI	=	0x00dd
+                           0000DE   198 _POR	=	0x00de
+                           0000DF   199 _SMOD_1	=	0x00df
+                           0000E8   200 _EX2	=	0x00e8
+                           0000E9   201 _EX3	=	0x00e9
+                           0000EA   202 _EX4	=	0x00ea
+                           0000EB   203 _EX5	=	0x00eb
+                           0000EC   204 _EWDI	=	0x00ec
+                           0000ED   205 _C1IE	=	0x00ed
+                           0000EE   206 _C0IE	=	0x00ee
+                           0000EF   207 _CANBIE	=	0x00ef
+                           0000F8   208 _PX2	=	0x00f8
+                           0000F9   209 _PX3	=	0x00f9
+                           0000FA   210 _PX4	=	0x00fa
+                           0000FB   211 _PX5	=	0x00fb
+                           0000FC   212 _PWDI	=	0x00fc
+                           0000FD   213 _C1IP	=	0x00fd
+                           0000FE   214 _C0IP	=	0x00fe
+                           0000FF   215 _CANBIP	=	0x00ff
+                                    216 ;--------------------------------------------------------
+                                    217 ; overlayable register banks
+                                    218 ;--------------------------------------------------------
+                                    219 	.area REG_BANK_0	(REL,OVR,DATA)
+      000000                        220 	.ds 8
+                                    221 ;--------------------------------------------------------
+                                    222 ; internal ram data
+                                    223 ;--------------------------------------------------------
+                                    224 	.area DSEG    (DATA)
+                                    225 ;--------------------------------------------------------
+                                    226 ; overlayable items in internal ram
+                                    227 ;--------------------------------------------------------
+                                    228 ;--------------------------------------------------------
+                                    229 ; indirectly addressable internal ram data
+                                    230 ;--------------------------------------------------------
+                                    231 	.area ISEG    (DATA)
+                                    232 ;--------------------------------------------------------
+                                    233 ; absolute internal ram data
+                                    234 ;--------------------------------------------------------
+                                    235 	.area IABS    (ABS,DATA)
+                                    236 	.area IABS    (ABS,DATA)
+                                    237 ;--------------------------------------------------------
+                                    238 ; bit data
+                                    239 ;--------------------------------------------------------
+                                    240 	.area BSEG    (BIT)
+      000000                        241 _I2CReset_sloc0_1_0:
+      000000                        242 	.ds 1
+      000001                        243 _I2CStop_sloc0_1_0:
+      000001                        244 	.ds 1
+                                    245 ;--------------------------------------------------------
+                                    246 ; paged external ram data
+                                    247 ;--------------------------------------------------------
+                                    248 	.area PSEG    (PAG,XDATA)
+                                    249 ;--------------------------------------------------------
+                                    250 ; uninitialized external ram data
+                                    251 ;--------------------------------------------------------
+                                    252 	.area XSEG    (XDATA)
+      000000                        253 _i2cTransmitBuffer::
+      000000                        254 	.ds 128
+      000080                        255 _i2cReceiveBuffer::
+      000080                        256 	.ds 128
+      000100                        257 _I2CDelay_delay_65536_50:
+      000100                        258 	.ds 4
+      000104                        259 _I2CSendStop_PARM_2:
+      000104                        260 	.ds 1
+      000105                        261 _I2CSendStop_PARM_3:
+      000105                        262 	.ds 1
+      000106                        263 _i2c_recv_PARM_2:
+      000106                        264 	.ds 1
+      000107                        265 _I2CSendReceive_PARM_2:
+      000107                        266 	.ds 1
+      000108                        267 _I2CSendReceive_PARM_3:
+      000108                        268 	.ds 1
+                                    269 ;--------------------------------------------------------
+                                    270 ; absolute external ram data
+                                    271 ;--------------------------------------------------------
+                                    272 	.area XABS    (ABS,XDATA)
+                                    273 ;--------------------------------------------------------
+                                    274 ; initialized external ram data
+                                    275 ;--------------------------------------------------------
+                                    276 	.area XISEG   (XDATA)
+      000000                        277 _i2cError:
+      000000                        278 	.ds 1
+                                    279 ;--------------------------------------------------------
+                                    280 ; global & static initialisations
+                                    281 ;--------------------------------------------------------
+                                    282 	.area HOME    (CODE)
+                                    283 	.area GSINIT  (CODE)
+                                    284 	.area GSFINAL (CODE)
+                                    285 	.area GSINIT  (CODE)
+                                    286 ;--------------------------------------------------------
+                                    287 ; Home
+                                    288 ;--------------------------------------------------------
+                                    289 	.area HOME    (CODE)
+                                    290 	.area HOME    (CODE)
+                                    291 ;--------------------------------------------------------
+                                    292 ; code
+                                    293 ;--------------------------------------------------------
+                                    294 	.area CSEG    (CODE)
+                                    295 ;------------------------------------------------------------
+                                    296 ;Allocation info for local variables in function 'I2CDelay'
+                                    297 ;------------------------------------------------------------
+                                    298 ;delay                     Allocated with name '_I2CDelay_delay_65536_50'
+                                    299 ;------------------------------------------------------------
+                                    300 ;	i2c390.c:69: void I2CDelay(volatile long delay) {
+                                    301 ;	-----------------------------------------
+                                    302 ;	 function I2CDelay
+                                    303 ;	-----------------------------------------
+      000000                        304 _I2CDelay:
+                           000002   305 	ar2 = 0x02
+                           000003   306 	ar3 = 0x03
+                           000004   307 	ar4 = 0x04
+                           000005   308 	ar5 = 0x05
+                           000006   309 	ar6 = 0x06
+                           000007   310 	ar7 = 0x07
+                           000000   311 	ar0 = 0x00
+                           000001   312 	ar1 = 0x01
+      000000 75 86 01         [12]  313 	mov     dps, #1
+      000003 90s00r01r00      [12]  314 	mov     dptr, #_I2CDelay_delay_65536_50
+      000007 E5 82            [ 8]  315 	mov	a,dpl
+      000009 F0               [ 8]  316 	movx	@dptr,a
+      00000A A3               [12]  317 	inc	dptr
+      00000B E5 83            [ 8]  318 	mov	a,dph
+      00000D F0               [ 8]  319 	movx	@dptr,a
+      00000E A3               [12]  320 	inc	dptr
+      00000F E5 93            [ 8]  321 	mov	a,dpx
+      000011 F0               [ 8]  322 	movx	@dptr,a
+      000012 A3               [12]  323 	inc	dptr
+      000013 E5 F0            [ 8]  324 	mov	a,b
+      000015 F0               [ 8]  325 	movx	@dptr,a
+      000016 75 86 00         [12]  326 	mov	dps,#0
+                                    327 ;	i2c390.c:70: while (delay--)
+      000019                        328 00101$:
+      000019 90s00r01r00      [12]  329 	mov	dptr,#_I2CDelay_delay_65536_50
+                                    330 ;	genAssign: resultIsFar = FALSE
+      00001D E0               [ 8]  331 	movx	a,@dptr
+      00001E FA               [ 4]  332 	mov	r2,a
+      00001F A3               [12]  333 	inc	dptr
+      000020 E0               [ 8]  334 	movx	a,@dptr
+      000021 FB               [ 4]  335 	mov	r3,a
+      000022 A3               [12]  336 	inc	dptr
+      000023 E0               [ 8]  337 	movx	a,@dptr
+      000024 FC               [ 4]  338 	mov	r4,a
+      000025 A3               [12]  339 	inc	dptr
+      000026 E0               [ 8]  340 	movx	a,@dptr
+      000027 FD               [ 4]  341 	mov	r5,a
+      000028 EA               [ 4]  342 	mov	a,r2
+      000029 24 FF            [ 8]  343 	add	a,#0xff
+      00002B FE               [ 4]  344 	mov	r6,a
+      00002C EB               [ 4]  345 	mov	a,r3
+      00002D 34 FF            [ 8]  346 	addc	a,#0xff
+      00002F FF               [ 4]  347 	mov	r7,a
+      000030 EC               [ 4]  348 	mov	a,r4
+      000031 34 FF            [ 8]  349 	addc	a,#0xff
+      000033 F8               [ 4]  350 	mov	r0,a
+      000034 ED               [ 4]  351 	mov	a,r5
+      000035 34 FF            [ 8]  352 	addc	a,#0xff
+      000037 F9               [ 4]  353 	mov	r1,a
+                                    354 ;	genAssign: resultIsFar = TRUE
+      000038 90s00r01r00      [12]  355 	mov	dptr,#_I2CDelay_delay_65536_50
+      00003C EE               [ 4]  356 	mov	a,r6
+      00003D F0               [ 8]  357 	movx	@dptr,a
+      00003E A3               [12]  358 	inc	dptr
+      00003F EF               [ 4]  359 	mov	a,r7
+      000040 F0               [ 8]  360 	movx	@dptr,a
+      000041 A3               [12]  361 	inc	dptr
+      000042 E8               [ 4]  362 	mov	a,r0
+      000043 F0               [ 8]  363 	movx	@dptr,a
+      000044 A3               [12]  364 	inc	dptr
+      000045 E9               [ 4]  365 	mov	a,r1
+      000046 F0               [ 8]  366 	movx	@dptr,a
+      000047 EA               [ 4]  367 	mov	a,r2
+      000048 4B               [ 4]  368 	orl	a,r3
+      000049 4C               [ 4]  369 	orl	a,r4
+      00004A 4D               [ 4]  370 	orl	a,r5
+      00004B 70 CC            [12]  371 	jnz  00101$
+      00004D                        372 00110$:
+      00004D                        373 00104$:
+                                    374 ;	i2c390.c:72: }
+      00004D 22               [16]  375 	ret
+                                    376 ;------------------------------------------------------------
+                                    377 ;Allocation info for local variables in function 'I2CReset'
+                                    378 ;------------------------------------------------------------
+                                    379 ;	i2c390.c:81: char I2CReset(void)
+                                    380 ;	-----------------------------------------
+                                    381 ;	 function I2CReset
+                                    382 ;	-----------------------------------------
+      00004E                        383 _I2CReset:
+                                    384 ;	i2c390.c:83: SDA_LOW;
+                                    385 ;	i2c390.c:84: SCL_LOW;
+      00004E 53 A1 FC         [12]  386 	anl  _P5,#(0xfd & 0xfe)
+                                    387 ;	i2c390.c:85: SCL_HIGH;
+      000051 43 A1 01         [12]  388 	orl	_P5,#0x01
+                                    389 ;	i2c390.c:86: SDA_HIGH;
+      000054 43 A1 02         [12]  390 	orl	_P5,#0x02
+                                    391 ;	i2c390.c:87: i2cError = 0;
+                                    392 ;	genAssign: resultIsFar = TRUE
+      000057 90s00r00r00      [12]  393 	mov	dptr,#_i2cError
+      00005B E4               [ 4]  394 	clr	a
+      00005C F0               [ 8]  395 	movx	@dptr,a
+                                    396 ;	i2c390.c:88: return (SCL_IN && SDA_IN);
+      00005D E5 A1            [ 8]  397 	mov	a,_P5
+      00005F 54 01            [ 8]  398 	anl	a,#0x01
+      000061 FA               [ 4]  399 	mov  r2,a
+      000062 60 08            [12]  400 	jz  00103$
+      000064                        401 00110$:
+      000064 E5 A1            [ 8]  402 	mov	a,_P5
+      000066 03               [ 4]  403 	rr	a
+      000067 54 01            [ 8]  404 	anl	a,#0x01
+      000069 FA               [ 4]  405 	mov  r2,a
+      00006A 70 04            [12]  406 	jnz  00104$
+      00006C                        407 00111$:
+      00006C                        408 00103$:
+                                    409 ;	genAssign: resultIsFar = FALSE
+      00006C C2*00            [ 8]  410 	clr	_I2CReset_sloc0_1_0
+      00006E 80 02            [12]  411 	sjmp 00105$
+      000070                        412 00104$:
+                                    413 ;	genAssign: resultIsFar = FALSE
+      000070 D2*00            [ 8]  414 	setb	_I2CReset_sloc0_1_0
+      000072                        415 00105$:
+      000072 A2*00            [ 8]  416 	mov	c,_I2CReset_sloc0_1_0
+      000074 E4               [ 4]  417 	clr	a
+      000075 33               [ 4]  418 	rlc	a
+      000076 FA               [ 4]  419 	mov	r2,a
+      000077 8A 82            [ 8]  420 	mov	dpl,r2
+      000079                        421 00101$:
+                                    422 ;	i2c390.c:89: }
+      000079 22               [16]  423 	ret
+                                    424 ;------------------------------------------------------------
+                                    425 ;Allocation info for local variables in function 'I2CStart'
+                                    426 ;------------------------------------------------------------
+                                    427 ;	i2c390.c:97: char I2CStart(void)
+                                    428 ;	-----------------------------------------
+                                    429 ;	 function I2CStart
+                                    430 ;	-----------------------------------------
+      00007A                        431 _I2CStart:
+                                    432 ;	i2c390.c:99: SDA_HIGH;
+      00007A 43 A1 02         [12]  433 	orl	_P5,#0x02
+                                    434 ;	i2c390.c:100: SCL_HIGH;
+      00007D 43 A1 01         [12]  435 	orl	_P5,#0x01
+                                    436 ;	i2c390.c:101: I2CDelay(I2CDELAY);
+      000080 90 00 00 01      [12]  437 	mov	dptr,#0x000001
+      000084 75 F0 00         [12]  438 	mov	b,#0x00
+      000087 12s00r00r00      [16]  439 	lcall	_I2CDelay
+                                    440 ;	i2c390.c:102: SDA_LOW;        /* Pull SDA down... */
+      00008B 53 A1 FD         [12]  441 	anl	_P5,#0xfd
+                                    442 ;	i2c390.c:103: I2CDelay(I2CDELAY);
+      00008E 90 00 00 01      [12]  443 	mov	dptr,#0x000001
+      000092 75 F0 00         [12]  444 	mov	b,#0x00
+      000095 12s00r00r00      [16]  445 	lcall	_I2CDelay
+                                    446 ;	i2c390.c:104: SCL_LOW;        /* ...and then SCL -> start condition. */
+      000099 53 A1 FE         [12]  447 	anl	_P5,#0xfe
+                                    448 ;	i2c390.c:105: I2CDelay(I2CDELAY);
+      00009C 90 00 00 01      [12]  449 	mov	dptr,#0x000001
+      0000A0 75 F0 00         [12]  450 	mov	b,#0x00
+      0000A3 12s00r00r00      [16]  451 	lcall	_I2CDelay
+                                    452 ;	i2c390.c:106: return 0;
+      0000A7 75 82 00         [12]  453 	mov	dpl,#0x00
+      0000AA                        454 00101$:
+                                    455 ;	i2c390.c:107: }
+      0000AA 22               [16]  456 	ret
+                                    457 ;------------------------------------------------------------
+                                    458 ;Allocation info for local variables in function 'I2CStop'
+                                    459 ;------------------------------------------------------------
+                                    460 ;	i2c390.c:115: char I2CStop(void)
+                                    461 ;	-----------------------------------------
+                                    462 ;	 function I2CStop
+                                    463 ;	-----------------------------------------
+      0000AB                        464 _I2CStop:
+                                    465 ;	i2c390.c:117: SDA_LOW;
+      0000AB 53 A1 FD         [12]  466 	anl	_P5,#0xfd
+                                    467 ;	i2c390.c:118: SCL_HIGH;        /* Let SCL go up */
+      0000AE 43 A1 01         [12]  468 	orl	_P5,#0x01
+                                    469 ;	i2c390.c:119: I2CDelay(I2CDELAY);
+      0000B1 90 00 00 01      [12]  470 	mov	dptr,#0x000001
+      0000B5 75 F0 00         [12]  471 	mov	b,#0x00
+      0000B8 12s00r00r00      [16]  472 	lcall	_I2CDelay
+                                    473 ;	i2c390.c:120: SDA_HIGH;        /* ...and then SDA up -> stop condition. */
+      0000BC 43 A1 02         [12]  474 	orl	_P5,#0x02
+                                    475 ;	i2c390.c:121: I2CDelay(I2CDELAY);
+      0000BF 90 00 00 01      [12]  476 	mov	dptr,#0x000001
+      0000C3 75 F0 00         [12]  477 	mov	b,#0x00
+      0000C6 12s00r00r00      [16]  478 	lcall	_I2CDelay
+                                    479 ;	i2c390.c:123: return (SCL_IN && SDA_IN);  /* Both will be up, if everything is fine */
+      0000CA E5 A1            [ 8]  480 	mov	a,_P5
+      0000CC 54 01            [ 8]  481 	anl	a,#0x01
+      0000CE FA               [ 4]  482 	mov  r2,a
+      0000CF 60 08            [12]  483 	jz  00103$
+      0000D1                        484 00110$:
+      0000D1 E5 A1            [ 8]  485 	mov	a,_P5
+      0000D3 03               [ 4]  486 	rr	a
+      0000D4 54 01            [ 8]  487 	anl	a,#0x01
+      0000D6 FA               [ 4]  488 	mov  r2,a
+      0000D7 70 04            [12]  489 	jnz  00104$
+      0000D9                        490 00111$:
+      0000D9                        491 00103$:
+                                    492 ;	genAssign: resultIsFar = FALSE
+      0000D9 C2*01            [ 8]  493 	clr	_I2CStop_sloc0_1_0
+      0000DB 80 02            [12]  494 	sjmp 00105$
+      0000DD                        495 00104$:
+                                    496 ;	genAssign: resultIsFar = FALSE
+      0000DD D2*01            [ 8]  497 	setb	_I2CStop_sloc0_1_0
+      0000DF                        498 00105$:
+      0000DF A2*01            [ 8]  499 	mov	c,_I2CStop_sloc0_1_0
+      0000E1 E4               [ 4]  500 	clr	a
+      0000E2 33               [ 4]  501 	rlc	a
+      0000E3 FA               [ 4]  502 	mov	r2,a
+      0000E4 8A 82            [ 8]  503 	mov	dpl,r2
+      0000E6                        504 00101$:
+                                    505 ;	i2c390.c:124: }
+      0000E6 22               [16]  506 	ret
+                                    507 ;------------------------------------------------------------
+                                    508 ;Allocation info for local variables in function 'BitOutI2C'
+                                    509 ;------------------------------------------------------------
+                                    510 ;bout                      Allocated to registers r2 
+                                    511 ;------------------------------------------------------------
+                                    512 ;	i2c390.c:132: char BitOutI2C(unsigned char bout)
+                                    513 ;	-----------------------------------------
+                                    514 ;	 function BitOutI2C
+                                    515 ;	-----------------------------------------
+      0000E7                        516 _BitOutI2C:
+      0000E7 AA 82            [ 8]  517 	mov	r2,dpl
+                                    518 ;	i2c390.c:134: SDA_OUT(bout);              /* Put data out on SDA */
+      0000E9 EA               [ 4]  519 	mov	a,r2
+      0000EA 60 05            [12]  520 	jz  00108$
+      0000EC                        521 00126$:
+      0000EC 43 A1 02         [12]  522 	orl	_P5,#0x02
+      0000EF 80 03            [12]  523 	sjmp 00109$
+      0000F1                        524 00108$:
+      0000F1 53 A1 FD         [12]  525 	anl	_P5,#0xfd
+      0000F4                        526 00109$:
+                                    527 ;	i2c390.c:135: I2CDelay(I2CDELAY);
+      0000F4 C0 02            [ 8]  528 	push	ar2
+      0000F6 90 00 00 01      [12]  529 	mov	dptr,#0x000001
+      0000FA 75 F0 00         [12]  530 	mov	b,#0x00
+      0000FD 12s00r00r00      [16]  531 	lcall	_I2CDelay
+      000101 D0 02            [ 8]  532 	pop	ar2
+                                    533 ;	i2c390.c:136: SCL_HIGH;                   /* Let SCL go up */
+      000103 43 A1 01         [12]  534 	orl	_P5,#0x01
+                                    535 ;	i2c390.c:137: while(!SCL_IN)              /* Wait until all other devices are ready */
+      000106                        536 00101$:
+                                    537 ;	genAssign: resultIsFar = FALSE
+      000106 AB A1            [ 8]  538 	mov	r3,_P5
+      000108 EB               [ 4]  539 	mov	a,r3
+      000109 30 E0 FA         [12]  540 	jnb  acc[0],00101$
+      00010C                        541 00127$:
+                                    542 ;	i2c390.c:142: if (SDA_IN != bout)         /* Arbitration lost, release bus and return */
+      00010C E5 A1            [ 8]  543 	mov	a,_P5
+      00010E 03               [ 4]  544 	rr	a
+      00010F 54 01            [ 8]  545 	anl	a,#0x01
+      000111 FB               [ 4]  546 	mov  r3,a
+      000112 B5 02 02         [16]  547 	cjne	a,ar2,00128$
+      000115 80 16            [12]  548 	sjmp 00105$
+      000117                        549 00128$:
+                                    550 ;	i2c390.c:144: SDA_HIGH;               /* Should be up anyway, but make sure */
+      000117 43 A1 02         [12]  551 	orl	_P5,#0x02
+                                    552 ;	i2c390.c:145: i2cError = I2CERR_LOST;
+                                    553 ;	genAssign: resultIsFar = TRUE
+      00011A 90s00r00r00      [12]  554 	mov	dptr,#_i2cError
+      00011E 74 02            [ 8]  555 	mov	a,#0x02
+      000120 F0               [ 8]  556 	movx	@dptr,a
+                                    557 ;	i2c390.c:146: I2CDumpError(i2cError);
+      000121 75 82 02         [12]  558 	mov	dpl,#0x02
+      000124 12s00r03rEB      [16]  559 	lcall	_I2CDumpError
+                                    560 ;	i2c390.c:147: return 1;
+      000128 75 82 01         [12]  561 	mov	dpl,#0x01
+      00012B 80 1C            [12]  562 	sjmp 00106$
+      00012D                        563 00105$:
+                                    564 ;	i2c390.c:149: I2CDelay(I2CDELAY);
+      00012D 90 00 00 01      [12]  565 	mov	dptr,#0x000001
+      000131 75 F0 00         [12]  566 	mov	b,#0x00
+      000134 12s00r00r00      [16]  567 	lcall	_I2CDelay
+                                    568 ;	i2c390.c:150: SCL_LOW;                    /* Pull SCL back down */
+      000138 53 A1 FE         [12]  569 	anl	_P5,#0xfe
+                                    570 ;	i2c390.c:151: I2CDelay(I2CDELAY);
+      00013B 90 00 00 01      [12]  571 	mov	dptr,#0x000001
+      00013F 75 F0 00         [12]  572 	mov	b,#0x00
+      000142 12s00r00r00      [16]  573 	lcall	_I2CDelay
+                                    574 ;	i2c390.c:152: return 0;                   /* OK */
+      000146 75 82 00         [12]  575 	mov	dpl,#0x00
+      000149                        576 00106$:
+                                    577 ;	i2c390.c:153: }
+      000149 22               [16]  578 	ret
+                                    579 ;------------------------------------------------------------
+                                    580 ;Allocation info for local variables in function 'BitInI2C'
+                                    581 ;------------------------------------------------------------
+                                    582 ;bin                       Allocated to registers r2 
+                                    583 ;------------------------------------------------------------
+                                    584 ;	i2c390.c:160: char BitInI2C(void)
+                                    585 ;	-----------------------------------------
+                                    586 ;	 function BitInI2C
+                                    587 ;	-----------------------------------------
+      00014A                        588 _BitInI2C:
+                                    589 ;	i2c390.c:165: SDA_HIGH;
+      00014A 43 A1 02         [12]  590 	orl	_P5,#0x02
+                                    591 ;	i2c390.c:167: SCL_HIGH;                   /* Let SCL go up */
+      00014D 43 A1 01         [12]  592 	orl	_P5,#0x01
+                                    593 ;	i2c390.c:168: while(!SCL_IN)              /* Wait for other devices */
+      000150                        594 00101$:
+                                    595 ;	genAssign: resultIsFar = FALSE
+      000150 AA A1            [ 8]  596 	mov	r2,_P5
+      000152 EA               [ 4]  597 	mov	a,r2
+      000153 30 E0 FA         [12]  598 	jnb  acc[0],00101$
+      000156                        599 00114$:
+                                    600 ;	i2c390.c:172: bin = SDA_IN;               /* Read in data */
+      000156 E5 A1            [ 8]  601 	mov	a,_P5
+      000158 03               [ 4]  602 	rr	a
+      000159 54 01            [ 8]  603 	anl	a,#0x01
+      00015B FA               [ 4]  604 	mov	r2,a
+                                    605 ;	i2c390.c:173: I2CDelay(I2CDELAY);
+      00015C C0 02            [ 8]  606 	push	ar2
+      00015E 90 00 00 01      [12]  607 	mov	dptr,#0x000001
+      000162 75 F0 00         [12]  608 	mov	b,#0x00
+      000165 12s00r00r00      [16]  609 	lcall	_I2CDelay
+      000169 D0 02            [ 8]  610 	pop	ar2
+                                    611 ;	i2c390.c:174: SCL_LOW;                    /* Pull SCL back up */
+      00016B 53 A1 FE         [12]  612 	anl	_P5,#0xfe
+                                    613 ;	i2c390.c:175: I2CDelay(I2CDELAY);
+      00016E C0 02            [ 8]  614 	push	ar2
+      000170 90 00 00 01      [12]  615 	mov	dptr,#0x000001
+      000174 75 F0 00         [12]  616 	mov	b,#0x00
+      000177 12s00r00r00      [16]  617 	lcall	_I2CDelay
+      00017B D0 02            [ 8]  618 	pop	ar2
+                                    619 ;	i2c390.c:176: return bin;                 /* Return the sampled bit */
+      00017D 8A 82            [ 8]  620 	mov	dpl,r2
+      00017F                        621 00104$:
+                                    622 ;	i2c390.c:177: }
+      00017F 22               [16]  623 	ret
+                                    624 ;------------------------------------------------------------
+                                    625 ;Allocation info for local variables in function 'ByteOutI2C'
+                                    626 ;------------------------------------------------------------
+                                    627 ;dat                       Allocated to registers r2 
+                                    628 ;bit_count                 Allocated to registers 
+                                    629 ;------------------------------------------------------------
+                                    630 ;	i2c390.c:187: char ByteOutI2C(char dat)
+                                    631 ;	-----------------------------------------
+                                    632 ;	 function ByteOutI2C
+                                    633 ;	-----------------------------------------
+      000180                        634 _ByteOutI2C:
+      000180 AA 82            [ 8]  635 	mov	r2,dpl
+                                    636 ;	i2c390.c:192: while(bit_count) {
+                                    637 ;	genAssign: resultIsFar = FALSE
+      000182 7B 08            [ 8]  638 	mov	r3,#0x08
+      000184                        639 00108$:
+      000184 EB               [ 4]  640 	mov	a,r3
+      000185 60 55            [12]  641 	jz  00110$
+      000187                        642 00139$:
+                                    643 ;	i2c390.c:193: if (dat & 0x80) {
+      000187 EA               [ 4]  644 	mov	a,r2
+      000188 30 E7 23         [12]  645 	jnb  acc[7],00106$
+      00018B                        646 00140$:
+                                    647 ;	i2c390.c:194: if (BitOutI2C(1)) {
+      00018B C0 02            [ 8]  648 	push	ar2
+      00018D C0 03            [ 8]  649 	push	ar3
+      00018F 75 82 01         [12]  650 	mov	dpl,#0x01
+      000192 12s00r00rE7      [16]  651 	lcall	_BitOutI2C
+      000196 D0 03            [ 8]  652 	pop	ar3
+      000198 D0 02            [ 8]  653 	pop	ar2
+      00019A E5 82            [ 8]  654 	mov	a,dpl
+      00019C 60 33            [12]  655 	jz  00107$
+      00019E                        656 00141$:
+                                    657 ;	i2c390.c:195: I2CDumpError(i2cError);
+      00019E 90s00r00r00      [12]  658 	mov	dptr,#_i2cError
+      0001A2 E0               [ 8]  659 	movx	a,@dptr
+      0001A3 F5 82            [ 8]  660 	mov	dpl,a
+      0001A5 12s00r03rEB      [16]  661 	lcall	_I2CDumpError
+                                    662 ;	i2c390.c:196: return 1;
+      0001A9 75 82 01         [12]  663 	mov	dpl,#0x01
+      0001AC 80 4B            [12]  664 	sjmp 00113$
+      0001AE                        665 00106$:
+                                    666 ;	i2c390.c:199: if (BitOutI2C(0)) {
+      0001AE C0 02            [ 8]  667 	push	ar2
+      0001B0 C0 03            [ 8]  668 	push	ar3
+      0001B2 75 82 00         [12]  669 	mov	dpl,#0x00
+      0001B5 12s00r00rE7      [16]  670 	lcall	_BitOutI2C
+      0001B9 D0 03            [ 8]  671 	pop	ar3
+      0001BB D0 02            [ 8]  672 	pop	ar2
+      0001BD E5 82            [ 8]  673 	mov	a,dpl
+      0001BF 60 10            [12]  674 	jz  00107$
+      0001C1                        675 00142$:
+                                    676 ;	i2c390.c:200: I2CDumpError(i2cError);
+      0001C1 90s00r00r00      [12]  677 	mov	dptr,#_i2cError
+      0001C5 E0               [ 8]  678 	movx	a,@dptr
+      0001C6 F5 82            [ 8]  679 	mov	dpl,a
+      0001C8 12s00r03rEB      [16]  680 	lcall	_I2CDumpError
+                                    681 ;	i2c390.c:201: return 1;
+      0001CC 75 82 01         [12]  682 	mov	dpl,#0x01
+      0001CF 80 28            [12]  683 	sjmp 00113$
+      0001D1                        684 00107$:
+                                    685 ;	i2c390.c:204: dat <<= 1;
+      0001D1 8A 04            [ 8]  686 	mov	ar4,r2
+      0001D3 EC               [ 4]  687 	mov	a,r4
+      0001D4 25 E0            [ 8]  688 	add	a,acc
+      0001D6 FC               [ 4]  689 	mov	r4,a
+                                    690 ;	genAssign: resultIsFar = TRUE
+      0001D7 8C 02            [ 8]  691 	mov	ar2,r4
+                                    692 ;	i2c390.c:205: bit_count--;
+      0001D9 1B               [ 4]  693 	dec	r3
+      0001DA 80 A8            [12]  694 	sjmp 00108$
+      0001DC                        695 00110$:
+                                    696 ;	i2c390.c:208: if (BitInI2C()) {
+      0001DC 12s00r01r4A      [16]  697 	lcall	_BitInI2C
+      0001E0 E5 82            [ 8]  698 	mov	a,dpl
+      0001E2 60 12            [12]  699 	jz  00112$
+      0001E4                        700 00143$:
+                                    701 ;	i2c390.c:209: i2cError = I2CERR_NAK;
+                                    702 ;	genAssign: resultIsFar = TRUE
+      0001E4 90s00r00r00      [12]  703 	mov	dptr,#_i2cError
+      0001E8 74 01            [ 8]  704 	mov	a,#0x01
+      0001EA F0               [ 8]  705 	movx	@dptr,a
+                                    706 ;	i2c390.c:210: I2CDumpError(i2cError);
+      0001EB 75 82 01         [12]  707 	mov	dpl,#0x01
+      0001EE 12s00r03rEB      [16]  708 	lcall	_I2CDumpError
+                                    709 ;	i2c390.c:211: return 1;
+      0001F2 75 82 01         [12]  710 	mov	dpl,#0x01
+                                    711 ;	i2c390.c:213: return 0;
+                                    712 ;	i2c390.c:214: }
+      0001F5 22               [16]  713 	ret
+      0001F6                        714 00112$:
+      0001F6 75 82 00         [12]  715 	mov     dpl,#0x00
+      0001F9                        716 00113$:
+      0001F9 22               [16]  717 	ret
+                                    718 ;------------------------------------------------------------
+                                    719 ;Allocation info for local variables in function 'I2CByteIn'
+                                    720 ;------------------------------------------------------------
+                                    721 ;ack                       Allocated to registers r2 
+                                    722 ;bit_count                 Allocated to registers 
+                                    723 ;byte_in                   Allocated to registers r3 
+                                    724 ;------------------------------------------------------------
+                                    725 ;	i2c390.c:224: char I2CByteIn(char ack)
+                                    726 ;	-----------------------------------------
+                                    727 ;	 function I2CByteIn
+                                    728 ;	-----------------------------------------
+      0001FA                        729 _I2CByteIn:
+      0001FA AA 82            [ 8]  730 	mov	r2,dpl
+                                    731 ;	i2c390.c:229: byte_in = 0;
+                                    732 ;	genAssign: resultIsFar = TRUE
+      0001FC 7B 00            [ 8]  733 	mov	r3,#0x00
+                                    734 ;	i2c390.c:231: while(bit_count)
+                                    735 ;	genAssign: resultIsFar = FALSE
+      0001FE 7C 08            [ 8]  736 	mov	r4,#0x08
+      000200                        737 00103$:
+      000200 EC               [ 4]  738 	mov	a,r4
+      000201 60 22            [12]  739 	jz  00105$
+      000203                        740 00121$:
+                                    741 ;	i2c390.c:233: byte_in <<= 1;
+      000203 8B 05            [ 8]  742 	mov	ar5,r3
+      000205 ED               [ 4]  743 	mov	a,r5
+      000206 25 E0            [ 8]  744 	add	a,acc
+      000208 FD               [ 4]  745 	mov	r5,a
+                                    746 ;	genAssign: resultIsFar = TRUE
+      000209 8D 03            [ 8]  747 	mov	ar3,r5
+                                    748 ;	i2c390.c:234: if (BitInI2C()) byte_in |= 0x01;
+      00020B C0 02            [ 8]  749 	push	ar2
+      00020D C0 03            [ 8]  750 	push	ar3
+      00020F C0 04            [ 8]  751 	push	ar4
+      000211 12s00r01r4A      [16]  752 	lcall	_BitInI2C
+      000215 D0 04            [ 8]  753 	pop	ar4
+      000217 D0 03            [ 8]  754 	pop	ar3
+      000219 D0 02            [ 8]  755 	pop	ar2
+      00021B E5 82            [ 8]  756 	mov	a,dpl
+      00021D 60 03            [12]  757 	jz  00102$
+      00021F                        758 00122$:
+      00021F 43 03 01         [12]  759 	orl	ar3,#0x01
+      000222                        760 00102$:
+                                    761 ;	i2c390.c:235: bit_count--;
+      000222 1C               [ 4]  762 	dec	r4
+      000223 80 DB            [12]  763 	sjmp 00103$
+      000225                        764 00105$:
+                                    765 ;	i2c390.c:238: BitOutI2C(ack);
+      000225 C0 03            [ 8]  766 	push	ar3
+      000227 8A 82            [ 8]  767 	mov	dpl,r2
+      000229 12s00r00rE7      [16]  768 	lcall	_BitOutI2C
+      00022D D0 03            [ 8]  769 	pop	ar3
+                                    770 ;	i2c390.c:239: SDA_HIGH;             /* Added 18-Jul-95 - thanks to Ray Bellis */
+      00022F 43 A1 02         [12]  771 	orl	_P5,#0x02
+                                    772 ;	i2c390.c:240: return byte_in;
+      000232 8B 82            [ 8]  773 	mov	dpl,r3
+      000234                        774 00106$:
+                                    775 ;	i2c390.c:241: }
+      000234 22               [16]  776 	ret
+                                    777 ;------------------------------------------------------------
+                                    778 ;Allocation info for local variables in function 'I2CSendStop'
+                                    779 ;------------------------------------------------------------
+                                    780 ;count                     Allocated with name '_I2CSendStop_PARM_2'
+                                    781 ;send_stop                 Allocated with name '_I2CSendStop_PARM_3'
+                                    782 ;addr                      Allocated to registers r2 
+                                    783 ;byteptr                   Allocated to registers 
+                                    784 ;byte_out                  Allocated to registers r2 
+                                    785 ;------------------------------------------------------------
+                                    786 ;	i2c390.c:249: char I2CSendStop(char addr, char count, char send_stop)
+                                    787 ;	-----------------------------------------
+                                    788 ;	 function I2CSendStop
+                                    789 ;	-----------------------------------------
+      000235                        790 _I2CSendStop:
+      000235 AA 82            [ 8]  791 	mov	r2,dpl
+                                    792 ;	i2c390.c:253: if (I2CStart()) return 1;
+      000237 C0 02            [ 8]  793 	push	ar2
+      000239 12s00r00r7A      [16]  794 	lcall	_I2CStart
+      00023D D0 02            [ 8]  795 	pop	ar2
+      00023F E5 82            [ 8]  796 	mov	a,dpl
+      000241 60 07            [12]  797 	jz  00102$
+      000243                        798 00143$:
+      000243 75 82 01         [12]  799 	mov	dpl,#0x01
+      000246 02s00r02rC4      [16]  800 	ljmp	00113$
+      00024A                        801 00102$:
+                                    802 ;	i2c390.c:254: i2cError = 0;
+                                    803 ;	genAssign: resultIsFar = TRUE
+      00024A 90s00r00r00      [12]  804 	mov	dptr,#_i2cError
+      00024E E4               [ 4]  805 	clr	a
+      00024F F0               [ 8]  806 	movx	@dptr,a
+                                    807 ;	i2c390.c:256: byte_out = addr & 0xfe;     /* Ensure that it's a write address */
+      000250 53 02 FE         [12]  808 	anl	ar2,#0xfe
+                                    809 ;	i2c390.c:257: count++;                    /* Include slave address to byte count */
+      000253 90s00r01r04      [12]  810 	mov	dptr,#_I2CSendStop_PARM_2
+      000257 E0               [ 8]  811 	movx	a,@dptr
+      000258 24 01            [ 8]  812 	add	a,#0x01
+      00025A F0               [ 8]  813 	movx	@dptr,a
+                                    814 ;	i2c390.c:259: while(count)
+                                    815 ;	genAssign: resultIsFar = FALSE
+      00025B 7B 00            [ 8]  816 	mov	r3,#0x00
+      00025D 90s00r01r04      [12]  817 	mov	dptr,#_I2CSendStop_PARM_2
+                                    818 ;	genAssign: resultIsFar = FALSE
+      000261 E0               [ 8]  819 	movx	a,@dptr
+      000262 FC               [ 4]  820 	mov	r4,a
+      000263                        821 00108$:
+      000263 EC               [ 4]  822 	mov	a,r4
+      000264 60 50            [12]  823 	jz  00110$
+      000266                        824 00144$:
+                                    825 ;	i2c390.c:261: if (ByteOutI2C(byte_out))
+      000266 C0 03            [ 8]  826 	push	ar3
+      000268 C0 04            [ 8]  827 	push	ar4
+      00026A 8A 82            [ 8]  828 	mov	dpl,r2
+      00026C 12s00r01r80      [16]  829 	lcall	_ByteOutI2C
+      000270 D0 04            [ 8]  830 	pop	ar4
+      000272 D0 03            [ 8]  831 	pop	ar3
+      000274 E5 82            [ 8]  832 	mov	a,dpl
+      000276 60 22            [12]  833 	jz  00107$
+      000278                        834 00145$:
+                                    835 ;	i2c390.c:263: if (i2cError == I2CERR_NAK && send_stop) I2CStop();
+      000278 90s00r00r00      [12]  836 	mov	dptr,#_i2cError
+      00027C E0               [ 8]  837 	movx	a,@dptr
+      00027D B4 01 0B         [16]  838 	cjne a,#0x01,00104$
+      000280                        839 00147$:
+      000280 90s00r01r05      [12]  840 	mov	dptr,#_I2CSendStop_PARM_3
+      000284 E0               [ 8]  841 	movx	a,@dptr
+      000285 60 04            [12]  842 	jz  00104$
+      000287                        843 00148$:
+      000287 12s00r00rAB      [16]  844 	lcall	_I2CStop
+      00028B                        845 00104$:
+                                    846 ;	i2c390.c:264: return i2cError;
+      00028B 75 86 01         [12]  847 	mov     dps, #1
+      00028E 90s00r00r00      [12]  848 	mov     dptr, #_i2cError
+      000292 E0               [ 8]  849 	movx	a,@dptr
+      000293 F5 82            [ 8]  850 	mov	dpl,a
+      000295 75 86 00         [12]  851 	mov	dps,#0
+      000298 80 2A            [12]  852 	sjmp 00113$
+      00029A                        853 00107$:
+                                    854 ;	i2c390.c:266: byte_out = i2cTransmitBuffer[byteptr];
+      00029A EB               [ 4]  855 	mov	a,r3
+      00029B 24r00            [ 8]  856 	add	a,#_i2cTransmitBuffer
+      00029D F5 84            [ 8]  857 	mov	dpl1,a
+      00029F E4               [ 4]  858 	clr	a
+      0002A0 34s00            [ 8]  859 	addc	a,#(_i2cTransmitBuffer >> 8)
+      0002A2 F5 85            [ 8]  860 	mov	dph1,a
+      0002A4 E4               [ 4]  861 	clr	a
+      0002A5 34s00            [ 8]  862 	addc	a,#(_i2cTransmitBuffer >> 16)
+      0002A7 F5 95            [ 8]  863 	mov	dpx1,a
+      0002A9 05 86            [ 8]  864 	inc	dps
+      0002AB E0               [ 8]  865 	movx	a,@dptr
+      0002AC FD               [ 4]  866 	mov	r5,a
+      0002AD 75 86 00         [12]  867 	mov	dps,#0
+                                    868 ;	genAssign: resultIsFar = TRUE
+      0002B0 8D 02            [ 8]  869 	mov	ar2,r5
+                                    870 ;	i2c390.c:267: byteptr++;
+      0002B2 0B               [ 4]  871 	inc	r3
+                                    872 ;	i2c390.c:268: count--;
+      0002B3 1C               [ 4]  873 	dec	r4
+      0002B4 80 AD            [12]  874 	sjmp 00108$
+      0002B6                        875 00110$:
+                                    876 ;	i2c390.c:271: if (send_stop) I2CStop();
+      0002B6 90s00r01r05      [12]  877 	mov	dptr,#_I2CSendStop_PARM_3
+      0002BA E0               [ 8]  878 	movx	a,@dptr
+      0002BB 60 04            [12]  879 	jz  00112$
+      0002BD                        880 00149$:
+      0002BD 12s00r00rAB      [16]  881 	lcall	_I2CStop
+      0002C1                        882 00112$:
+                                    883 ;	i2c390.c:272: return 0;
+      0002C1 75 82 00         [12]  884 	mov	dpl,#0x00
+      0002C4                        885 00113$:
+                                    886 ;	i2c390.c:273: }
+      0002C4 22               [16]  887 	ret
+                                    888 ;------------------------------------------------------------
+                                    889 ;Allocation info for local variables in function 'i2c_recv'
+                                    890 ;------------------------------------------------------------
+                                    891 ;count                     Allocated with name '_i2c_recv_PARM_2'
+                                    892 ;addr                      Allocated to registers r2 
+                                    893 ;byteptr                   Allocated to registers 
+                                    894 ;byte_in                   Allocated to registers r3 
+                                    895 ;------------------------------------------------------------
+                                    896 ;	i2c390.c:281: char i2c_recv(char addr, char count)
+                                    897 ;	-----------------------------------------
+                                    898 ;	 function i2c_recv
+                                    899 ;	-----------------------------------------
+      0002C5                        900 _i2c_recv:
+      0002C5 AA 82            [ 8]  901 	mov	r2,dpl
+                                    902 ;	i2c390.c:285: if (I2CStart()) return 1;
+      0002C7 C0 02            [ 8]  903 	push	ar2
+      0002C9 12s00r00r7A      [16]  904 	lcall	_I2CStart
+      0002CD D0 02            [ 8]  905 	pop	ar2
+      0002CF E5 82            [ 8]  906 	mov	a,dpl
+      0002D1 60 07            [12]  907 	jz  00102$
+      0002D3                        908 00153$:
+      0002D3 75 82 01         [12]  909 	mov	dpl,#0x01
+      0002D6 02s00r03r72      [16]  910 	ljmp	00113$
+      0002DA                        911 00102$:
+                                    912 ;	i2c390.c:286: i2cError = 0;
+                                    913 ;	genAssign: resultIsFar = TRUE
+      0002DA 90s00r00r00      [12]  914 	mov	dptr,#_i2cError
+      0002DE E4               [ 4]  915 	clr	a
+      0002DF F0               [ 8]  916 	movx	@dptr,a
+                                    917 ;	i2c390.c:289: byte_in = addr | 0x01;
+      0002E0 43 02 01         [12]  918 	orl	ar2,#0x01
+                                    919 ;	i2c390.c:291: if (ByteOutI2C(byte_in))
+      0002E3 8A 82            [ 8]  920 	mov	dpl,r2
+      0002E5 12s00r01r80      [16]  921 	lcall	_ByteOutI2C
+      0002E9 E5 82            [ 8]  922 	mov	a,dpl
+      0002EB 60 1B            [12]  923 	jz  00122$
+      0002ED                        924 00154$:
+                                    925 ;	i2c390.c:293: if (i2cError == I2CERR_NAK) I2CStop();
+      0002ED 90s00r00r00      [12]  926 	mov	dptr,#_i2cError
+      0002F1 E0               [ 8]  927 	movx	a,@dptr
+      0002F2 B4 01 04         [16]  928 	cjne a,#0x01,00104$
+      0002F5                        929 00156$:
+      0002F5 12s00r00rAB      [16]  930 	lcall	_I2CStop
+      0002F9                        931 00104$:
+                                    932 ;	i2c390.c:294: return i2cError;
+      0002F9 75 86 01         [12]  933 	mov     dps, #1
+      0002FC 90s00r00r00      [12]  934 	mov     dptr, #_i2cError
+      000300 E0               [ 8]  935 	movx	a,@dptr
+      000301 F5 82            [ 8]  936 	mov	dpl,a
+      000303 75 86 00         [12]  937 	mov	dps,#0
+                                    938 ;	i2c390.c:297: while(count)
+      000306 80 6A            [12]  939 	sjmp 00113$
+      000308                        940 00122$:
+                                    941 ;	genAssign: resultIsFar = FALSE
+      000308 7A 00            [ 8]  942 	mov	r2,#0x00
+      00030A                        943 00110$:
+      00030A 90s00r01r06      [12]  944 	mov	dptr,#_i2c_recv_PARM_2
+      00030E E0               [ 8]  945 	movx	a,@dptr
+      00030F 60 4A            [12]  946 	jz  00112$
+      000311                        947 00157$:
+                                    948 ;	i2c390.c:299: count-=1;
+      000311 90s00r01r06      [12]  949 	mov	dptr,#_i2c_recv_PARM_2
+      000315 E0               [ 8]  950 	movx	a,@dptr
+      000316 FB               [ 4]  951 	mov  r3,a
+      000317 14               [ 4]  952 	dec	a
+                                    953 ;	genAssign: resultIsFar = TRUE
+      000318 90s00r01r06      [12]  954 	mov	dptr,#_i2c_recv_PARM_2
+      00031C F0               [ 8]  955 	movx	@dptr,a
+                                    956 ;	i2c390.c:300: if (count) {
+      00031D 90s00r01r06      [12]  957 	mov	dptr,#_i2c_recv_PARM_2
+      000321 E0               [ 8]  958 	movx	a,@dptr
+      000322 60 0F            [12]  959 	jz  00108$
+      000324                        960 00158$:
+                                    961 ;	i2c390.c:301: byte_in = I2CByteIn(0);
+      000324 C0 02            [ 8]  962 	push	ar2
+      000326 75 82 00         [12]  963 	mov	dpl,#0x00
+      000329 12s00r01rFA      [16]  964 	lcall	_I2CByteIn
+      00032D AB 82            [ 8]  965 	mov	r3,dpl
+      00032F D0 02            [ 8]  966 	pop	ar2
+                                    967 ;	genAssign: resultIsFar = TRUE
+      000331 80 0F            [12]  968 	sjmp 00109$
+      000333                        969 00108$:
+                                    970 ;	i2c390.c:303: byte_in = I2CByteIn(1);   /* No ACK during last byte */
+      000333 C0 02            [ 8]  971 	push	ar2
+      000335 75 82 01         [12]  972 	mov	dpl,#0x01
+      000338 12s00r01rFA      [16]  973 	lcall	_I2CByteIn
+      00033C AC 82            [ 8]  974 	mov	r4,dpl
+      00033E D0 02            [ 8]  975 	pop	ar2
+                                    976 ;	genAssign: resultIsFar = TRUE
+      000340 8C 03            [ 8]  977 	mov	ar3,r4
+      000342                        978 00109$:
+                                    979 ;	i2c390.c:305: i2cReceiveBuffer[byteptr] = byte_in;
+      000342 EA               [ 4]  980 	mov	a,r2
+      000343 24r80            [ 8]  981 	add	a,#_i2cReceiveBuffer
+      000345 F5 84            [ 8]  982 	mov	dpl1,a
+      000347 E4               [ 4]  983 	clr	a
+      000348 34s00            [ 8]  984 	addc	a,#(_i2cReceiveBuffer >> 8)
+      00034A F5 85            [ 8]  985 	mov	dph1,a
+      00034C E4               [ 4]  986 	clr	a
+      00034D 34s00            [ 8]  987 	addc	a,#(_i2cReceiveBuffer >> 16)
+      00034F F5 95            [ 8]  988 	mov	dpx1,a
+      000351 EB               [ 4]  989 	mov	a,r3
+      000352 05 86            [ 8]  990 	inc	dps
+      000354 F0               [ 8]  991 	movx	@dptr,a
+      000355 75 86 00         [12]  992 	mov	dps,#0
+                                    993 ;	i2c390.c:306: byteptr++;
+      000358 0A               [ 4]  994 	inc	r2
+      000359 80 AF            [12]  995 	sjmp 00110$
+      00035B                        996 00112$:
+                                    997 ;	i2c390.c:309: I2CStop();
+      00035B 12s00r00rAB      [16]  998 	lcall	_I2CStop
+                                    999 ;	i2c390.c:311: return (i2cError ? 1 : 0);
+      00035F 90s00r00r00      [12] 1000 	mov	dptr,#_i2cError
+      000363 E0               [ 8] 1001 	movx	a,@dptr
+      000364 60 06            [12] 1002 	jz  00115$
+      000366                       1003 00159$:
+                                   1004 ;	genAssign: resultIsFar = FALSE
+      000366 7A 01            [ 8] 1005 	mov	r2,#0x01
+      000368 7B 00            [ 8] 1006 	mov	r3,#0x00
+      00036A 80 04            [12] 1007 	sjmp 00116$
+      00036C                       1008 00115$:
+                                   1009 ;	genAssign: resultIsFar = FALSE
+      00036C 7A 00            [ 8] 1010 	mov	r2,#0x00
+      00036E 7B 00            [ 8] 1011 	mov	r3,#0x00
+      000370                       1012 00116$:
+      000370 8A 82            [ 8] 1013 	mov	dpl,r2
+      000372                       1014 00113$:
+                                   1015 ;	i2c390.c:312: }
+      000372 22               [16] 1016 	ret
+                                   1017 ;------------------------------------------------------------
+                                   1018 ;Allocation info for local variables in function 'I2CSendReceive'
+                                   1019 ;------------------------------------------------------------
+                                   1020 ;tx_count                  Allocated with name '_I2CSendReceive_PARM_2'
+                                   1021 ;rx_count                  Allocated with name '_I2CSendReceive_PARM_3'
+                                   1022 ;addr                      Allocated to registers r2 
+                                   1023 ;------------------------------------------------------------
+                                   1024 ;	i2c390.c:322: char I2CSendReceive(char addr, char tx_count, char rx_count)
+                                   1025 ;	-----------------------------------------
+                                   1026 ;	 function I2CSendReceive
+                                   1027 ;	-----------------------------------------
+      000373                       1028 _I2CSendReceive:
+      000373 AA 82            [ 8] 1029 	mov	r2,dpl
+                                   1030 ;	i2c390.c:324: if (I2CSendStop(addr, tx_count, 0))
+      000375 90s00r01r07      [12] 1031 	mov	dptr,#_I2CSendReceive_PARM_2
+                                   1032 ;	genAssign: resultIsFar = TRUE
+      000379 E0               [ 8] 1033 	movx	a,@dptr
+      00037A 90s00r01r04      [12] 1034 	mov	dptr,#_I2CSendStop_PARM_2
+      00037E F0               [ 8] 1035 	movx	@dptr,a
+                                   1036 ;	genAssign: resultIsFar = TRUE
+      00037F 90s00r01r05      [12] 1037 	mov	dptr,#_I2CSendStop_PARM_3
+      000383 E4               [ 4] 1038 	clr	a
+      000384 F0               [ 8] 1039 	movx	@dptr,a
+      000385 C0 02            [ 8] 1040 	push	ar2
+      000387 8A 82            [ 8] 1041 	mov	dpl,r2
+      000389 12s00r02r35      [16] 1042 	lcall	_I2CSendStop
+      00038D D0 02            [ 8] 1043 	pop	ar2
+      00038F E5 82            [ 8] 1044 	mov	a,dpl
+      000391 60 13            [12] 1045 	jz  00104$
+      000393                       1046 00127$:
+                                   1047 ;	i2c390.c:329: if (i2cError != I2CERR_LOST) I2CStop();
+      000393 90s00r00r00      [12] 1048 	mov	dptr,#_i2cError
+      000397 E0               [ 8] 1049 	movx	a,@dptr
+      000398 B4 02 02         [16] 1050 	cjne	a,#0x02,00128$
+      00039B 80 04            [12] 1051 	sjmp 00102$
+      00039D                       1052 00128$:
+      00039D 12s00r00rAB      [16] 1053 	lcall	_I2CStop
+      0003A1                       1054 00102$:
+                                   1055 ;	i2c390.c:330: return 1;
+      0003A1 75 82 01         [12] 1056 	mov	dpl,#0x01
+      0003A4 80 44            [12] 1057 	sjmp 00107$
+      0003A6                       1058 00104$:
+                                   1059 ;	i2c390.c:333: SDA_HIGH; /* One of these may be low now, in which case the next */
+      0003A6 43 A1 02         [12] 1060 	orl	_P5,#0x02
+                                   1061 ;	i2c390.c:334: SCL_HIGH; /* start condition wouldn't be detected so make */
+      0003A9 43 A1 01         [12] 1062 	orl	_P5,#0x01
+                                   1063 ;	i2c390.c:335: I2CDelay(I2CDELAY); /*   sure that they're up and wait for one delay slot */
+      0003AC C0 02            [ 8] 1064 	push	ar2
+      0003AE 90 00 00 01      [12] 1065 	mov	dptr,#0x000001
+      0003B2 75 F0 00         [12] 1066 	mov	b,#0x00
+      0003B5 12s00r00r00      [16] 1067 	lcall	_I2CDelay
+      0003B9 D0 02            [ 8] 1068 	pop	ar2
+                                   1069 ;	i2c390.c:337: if (i2c_recv((char)(addr|0x01), rx_count)) return 1;
+      0003BB 43 02 01         [12] 1070 	orl	ar2,#0x01
+      0003BE 90s00r01r08      [12] 1071 	mov	dptr,#_I2CSendReceive_PARM_3
+                                   1072 ;	genAssign: resultIsFar = TRUE
+      0003C2 E0               [ 8] 1073 	movx	a,@dptr
+      0003C3 90s00r01r06      [12] 1074 	mov	dptr,#_i2c_recv_PARM_2
+      0003C7 F0               [ 8] 1075 	movx	@dptr,a
+      0003C8 8A 82            [ 8] 1076 	mov	dpl,r2
+      0003CA 12s00r02rC5      [16] 1077 	lcall	_i2c_recv
+      0003CE E5 82            [ 8] 1078 	mov	a,dpl
+      0003D0 60 05            [12] 1079 	jz  00106$
+      0003D2                       1080 00129$:
+      0003D2 75 82 01         [12] 1081 	mov	dpl,#0x01
+      0003D5 80 13            [12] 1082 	sjmp 00107$
+      0003D7                       1083 00106$:
+                                   1084 ;	i2c390.c:338: return (i2cError ? 1 : 0);
+      0003D7 90s00r00r00      [12] 1085 	mov	dptr,#_i2cError
+      0003DB E0               [ 8] 1086 	movx	a,@dptr
+      0003DC 60 06            [12] 1087 	jz  00109$
+      0003DE                       1088 00130$:
+                                   1089 ;	genAssign: resultIsFar = FALSE
+      0003DE 7A 01            [ 8] 1090 	mov	r2,#0x01
+      0003E0 7B 00            [ 8] 1091 	mov	r3,#0x00
+      0003E2 80 04            [12] 1092 	sjmp 00110$
+      0003E4                       1093 00109$:
+                                   1094 ;	genAssign: resultIsFar = FALSE
+      0003E4 7A 00            [ 8] 1095 	mov	r2,#0x00
+      0003E6 7B 00            [ 8] 1096 	mov	r3,#0x00
+      0003E8                       1097 00110$:
+      0003E8 8A 82            [ 8] 1098 	mov	dpl,r2
+      0003EA                       1099 00107$:
+                                   1100 ;	i2c390.c:339: }
+      0003EA 22               [16] 1101 	ret
+                                   1102 ;------------------------------------------------------------
+                                   1103 ;Allocation info for local variables in function 'I2CDumpError'
+                                   1104 ;------------------------------------------------------------
+                                   1105 ;error                     Allocated to registers 
+                                   1106 ;------------------------------------------------------------
+                                   1107 ;	i2c390.c:345: void I2CDumpError(char error)
+                                   1108 ;	-----------------------------------------
+                                   1109 ;	 function I2CDumpError
+                                   1110 ;	-----------------------------------------
+      0003EB                       1111 _I2CDumpError:
+                                   1112 ;	i2c390.c:370: error; // hush the compiler
+      0003EB                       1113 00101$:
+                                   1114 ;	i2c390.c:372: }
+      0003EB 22               [16] 1115 	ret
+                                   1116 	.area CSEG    (CODE)
+                                   1117 	.area CONST   (CODE)
+                                   1118 	.area XINIT   (CODE)
+      000000                       1119 __xinit__i2cError:
+      000000 00                    1120 	.db #0x00	; 0
+                                   1121 	.area CABS    (ABS,CODE)

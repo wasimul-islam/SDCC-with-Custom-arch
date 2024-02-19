@@ -1,0 +1,1091 @@
+                                      1 ;--------------------------------------------------------
+                                      2 ; File Created by SDCC : free open source ISO C Compiler 
+                                      3 ; Version 4.2.14 #0 (Linux)
+                                      4 ;--------------------------------------------------------
+                                      5 	.module mbrtowc
+                                      6 	.optsdcc -mds400 --model-flat24
+                                      7 	
+                                      8 ;--------------------------------------------------------
+                                      9 ; CPU specific extensions
+                                     10 ;--------------------------------------------------------
+                                     11 	.DS80C390
+                                     12 	.amode	2	; 24 bit flat addressing
+                           000082    13 dpl	=	0x82
+                           000083    14 dph	=	0x83
+                           000084    15 dpl1	=	0x84
+                           000085    16 dph1	=	0x85
+                           000086    17 dps	=	0x86
+                           000093    18 dpx	=	0x93
+                           000095    19 dpx1	=	0x95
+                           00009B    20 esp	=	0x9B
+                           00009C    21 ap	=	0x9C
+                           00009C    22 acc1	=	0x9C
+                           0000D1    23 mcnt0	=	0xD1
+                           0000D2    24 mcnt1	=	0xD2
+                           0000D3    25 ma	=	0xD3
+                           0000D4    26 mb	=	0xD4
+                           0000D5    27 mc	=	0xD5
+                           00009D    28 acon	=	0x9D
+                           0000C6    29 mcon	=	0xC6
+                           0000D1    30 F1	=	0xD1	; user flag
+                                     31 ;--------------------------------------------------------
+                                     32 ; Public variables in this module
+                                     33 ;--------------------------------------------------------
+                                     34 	.globl _mbrtowc_PARM_4
+                                     35 	.globl _mbrtowc_PARM_3
+                                     36 	.globl _mbrtowc_PARM_2
+                                     37 	.globl _mbrtowc
+                                     38 ;--------------------------------------------------------
+                                     39 ; special function registers
+                                     40 ;--------------------------------------------------------
+                                     41 ;--------------------------------------------------------
+                                     42 ; special function bits
+                                     43 ;--------------------------------------------------------
+                                     44 ;--------------------------------------------------------
+                                     45 ; overlayable register banks
+                                     46 ;--------------------------------------------------------
+                                     47 	.area REG_BANK_0	(REL,OVR,DATA)
+      000000                         48 	.ds 8
+                                     49 	.area REG_BANK_3	(REL,OVR,DATA)
+      000000                         50 	.ds 8
+                                     51 ;--------------------------------------------------------
+                                     52 ; internal ram data
+                                     53 ;--------------------------------------------------------
+                                     54 	.area DSEG    (DATA)
+                                     55 ;--------------------------------------------------------
+                                     56 ; overlayable items in internal ram
+                                     57 ;--------------------------------------------------------
+                                     58 ;--------------------------------------------------------
+                                     59 ; indirectly addressable internal ram data
+                                     60 ;--------------------------------------------------------
+                                     61 	.area ISEG    (DATA)
+                                     62 ;--------------------------------------------------------
+                                     63 ; absolute internal ram data
+                                     64 ;--------------------------------------------------------
+                                     65 	.area IABS    (ABS,DATA)
+                                     66 	.area IABS    (ABS,DATA)
+                                     67 ;--------------------------------------------------------
+                                     68 ; bit data
+                                     69 ;--------------------------------------------------------
+                                     70 	.area BSEG    (BIT)
+                                     71 ;--------------------------------------------------------
+                                     72 ; paged external ram data
+                                     73 ;--------------------------------------------------------
+                                     74 	.area PSEG    (PAG,XDATA)
+                                     75 ;--------------------------------------------------------
+                                     76 ; uninitialized external ram data
+                                     77 ;--------------------------------------------------------
+                                     78 	.area XSEG    (XDATA)
+      000000                         79 _mbrtowc_PARM_2:
+      000000                         80 	.ds 4
+      000004                         81 _mbrtowc_PARM_3:
+      000004                         82 	.ds 2
+      000006                         83 _mbrtowc_PARM_4:
+      000006                         84 	.ds 4
+      00000A                         85 _mbrtowc_pwc_65536_9:
+      00000A                         86 	.ds 4
+      00000E                         87 _mbrtowc_first_byte_65536_10:
+      00000E                         88 	.ds 1
+      00000F                         89 _mbrtowc_mbseq_65536_10:
+      00000F                         90 	.ds 4
+      000013                         91 _mbrtowc_codepoint_65536_10:
+      000013                         92 	.ds 4
+      000017                         93 _mbrtowc_sps_65536_10:
+      000017                         94 	.ds 3
+      00001A                         95 _mbrtowc_sloc0_1_0:
+      00001A                         96 	.ds 4
+      00001E                         97 _mbrtowc_sloc1_1_0:
+      00001E                         98 	.ds 1
+      00001F                         99 _mbrtowc_sloc3_1_0:
+      00001F                        100 	.ds 4
+      000023                        101 _mbrtowc_sloc4_1_0:
+      000023                        102 	.ds 4
+      000027                        103 _mbrtowc_sloc6_1_0:
+      000027                        104 	.ds 2
+      000029                        105 _mbrtowc_sloc7_1_0:
+      000029                        106 	.ds 4
+                                    107 ;--------------------------------------------------------
+                                    108 ; absolute external ram data
+                                    109 ;--------------------------------------------------------
+                                    110 	.area XABS    (ABS,XDATA)
+                                    111 ;--------------------------------------------------------
+                                    112 ; initialized external ram data
+                                    113 ;--------------------------------------------------------
+                                    114 	.area XISEG   (XDATA)
+                                    115 ;--------------------------------------------------------
+                                    116 ; global & static initialisations
+                                    117 ;--------------------------------------------------------
+                                    118 	.area HOME    (CODE)
+                                    119 	.area GSINIT  (CODE)
+                                    120 	.area GSFINAL (CODE)
+                                    121 	.area GSINIT  (CODE)
+                                    122 ;--------------------------------------------------------
+                                    123 ; Home
+                                    124 ;--------------------------------------------------------
+                                    125 	.area HOME    (CODE)
+                                    126 	.area HOME    (CODE)
+                                    127 ;--------------------------------------------------------
+                                    128 ; code
+                                    129 ;--------------------------------------------------------
+                                    130 	.area CSEG    (CODE)
+                                    131 ;------------------------------------------------------------
+                                    132 ;Allocation info for local variables in function 'mbrtowc'
+                                    133 ;------------------------------------------------------------
+                                    134 ;s                         Allocated with name '_mbrtowc_PARM_2'
+                                    135 ;n                         Allocated with name '_mbrtowc_PARM_3'
+                                    136 ;ps                        Allocated with name '_mbrtowc_PARM_4'
+                                    137 ;pwc                       Allocated with name '_mbrtowc_pwc_65536_9'
+                                    138 ;first_byte                Allocated with name '_mbrtowc_first_byte_65536_10'
+                                    139 ;seqlen                    Allocated to registers 
+                                    140 ;mbseq                     Allocated with name '_mbrtowc_mbseq_65536_10'
+                                    141 ;codepoint                 Allocated with name '_mbrtowc_codepoint_65536_10'
+                                    142 ;i                         Allocated to registers r2 
+                                    143 ;j                         Allocated to registers 
+                                    144 ;sps                       Allocated with name '_mbrtowc_sps_65536_10'
+                                    145 ;sloc0                     Allocated with name '_mbrtowc_sloc0_1_0'
+                                    146 ;sloc1                     Allocated with name '_mbrtowc_sloc1_1_0'
+                                    147 ;sloc2                     Allocated with name '_mbrtowc_sloc2_1_0'
+                                    148 ;sloc3                     Allocated with name '_mbrtowc_sloc3_1_0'
+                                    149 ;sloc4                     Allocated with name '_mbrtowc_sloc4_1_0'
+                                    150 ;sloc5                     Allocated with name '_mbrtowc_sloc5_1_0'
+                                    151 ;sloc6                     Allocated with name '_mbrtowc_sloc6_1_0'
+                                    152 ;sloc7                     Allocated with name '_mbrtowc_sloc7_1_0'
+                                    153 ;------------------------------------------------------------
+                                    154 ;	mbrtowc.c:32: size_t mbrtowc(wchar_t *restrict pwc, const char *restrict s, size_t n, mbstate_t *restrict ps)
+                                    155 ;	-----------------------------------------
+                                    156 ;	 function mbrtowc
+                                    157 ;	-----------------------------------------
+      000000                        158 _mbrtowc:
+                           000002   159 	ar2 = 0x02
+                           000003   160 	ar3 = 0x03
+                           000004   161 	ar4 = 0x04
+                           000005   162 	ar5 = 0x05
+                           000006   163 	ar6 = 0x06
+                           000007   164 	ar7 = 0x07
+                           000000   165 	ar0 = 0x00
+                           000001   166 	ar1 = 0x01
+      000000 75 86 01         [12]  167 	mov     dps, #1
+      000003 90s00r00r0A      [12]  168 	mov     dptr, #_mbrtowc_pwc_65536_9
+      000007 E5 82            [ 8]  169 	mov	a,dpl
+      000009 F0               [ 8]  170 	movx	@dptr,a
+      00000A A3               [12]  171 	inc	dptr
+      00000B E5 83            [ 8]  172 	mov	a,dph
+      00000D F0               [ 8]  173 	movx	@dptr,a
+      00000E A3               [12]  174 	inc	dptr
+      00000F E5 93            [ 8]  175 	mov	a,dpx
+      000011 F0               [ 8]  176 	movx	@dptr,a
+      000012 A3               [12]  177 	inc	dptr
+      000013 E5 F0            [ 8]  178 	mov	a,b
+      000015 F0               [ 8]  179 	movx	@dptr,a
+      000016 75 86 00         [12]  180 	mov	dps,#0
+                                    181 ;	mbrtowc.c:41: if(!s)
+      000019 90s00r00r00      [12]  182 	mov	dptr,#_mbrtowc_PARM_2
+                                    183 ;	genAssign: resultIsFar = FALSE
+      00001D E0               [ 8]  184 	movx	a,@dptr
+      00001E FE               [ 4]  185 	mov	r6,a
+      00001F A3               [12]  186 	inc	dptr
+      000020 E0               [ 8]  187 	movx	a,@dptr
+      000021 FF               [ 4]  188 	mov	r7,a
+      000022 A3               [12]  189 	inc	dptr
+      000023 E0               [ 8]  190 	movx	a,@dptr
+      000024 F8               [ 4]  191 	mov	r0,a
+      000025 A3               [12]  192 	inc	dptr
+      000026 E0               [ 8]  193 	movx	a,@dptr
+      000027 F9               [ 4]  194 	mov	r1,a
+      000028 90s00r00r00      [12]  195 	mov	dptr,#_mbrtowc_PARM_2
+      00002C E0               [ 8]  196 	movx	a,@dptr
+      00002D F5 F0            [ 8]  197 	mov	b,a
+      00002F A3               [12]  198 	inc	dptr
+      000030 E0               [ 8]  199 	movx	a,@dptr
+      000031 42 F0            [ 8]  200 	orl	b,a
+      000033 A3               [12]  201 	inc	dptr
+      000034 E0               [ 8]  202 	movx	a,@dptr
+      000035 45 F0            [ 8]  203 	orl	a,b
+      000037 70 4A            [12]  204 	jnz  00102$
+      000039                        205 00279$:
+                                    206 ;	mbrtowc.c:42: return(mbrtowc(0, "", 1, ps));
+      000039 90s00r00r06      [12]  207 	mov	dptr,#_mbrtowc_PARM_4
+                                    208 ;	genAssign: resultIsFar = FALSE
+      00003D E0               [ 8]  209 	movx	a,@dptr
+      00003E FA               [ 4]  210 	mov	r2,a
+      00003F A3               [12]  211 	inc	dptr
+      000040 E0               [ 8]  212 	movx	a,@dptr
+      000041 FB               [ 4]  213 	mov	r3,a
+      000042 A3               [12]  214 	inc	dptr
+      000043 E0               [ 8]  215 	movx	a,@dptr
+      000044 FC               [ 4]  216 	mov	r4,a
+      000045 A3               [12]  217 	inc	dptr
+      000046 E0               [ 8]  218 	movx	a,@dptr
+      000047 FD               [ 4]  219 	mov	r5,a
+                                    220 ;	genAssign: resultIsFar = TRUE
+      000048 90s00r00r00      [12]  221 	mov	dptr,#_mbrtowc_PARM_2
+      00004C 74r00            [ 8]  222 	mov	a,#___str_0
+      00004E F0               [ 8]  223 	movx	@dptr,a
+      00004F A3               [12]  224 	inc	dptr
+      000050 74s00            [ 8]  225 	mov	a,#(___str_0 >> 8)
+      000052 F0               [ 8]  226 	movx	@dptr,a
+      000053 A3               [12]  227 	inc	dptr
+      000054 74s00            [ 8]  228 	mov	a,#(___str_0 >> 16)
+      000056 F0               [ 8]  229 	movx	@dptr,a
+      000057 A3               [12]  230 	inc	dptr
+      000058 74 80            [ 8]  231 	mov	a,#0x80
+      00005A F0               [ 8]  232 	movx	@dptr,a
+                                    233 ;	genAssign: resultIsFar = TRUE
+      00005B 90s00r00r04      [12]  234 	mov	dptr,#_mbrtowc_PARM_3
+      00005F 74 01            [ 8]  235 	mov	a,#0x01
+      000061 F0               [ 8]  236 	movx	@dptr,a
+      000062 E4               [ 4]  237 	clr	a
+      000063 A3               [12]  238 	inc	dptr
+      000064 F0               [ 8]  239 	movx	@dptr,a
+                                    240 ;	genAssign: resultIsFar = TRUE
+      000065 90s00r00r06      [12]  241 	mov	dptr,#_mbrtowc_PARM_4
+      000069 EA               [ 4]  242 	mov	a,r2
+      00006A F0               [ 8]  243 	movx	@dptr,a
+      00006B A3               [12]  244 	inc	dptr
+      00006C EB               [ 4]  245 	mov	a,r3
+      00006D F0               [ 8]  246 	movx	@dptr,a
+      00006E A3               [12]  247 	inc	dptr
+      00006F EC               [ 4]  248 	mov	a,r4
+      000070 F0               [ 8]  249 	movx	@dptr,a
+      000071 A3               [12]  250 	inc	dptr
+      000072 ED               [ 4]  251 	mov	a,r5
+      000073 F0               [ 8]  252 	movx	@dptr,a
+      000074 90 00 00 00      [12]  253 	mov  dptr,#0x0000
+      000078 75 F0 00         [12]  254 	mov	b,#0x00
+      00007B 12s00r00r00      [16]  255 	lcall	_mbrtowc
+      00007F 02s00r05r29      [16]  256 	ljmp	00145$
+      000083                        257 00102$:
+                                    258 ;	mbrtowc.c:43: if(!n)
+      000083 90s00r00r04      [12]  259 	mov	dptr,#_mbrtowc_PARM_3
+      000087 E0               [ 8]  260 	movx	a,@dptr
+      000088 F5 F0            [ 8]  261 	mov	b,a
+      00008A A3               [12]  262 	inc	dptr
+      00008B E0               [ 8]  263 	movx	a,@dptr
+      00008C 45 F0            [ 8]  264 	orl	a,b
+      00008E 70 04            [12]  265 	jnz	00280$
+      000090 02s00r05r1B      [16]  266 	ljmp	00128$
+      000094                        267 00280$:
+                                    268 ;	mbrtowc.c:45: if(!ps)
+      000094 90s00r00r06      [12]  269 	mov	dptr,#_mbrtowc_PARM_4
+      000098 E0               [ 8]  270 	movx	a,@dptr
+      000099 F5 F0            [ 8]  271 	mov	b,a
+      00009B A3               [12]  272 	inc	dptr
+      00009C E0               [ 8]  273 	movx	a,@dptr
+      00009D 42 F0            [ 8]  274 	orl	b,a
+      00009F A3               [12]  275 	inc	dptr
+      0000A0 E0               [ 8]  276 	movx	a,@dptr
+      0000A1 45 F0            [ 8]  277 	orl	a,b
+      0000A3 70 12            [12]  278 	jnz  00106$
+      0000A5                        279 00281$:
+                                    280 ;	mbrtowc.c:47: ps = &sps;
+      0000A5 90s00r00r06      [12]  281 	mov	dptr,#_mbrtowc_PARM_4
+      0000A9 74r17            [ 8]  282 	mov	a,#_mbrtowc_sps_65536_10
+      0000AB F0               [ 8]  283 	movx	@dptr,a
+      0000AC A3               [12]  284 	inc	dptr
+      0000AD 74s00            [ 8]  285 	mov	a,#(_mbrtowc_sps_65536_10 >> 8)
+      0000AF F0               [ 8]  286 	movx	@dptr,a
+      0000B0 A3               [12]  287 	inc	dptr
+      0000B1 74s00            [ 8]  288 	mov	a,#(_mbrtowc_sps_65536_10 >> 16)
+      0000B3 F0               [ 8]  289 	movx	@dptr,a
+      0000B4 A3               [12]  290 	inc	dptr
+      0000B5 E4               [ 4]  291 	clr	a
+      0000B6 F0               [ 8]  292 	movx	@dptr,a
+      0000B7                        293 00106$:
+                                    294 ;	mbrtowc.c:50: for(i = 0; ps->c[i] && i < 3; i++)
+      0000B7 90s00r00r06      [12]  295 	mov	dptr,#_mbrtowc_PARM_4
+                                    296 ;	genAssign: resultIsFar = TRUE
+      0000BB 75 86 21         [12]  297 	mov	dps,#0x21
+      0000BE 90s00r00r1A      [12]  298 	mov	dptr,#_mbrtowc_sloc0_1_0
+      0000C2 E0               [ 8]  299 	movx	a,@dptr
+      0000C3 F0               [ 8]  300 	movx	@dptr,a
+      0000C4 A3               [12]  301 	inc	dptr
+      0000C5 A3               [12]  302 	inc	dptr
+      0000C6 E0               [ 8]  303 	movx	a,@dptr
+      0000C7 F0               [ 8]  304 	movx	@dptr,a
+      0000C8 A3               [12]  305 	inc	dptr
+      0000C9 A3               [12]  306 	inc	dptr
+      0000CA E0               [ 8]  307 	movx	a,@dptr
+      0000CB F0               [ 8]  308 	movx	@dptr,a
+      0000CC A3               [12]  309 	inc	dptr
+      0000CD A3               [12]  310 	inc	dptr
+      0000CE E0               [ 8]  311 	movx	a,@dptr
+      0000CF F0               [ 8]  312 	movx	@dptr,a
+      0000D0 75 86 00         [12]  313 	mov	dps,#0
+                                    314 ;	genAssign: resultIsFar = TRUE
+      0000D3 90s00r00r1E      [12]  315 	mov	dptr,#_mbrtowc_sloc1_1_0
+      0000D7 E4               [ 4]  316 	clr	a
+      0000D8 F0               [ 8]  317 	movx	@dptr,a
+      0000D9                        318 00131$:
+      0000D9 90s00r00r1E      [12]  319 	mov	dptr,#_mbrtowc_sloc1_1_0
+      0000DD 75 86 01         [12]  320 	mov	dps, #1
+      0000E0 90s00r00r1A      [12]  321 	mov	dptr, #_mbrtowc_sloc0_1_0
+      0000E4 15 86            [ 8]  322 	dec	dps
+      0000E6 E0               [ 8]  323 	movx	a,@dptr
+      0000E7 C5 9C            [ 8]  324 	xch	a, acc1
+      0000E9 05 86            [ 8]  325 	inc	dps
+      0000EB E0               [ 8]  326 	movx	a,@dptr
+      0000EC C5 9C            [ 8]  327 	xch	a, acc1
+      0000EE 25 9C            [ 8]  328 	add	a,acc1
+      0000F0 FA               [ 4]  329 	mov	r2,a
+      0000F1 E4               [ 4]  330 	clr	a
+      0000F2 C5 9C            [ 8]  331 	xch	a, acc1
+      0000F4 A3               [12]  332 	inc	dptr
+      0000F5 E0               [ 8]  333 	movx	a,@dptr
+      0000F6 C5 9C            [ 8]  334 	xch	a, acc1
+      0000F8 35 9C            [ 8]  335 	addc	a,acc1
+      0000FA FB               [ 4]  336 	mov	r3,a
+      0000FB E4               [ 4]  337 	clr	a
+      0000FC C5 9C            [ 8]  338 	xch	a, acc1
+      0000FE A3               [12]  339 	inc	dptr
+      0000FF E0               [ 8]  340 	movx	a,@dptr
+      000100 C5 9C            [ 8]  341 	xch	a, acc1
+      000102 35 9C            [ 8]  342 	addc	a,acc1
+      000104 FC               [ 4]  343 	mov	r4,a
+      000105 75 86 01         [12]  344 	mov     dps, #1
+      000108 A3               [12]  345 	inc	dptr
+      000109 E0               [ 8]  346 	movx	a,@dptr
+      00010A 75 86 00         [12]  347 	mov	dps,#0
+      00010D FD               [ 4]  348 	mov	r5,a
+      00010E 8A 82            [ 8]  349 	mov	dpl,r2
+      000110 8B 83            [ 8]  350 	mov	dph,r3
+      000112 8C 93            [ 8]  351 	mov	dpx,r4
+      000114 8D F0            [ 8]  352 	mov	b,r5
+      000116 12s00r00r00      [16]  353 	lcall	__gptrget
+      00011A FD               [ 4]  354 	mov  r5,a
+      00011B 60 2C            [12]  355 	jz  00174$
+      00011D                        356 00282$:
+      00011D 90s00r00r1E      [12]  357 	mov	dptr,#_mbrtowc_sloc1_1_0
+      000121 E0               [ 8]  358 	movx	a,@dptr
+      000122 B4 03 00         [16]  359 	cjne	a,#0x03,00283$
+      000125                        360 00283$:
+      000125 50 22            [12]  361 	jnc  00174$
+      000127                        362 00284$:
+                                    363 ;	mbrtowc.c:51: mbseq[i] = ps->c[i];
+      000127 90s00r00r1E      [12]  364 	mov	dptr,#_mbrtowc_sloc1_1_0
+      00012B E0               [ 8]  365 	movx	a,@dptr
+      00012C 24r0F            [ 8]  366 	add	a,#_mbrtowc_mbseq_65536_10
+      00012E FA               [ 4]  367 	mov	r2,a
+      00012F E4               [ 4]  368 	clr	a
+      000130 34s00            [ 8]  369 	addc	a,#(_mbrtowc_mbseq_65536_10 >> 8)
+      000132 FB               [ 4]  370 	mov	r3,a
+      000133 E4               [ 4]  371 	clr	a
+      000134 34s00            [ 8]  372 	addc	a,#(_mbrtowc_mbseq_65536_10 >> 16)
+      000136 FC               [ 4]  373 	mov	r4,a
+      000137 8A 82            [ 8]  374 	mov	dpl,r2
+      000139 8B 83            [ 8]  375 	mov	dph,r3
+      00013B 8C 93            [ 8]  376 	mov	dpx,r4
+      00013D ED               [ 4]  377 	mov	a,r5
+      00013E F0               [ 8]  378 	movx	@dptr,a
+                                    379 ;	mbrtowc.c:50: for(i = 0; ps->c[i] && i < 3; i++)
+      00013F 90s00r00r1E      [12]  380 	mov	dptr,#_mbrtowc_sloc1_1_0
+      000143 E0               [ 8]  381 	movx	a,@dptr
+      000144 24 01            [ 8]  382 	add	a,#0x01
+      000146 F0               [ 8]  383 	movx	@dptr,a
+      000147 80 90            [12]  384 	sjmp 00131$
+      000149                        385 00174$:
+      000149 C0 06            [ 8]  386 	push	ar6
+      00014B C0 07            [ 8]  387 	push	ar7
+      00014D C0 00            [ 8]  388 	push	ar0
+      00014F C0 01            [ 8]  389 	push	ar1
+      000151 90s00r00r1E      [12]  390 	mov	dptr,#_mbrtowc_sloc1_1_0
+                                    391 ;	genAssign: resultIsFar = TRUE
+      000155 E0               [ 8]  392 	movx	a,@dptr
+      000156 FA               [ 4]  393 	mov	r2,a
+                                    394 ;	mbrtowc.c:53: seqlen = 1;
+                                    395 ;	genAssign: resultIsFar = FALSE
+      000157 7B 01            [ 8]  396 	mov	r3,#0x01
+                                    397 ;	mbrtowc.c:54: first_byte = ps->c[0] ? ps->c[0] : *s;
+      000159 90s00r00r06      [12]  398 	mov	dptr,#_mbrtowc_PARM_4
+                                    399 ;	genAssign: resultIsFar = FALSE
+      00015D E0               [ 8]  400 	movx	a,@dptr
+      00015E FC               [ 4]  401 	mov	r4,a
+      00015F A3               [12]  402 	inc	dptr
+      000160 E0               [ 8]  403 	movx	a,@dptr
+      000161 FD               [ 4]  404 	mov	r5,a
+      000162 A3               [12]  405 	inc	dptr
+      000163 E0               [ 8]  406 	movx	a,@dptr
+      000164 FE               [ 4]  407 	mov	r6,a
+      000165 A3               [12]  408 	inc	dptr
+      000166 E0               [ 8]  409 	movx	a,@dptr
+      000167 FF               [ 4]  410 	mov	r7,a
+      000168 8C 82            [ 8]  411 	mov	dpl,r4
+      00016A 8D 83            [ 8]  412 	mov	dph,r5
+      00016C 8E 93            [ 8]  413 	mov	dpx,r6
+      00016E 8F F0            [ 8]  414 	mov	b,r7
+      000170 12s00r00r00      [16]  415 	lcall	__gptrget
+      000174 FC               [ 4]  416 	mov	r4,a
+      000175 D0 01            [ 8]  417 	pop	ar1
+      000177 D0 00            [ 8]  418 	pop	ar0
+      000179 D0 07            [ 8]  419 	pop	ar7
+      00017B D0 06            [ 8]  420 	pop	ar6
+      00017D EC               [ 4]  421 	mov	a,r4
+      00017E 60 02            [12]  422 	jz  00147$
+      000180                        423 00285$:
+                                    424 ;	genAssign: resultIsFar = FALSE
+      000180 80 0D            [12]  425 	sjmp 00148$
+      000182                        426 00147$:
+      000182 8E 82            [ 8]  427 	mov	dpl,r6
+      000184 8F 83            [ 8]  428 	mov	dph,r7
+      000186 88 93            [ 8]  429 	mov	dpx,r0
+      000188 89 F0            [ 8]  430 	mov	b,r1
+      00018A 12s00r00r00      [16]  431 	lcall	__gptrget
+      00018E FC               [ 4]  432 	mov	r4,a
+      00018F                        433 00148$:
+                                    434 ;	genAssign: resultIsFar = TRUE
+      00018F 90s00r00r0E      [12]  435 	mov	dptr,#_mbrtowc_first_byte_65536_10
+      000193 EC               [ 4]  436 	mov	a,r4
+      000194 F0               [ 8]  437 	movx	@dptr,a
+                                    438 ;	mbrtowc.c:56: if(first_byte & 0x80)
+      000195 90s00r00r0E      [12]  439 	mov	dptr,#_mbrtowc_first_byte_65536_10
+      000199 E0               [ 8]  440 	movx	a,@dptr
+      00019A 30 E7 71         [12]  441 	jnb  acc[7],00112$
+      00019D                        442 00286$:
+                                    443 ;	mbrtowc.c:58: while (first_byte & (0x80 >> seqlen))
+                                    444 ;	genAssign: resultIsFar = FALSE
+      00019D 7D 01            [ 8]  445 	mov	r5,#0x01
+      00019F                        446 00108$:
+      00019F C0 06            [ 8]  447 	push	ar6
+      0001A1 C0 07            [ 8]  448 	push	ar7
+      0001A3 C0 00            [ 8]  449 	push	ar0
+      0001A5 C0 01            [ 8]  450 	push	ar1
+      0001A7 8D F0            [ 8]  451 	mov	b,r5
+      0001A9 05 F0            [ 8]  452 	inc	b
+      0001AB 7E 80            [ 8]  453 	mov	r6,#0x80
+      0001AD E4               [ 4]  454 	clr  a
+      0001AE FF               [ 4]  455 	mov  r7,a
+      0001AF 33               [ 4]  456 	rlc	a
+      0001B0 92 D2            [ 8]  457 	mov	ov,c
+      0001B2 80 08            [12]  458 	sjmp	00288$
+      0001B4                        459 00287$:
+      0001B4 A2 D2            [ 8]  460 	mov	c,ov
+      0001B6 EF               [ 4]  461 	mov	a,r7
+      0001B7 13               [ 4]  462 	rrc	a
+      0001B8 FF               [ 4]  463 	mov	r7,a
+      0001B9 EE               [ 4]  464 	mov	a,r6
+      0001BA 13               [ 4]  465 	rrc	a
+      0001BB FE               [ 4]  466 	mov	r6,a
+      0001BC                        467 00288$:
+      0001BC D5 F0 F5         [16]  468 	djnz	b,00287$
+      0001BF 90s00r00r0E      [12]  469 	mov	dptr,#_mbrtowc_first_byte_65536_10
+      0001C3 E0               [ 8]  470 	movx	a,@dptr
+      0001C4 F8               [ 4]  471 	mov	r0,a
+      0001C5 79 00            [ 8]  472 	mov	r1,#0x00
+      0001C7 E8               [ 4]  473 	mov	a,r0
+      0001C8 52 06            [ 8]  474 	anl	ar6,a
+      0001CA E9               [ 4]  475 	mov	a,r1
+      0001CB 52 07            [ 8]  476 	anl	ar7,a
+      0001CD EE               [ 4]  477 	mov	a,r6
+      0001CE 4F               [ 4]  478 	orl	a,r7
+      0001CF D0 01            [ 8]  479 	pop	ar1
+      0001D1 D0 00            [ 8]  480 	pop	ar0
+      0001D3 D0 07            [ 8]  481 	pop	ar7
+      0001D5 D0 06            [ 8]  482 	pop	ar6
+      0001D7 60 03            [12]  483 	jz  00175$
+      0001D9                        484 00289$:
+                                    485 ;	mbrtowc.c:59: seqlen++;
+      0001D9 0D               [ 4]  486 	inc	r5
+      0001DA 80 C3            [12]  487 	sjmp 00108$
+      0001DC                        488 00175$:
+      0001DC C0 06            [ 8]  489 	push	ar6
+      0001DE C0 07            [ 8]  490 	push	ar7
+      0001E0 C0 00            [ 8]  491 	push	ar0
+      0001E2 C0 01            [ 8]  492 	push	ar1
+                                    493 ;	genAssign: resultIsFar = FALSE
+      0001E4 8D 03            [ 8]  494 	mov	ar3,r5
+                                    495 ;	mbrtowc.c:60: first_byte &= (0xff >> (seqlen + 1));
+      0001E6 0D               [ 4]  496 	inc	r5
+      0001E7 8D F0            [ 8]  497 	mov	b,r5
+      0001E9 05 F0            [ 8]  498 	inc	b
+      0001EB 7D FF            [ 8]  499 	mov	r5,#0xff
+      0001ED E4               [ 4]  500 	clr  a
+      0001EE FE               [ 4]  501 	mov  r6,a
+      0001EF 33               [ 4]  502 	rlc	a
+      0001F0 92 D2            [ 8]  503 	mov	ov,c
+      0001F2 80 08            [12]  504 	sjmp	00291$
+      0001F4                        505 00290$:
+      0001F4 A2 D2            [ 8]  506 	mov	c,ov
+      0001F6 EE               [ 4]  507 	mov	a,r6
+      0001F7 13               [ 4]  508 	rrc	a
+      0001F8 FE               [ 4]  509 	mov	r6,a
+      0001F9 ED               [ 4]  510 	mov	a,r5
+      0001FA 13               [ 4]  511 	rrc	a
+      0001FB FD               [ 4]  512 	mov	r5,a
+      0001FC                        513 00291$:
+      0001FC D5 F0 F5         [16]  514 	djnz	b,00290$
+      0001FF 90s00r00r0E      [12]  515 	mov	dptr,#_mbrtowc_first_byte_65536_10
+      000203 E0               [ 8]  516 	movx	a,@dptr
+      000204 5D               [ 4]  517 	anl	a,r5
+      000205 F0               [ 8]  518 	movx	@dptr,a
+                                    519 ;	mbrtowc.c:101: return(-1);
+      000206 D0 01            [ 8]  520 	pop	ar1
+      000208 D0 00            [ 8]  521 	pop	ar0
+      00020A D0 07            [ 8]  522 	pop	ar7
+      00020C D0 06            [ 8]  523 	pop	ar6
+                                    524 ;	mbrtowc.c:60: first_byte &= (0xff >> (seqlen + 1));
+      00020E                        525 00112$:
+                                    526 ;	mbrtowc.c:63: if(seqlen > 4)
+      00020E C3               [ 4]  527 	clr	c
+      00020F 74 04            [ 8]  528 	mov	a,#0x04
+      000211 9B               [ 4]  529 	subb	a,r3
+      000212 50 04            [12]  530 	jnc	00292$
+      000214 02s00r05r1B      [16]  531 	ljmp	00128$
+      000218                        532 00292$:
+                                    533 ;	mbrtowc.c:66: if(i + n < seqlen) // Incomplete multibyte character
+      000218 C0 06            [ 8]  534 	push	ar6
+      00021A C0 07            [ 8]  535 	push	ar7
+      00021C C0 00            [ 8]  536 	push	ar0
+      00021E C0 01            [ 8]  537 	push	ar1
+      000220 90s00r00r1A      [12]  538 	mov	dptr,#_mbrtowc_sloc0_1_0
+      000224 EA               [ 4]  539 	mov	a,r2
+      000225 F0               [ 8]  540 	movx	@dptr,a
+      000226 A3               [12]  541 	inc	dptr
+      000227 E4               [ 4]  542 	clr	a
+      000228 F0               [ 8]  543 	movx	@dptr,a
+      000229 90s00r00r1A      [12]  544 	mov	dptr,#_mbrtowc_sloc0_1_0
+      00022D E0               [ 8]  545 	movx	a,@dptr
+      00022E FD               [ 4]  546 	mov	r5,a
+      00022F A3               [12]  547 	inc	dptr
+      000230 E0               [ 8]  548 	movx	a,@dptr
+      000231 FE               [ 4]  549 	mov	r6,a
+      000232 90s00r00r04      [12]  550 	mov	dptr,#_mbrtowc_PARM_3
+      000236 E0               [ 8]  551 	movx	a,@dptr
+      000237 2D               [ 4]  552 	add	a,r5
+      000238 FD               [ 4]  553 	mov	r5,a
+      000239 A3               [12]  554 	inc	dptr
+      00023A E0               [ 8]  555 	movx	a,@dptr
+      00023B 3E               [ 4]  556 	addc	a,r6
+      00023C FE               [ 4]  557 	mov	r6,a
+      00023D 8B 07            [ 8]  558 	mov	ar7,r3
+      00023F 78 00            [ 8]  559 	mov	r0,#0x00
+      000241 C3               [ 4]  560 	clr	c
+      000242 ED               [ 4]  561 	mov	a,r5
+      000243 9F               [ 4]  562 	subb	a,r7
+      000244 EE               [ 4]  563 	mov	a,r6
+      000245 98               [ 4]  564 	subb	a,r0
+      000246 D0 01            [ 8]  565 	pop	ar1
+      000248 D0 00            [ 8]  566 	pop	ar0
+      00024A D0 07            [ 8]  567 	pop	ar7
+      00024C D0 06            [ 8]  568 	pop	ar6
+      00024E 40 04            [12]  569 	jc	00293$
+      000250 02s00r02rF6      [16]  570 	ljmp	00164$
+      000254                        571 00293$:
+                                    572 ;	mbrtowc.c:70: return(-2);
+      000254 90s00r00r06      [12]  573 	mov	dptr,#_mbrtowc_PARM_4
+                                    574 ;	genAssign: resultIsFar = TRUE
+      000258 75 86 21         [12]  575 	mov	dps,#0x21
+      00025B 90s00r00r1F      [12]  576 	mov	dptr,#_mbrtowc_sloc3_1_0
+      00025F E0               [ 8]  577 	movx	a,@dptr
+      000260 F0               [ 8]  578 	movx	@dptr,a
+      000261 A3               [12]  579 	inc	dptr
+      000262 A3               [12]  580 	inc	dptr
+      000263 E0               [ 8]  581 	movx	a,@dptr
+      000264 F0               [ 8]  582 	movx	@dptr,a
+      000265 A3               [12]  583 	inc	dptr
+      000266 A3               [12]  584 	inc	dptr
+      000267 E0               [ 8]  585 	movx	a,@dptr
+      000268 F0               [ 8]  586 	movx	@dptr,a
+      000269 A3               [12]  587 	inc	dptr
+      00026A A3               [12]  588 	inc	dptr
+      00026B E0               [ 8]  589 	movx	a,@dptr
+      00026C F0               [ 8]  590 	movx	@dptr,a
+      00026D 75 86 00         [12]  591 	mov	dps,#0
+                                    592 ;	genAssign: resultIsFar = TRUE
+      000270 90s00r00r23      [12]  593 	mov	dptr,#_mbrtowc_sloc4_1_0
+      000274 EE               [ 4]  594 	mov	a,r6
+      000275 F0               [ 8]  595 	movx	@dptr,a
+      000276 A3               [12]  596 	inc	dptr
+      000277 EF               [ 4]  597 	mov	a,r7
+      000278 F0               [ 8]  598 	movx	@dptr,a
+      000279 A3               [12]  599 	inc	dptr
+      00027A E8               [ 4]  600 	mov	a,r0
+      00027B F0               [ 8]  601 	movx	@dptr,a
+      00027C A3               [12]  602 	inc	dptr
+      00027D E9               [ 4]  603 	mov	a,r1
+      00027E F0               [ 8]  604 	movx	@dptr,a
+                                    605 ;	genAssign: resultIsFar = FALSE
+      00027F 8A 01            [ 8]  606 	mov	ar1,r2
+      000281 90s00r00r04      [12]  607 	mov	dptr,#_mbrtowc_PARM_3
+                                    608 ;	genAssign: resultIsFar = FALSE
+      000285 E0               [ 8]  609 	movx	a,@dptr
+      000286 FC               [ 4]  610 	mov	r4,a
+      000287 A3               [12]  611 	inc	dptr
+      000288 E0               [ 8]  612 	movx	a,@dptr
+      000289 FE               [ 4]  613 	mov	r6,a
+      00028A                        614 00134$:
+                                    615 ;	mbrtowc.c:68: for(;n-- ; i++)
+                                    616 ;	genAssign: resultIsFar = FALSE
+      00028A 8C 02            [ 8]  617 	mov	ar2,r4
+      00028C 8E 03            [ 8]  618 	mov	ar3,r6
+      00028E 1C               [ 4]  619 	dec	r4
+      00028F BC FF 01         [16]  620 	cjne	r4,#0xff,00294$
+      000292 1E               [ 4]  621 	dec	r6
+      000293                        622 00294$:
+      000293 EA               [ 4]  623 	mov	a,r2
+      000294 4B               [ 4]  624 	orl	a,r3
+      000295 60 57            [12]  625 	jz  00115$
+      000297                        626 00295$:
+                                    627 ;	mbrtowc.c:69: ps->c[i] = *s++;
+      000297 90s00r00r1F      [12]  628 	mov	dptr,#_mbrtowc_sloc3_1_0
+      00029B E0               [ 8]  629 	movx	a,@dptr
+      00029C 29               [ 4]  630 	add	a,r1
+      00029D FA               [ 4]  631 	mov	r2,a
+      00029E A3               [12]  632 	inc	dptr
+      00029F E0               [ 8]  633 	movx	a,@dptr
+      0002A0 34 00            [ 8]  634 	addc	a,#0x00
+      0002A2 FB               [ 4]  635 	mov	r3,a
+      0002A3 A3               [12]  636 	inc	dptr
+      0002A4 E0               [ 8]  637 	movx	a,@dptr
+      0002A5 34 00            [ 8]  638 	addc	a,#0x00
+      0002A7 FF               [ 4]  639 	mov	r7,a
+      0002A8 A3               [12]  640 	inc	dptr
+      0002A9 E0               [ 8]  641 	movx	a,@dptr
+      0002AA F8               [ 4]  642 	mov	r0,a
+      0002AB 90s00r00r23      [12]  643 	mov	dptr,#_mbrtowc_sloc4_1_0
+      0002AF E0               [ 8]  644 	movx	a,@dptr
+      0002B0 C0 E0            [ 8]  645 	push	acc
+      0002B2 A3               [12]  646 	inc	dptr
+      0002B3 E0               [ 8]  647 	movx	a,@dptr
+      0002B4 C0 E0            [ 8]  648 	push	acc
+      0002B6 A3               [12]  649 	inc	dptr
+      0002B7 E0               [ 8]  650 	movx	a,@dptr
+      0002B8 C0 E0            [ 8]  651 	push	acc
+      0002BA A3               [12]  652 	inc	dptr
+      0002BB E0               [ 8]  653 	movx	a,@dptr
+      0002BC F5 F0            [ 8]  654 	mov	b,a
+      0002BE D0 93            [ 8]  655 	pop	dpx
+      0002C0 D0 83            [ 8]  656 	pop	dph
+      0002C2 D0 82            [ 8]  657 	pop	dpl
+      0002C4 12s00r00r00      [16]  658 	lcall	__gptrget
+      0002C8 FD               [ 4]  659 	mov	r5,a
+      0002C9 90s00r00r23      [12]  660 	mov	dptr,#_mbrtowc_sloc4_1_0
+      0002CD E0               [ 8]  661 	movx	a,@dptr
+      0002CE 24 01            [ 8]  662 	add	a,#0x01
+      0002D0 F0               [ 8]  663 	movx	@dptr,a
+      0002D1 A3               [12]  664 	inc	dptr
+      0002D2 E0               [ 8]  665 	movx	a,@dptr
+      0002D3 34 00            [ 8]  666 	addc	a,#0x00
+      0002D5 F0               [ 8]  667 	movx	@dptr,a
+      0002D6 A3               [12]  668 	inc	dptr
+      0002D7 E0               [ 8]  669 	movx	a,@dptr
+      0002D8 34 00            [ 8]  670 	addc	a,#0x00
+      0002DA F0               [ 8]  671 	movx	@dptr,a
+      0002DB A3               [12]  672 	inc	dptr
+      0002DC E0               [ 8]  673 	movx	a,@dptr
+      0002DD F0               [ 8]  674 	movx	@dptr,a
+      0002DE 8A 82            [ 8]  675 	mov	dpl,r2
+      0002E0 8B 83            [ 8]  676 	mov	dph,r3
+      0002E2 8F 93            [ 8]  677 	mov	dpx,r7
+      0002E4 88 F0            [ 8]  678 	mov	b,r0
+      0002E6 ED               [ 4]  679 	mov	a,r5
+      0002E7 12s00r00r00      [16]  680 	lcall	__gptrput
+                                    681 ;	mbrtowc.c:68: for(;n-- ; i++)
+      0002EB 09               [ 4]  682 	inc	r1
+      0002EC 80 9C            [12]  683 	sjmp 00134$
+      0002EE                        684 00115$:
+                                    685 ;	mbrtowc.c:70: return(-2);
+      0002EE 90 00 FF FE      [12]  686 	mov  dptr,#0xfffe
+      0002F2 02s00r05r29      [16]  687 	ljmp	00145$
+                                    688 ;	mbrtowc.c:73: for(j = 0; j < i; j++)
+      0002F6                        689 00164$:
+      0002F6 90s00r00r06      [12]  690 	mov	dptr,#_mbrtowc_PARM_4
+                                    691 ;	genAssign: resultIsFar = TRUE
+      0002FA 75 86 21         [12]  692 	mov	dps,#0x21
+      0002FD 90s00r00r29      [12]  693 	mov	dptr,#_mbrtowc_sloc7_1_0
+      000301 E0               [ 8]  694 	movx	a,@dptr
+      000302 F0               [ 8]  695 	movx	@dptr,a
+      000303 A3               [12]  696 	inc	dptr
+      000304 A3               [12]  697 	inc	dptr
+      000305 E0               [ 8]  698 	movx	a,@dptr
+      000306 F0               [ 8]  699 	movx	@dptr,a
+      000307 A3               [12]  700 	inc	dptr
+      000308 A3               [12]  701 	inc	dptr
+      000309 E0               [ 8]  702 	movx	a,@dptr
+      00030A F0               [ 8]  703 	movx	@dptr,a
+      00030B A3               [12]  704 	inc	dptr
+      00030C A3               [12]  705 	inc	dptr
+      00030D E0               [ 8]  706 	movx	a,@dptr
+      00030E F0               [ 8]  707 	movx	@dptr,a
+      00030F 75 86 00         [12]  708 	mov	dps,#0
+                                    709 ;	genAssign: resultIsFar = FALSE
+      000312 7D 00            [ 8]  710 	mov	r5,#0x00
+      000314                        711 00137$:
+      000314 C3               [ 4]  712 	clr	c
+      000315 ED               [ 4]  713 	mov	a,r5
+      000316 9A               [ 4]  714 	subb	a,r2
+      000317 50 34            [12]  715 	jnc  00118$
+      000319                        716 00296$:
+                                    717 ;	mbrtowc.c:74: ps->c[j] = 0;
+      000319 C0 06            [ 8]  718 	push	ar6
+      00031B C0 07            [ 8]  719 	push	ar7
+      00031D C0 00            [ 8]  720 	push	ar0
+      00031F C0 01            [ 8]  721 	push	ar1
+      000321 90s00r00r29      [12]  722 	mov	dptr,#_mbrtowc_sloc7_1_0
+      000325 E0               [ 8]  723 	movx	a,@dptr
+      000326 2D               [ 4]  724 	add	a,r5
+      000327 FE               [ 4]  725 	mov	r6,a
+      000328 A3               [12]  726 	inc	dptr
+      000329 E0               [ 8]  727 	movx	a,@dptr
+      00032A 34 00            [ 8]  728 	addc	a,#0x00
+      00032C FF               [ 4]  729 	mov	r7,a
+      00032D A3               [12]  730 	inc	dptr
+      00032E E0               [ 8]  731 	movx	a,@dptr
+      00032F 34 00            [ 8]  732 	addc	a,#0x00
+      000331 F8               [ 4]  733 	mov	r0,a
+      000332 A3               [12]  734 	inc	dptr
+      000333 E0               [ 8]  735 	movx	a,@dptr
+      000334 F9               [ 4]  736 	mov	r1,a
+      000335 8E 82            [ 8]  737 	mov	dpl,r6
+      000337 8F 83            [ 8]  738 	mov	dph,r7
+      000339 88 93            [ 8]  739 	mov	dpx,r0
+      00033B 89 F0            [ 8]  740 	mov	b,r1
+      00033D E4               [ 4]  741 	clr	a
+      00033E 12s00r00r00      [16]  742 	lcall	__gptrput
+                                    743 ;	mbrtowc.c:73: for(j = 0; j < i; j++)
+      000342 0D               [ 4]  744 	inc	r5
+      000343 D0 01            [ 8]  745 	pop	ar1
+      000345 D0 00            [ 8]  746 	pop	ar0
+      000347 D0 07            [ 8]  747 	pop	ar7
+      000349 D0 06            [ 8]  748 	pop	ar6
+      00034B 80 C7            [12]  749 	sjmp 00137$
+      00034D                        750 00118$:
+                                    751 ;	mbrtowc.c:76: for(n = 1, i = i ? i : 1; i < seqlen; i++, n++)
+                                    752 ;	genAssign: resultIsFar = TRUE
+      00034D 90s00r00r04      [12]  753 	mov	dptr,#_mbrtowc_PARM_3
+      000351 74 01            [ 8]  754 	mov	a,#0x01
+      000353 F0               [ 8]  755 	movx	@dptr,a
+      000354 E4               [ 4]  756 	clr	a
+      000355 A3               [12]  757 	inc	dptr
+      000356 F0               [ 8]  758 	movx	@dptr,a
+      000357 EA               [ 4]  759 	mov	a,r2
+      000358 60 0B            [12]  760 	jz  00149$
+      00035A                        761 00297$:
+      00035A 90s00r00r1A      [12]  762 	mov	dptr,#_mbrtowc_sloc0_1_0
+                                    763 ;	genAssign: resultIsFar = FALSE
+      00035E E0               [ 8]  764 	movx	a,@dptr
+      00035F FA               [ 4]  765 	mov	r2,a
+      000360 A3               [12]  766 	inc	dptr
+      000361 E0               [ 8]  767 	movx	a,@dptr
+      000362 FD               [ 4]  768 	mov	r5,a
+      000363 80 04            [12]  769 	sjmp 00150$
+      000365                        770 00149$:
+                                    771 ;	genAssign: resultIsFar = FALSE
+      000365 7A 01            [ 8]  772 	mov	r2,#0x01
+      000367 7D 00            [ 8]  773 	mov	r5,#0x00
+      000369                        774 00150$:
+                                    775 ;	genAssign: resultIsFar = FALSE
+      000369 89 05            [ 8]  776 	mov	ar5,r1
+                                    777 ;	genAssign: resultIsFar = TRUE
+      00036B 90s00r00r29      [12]  778 	mov	dptr,#_mbrtowc_sloc7_1_0
+      00036F 74 01            [ 8]  779 	mov	a,#0x01
+      000371 F0               [ 8]  780 	movx	@dptr,a
+      000372 E4               [ 4]  781 	clr	a
+      000373 A3               [12]  782 	inc	dptr
+      000374 F0               [ 8]  783 	movx	@dptr,a
+      000375                        784 00140$:
+      000375 C3               [ 4]  785 	clr	c
+      000376 EA               [ 4]  786 	mov	a,r2
+      000377 9B               [ 4]  787 	subb	a,r3
+      000378 50 69            [12]  788 	jnc  00121$
+      00037A                        789 00298$:
+                                    790 ;	mbrtowc.c:78: mbseq[i] = *s++;
+      00037A C0 03            [ 8]  791 	push	ar3
+      00037C EA               [ 4]  792 	mov	a,r2
+      00037D 24r0F            [ 8]  793 	add	a,#_mbrtowc_mbseq_65536_10
+      00037F F5 84            [ 8]  794 	mov	dpl1,a
+      000381 E4               [ 4]  795 	clr	a
+      000382 34s00            [ 8]  796 	addc	a,#(_mbrtowc_mbseq_65536_10 >> 8)
+      000384 F5 85            [ 8]  797 	mov	dph1,a
+      000386 E4               [ 4]  798 	clr	a
+      000387 34s00            [ 8]  799 	addc	a,#(_mbrtowc_mbseq_65536_10 >> 16)
+      000389 F5 95            [ 8]  800 	mov	dpx1,a
+      00038B 8E 82            [ 8]  801 	mov	dpl,r6
+      00038D 8F 83            [ 8]  802 	mov	dph,r7
+      00038F 88 93            [ 8]  803 	mov	dpx,r0
+      000391 8D F0            [ 8]  804 	mov	b,r5
+      000393 12s00r00r00      [16]  805 	lcall	__gptrget
+      000397 FB               [ 4]  806 	mov	r3,a
+      000398 A3               [12]  807 	inc	dptr
+      000399 AE 82            [ 8]  808 	mov	r6,dpl
+      00039B AF 83            [ 8]  809 	mov	r7,dph
+      00039D A8 93            [ 8]  810 	mov	r0,dpx
+      00039F AD F0            [ 8]  811 	mov	r5,b
+      0003A1 EB               [ 4]  812 	mov	a,r3
+      0003A2 05 86            [ 8]  813 	inc	dps
+      0003A4 F0               [ 8]  814 	movx	@dptr,a
+      0003A5 75 86 00         [12]  815 	mov	dps,#0
+                                    816 ;	mbrtowc.c:79: if((mbseq[i] & 0xc0) != 0x80)
+      0003A8 7C 00            [ 8]  817 	mov	r4,#0x00
+      0003AA 53 03 C0         [12]  818 	anl	ar3,#0xc0
+      0003AD 7C 00            [ 8]  819 	mov	r4,#0x00
+      0003AF BB 80 05         [16]  820 	cjne	r3,#0x80,00299$
+      0003B2 BC 00 02         [16]  821 	cjne	r4,#0x00,00299$
+      0003B5 80 06            [12]  822 	sjmp	00300$
+      0003B7                        823 00299$:
+      0003B7 D0 03            [ 8]  824 	pop	ar3
+      0003B9 02s00r05r1B      [16]  825 	ljmp	00128$
+      0003BD                        826 00300$:
+      0003BD D0 03            [ 8]  827 	pop	ar3
+                                    828 ;	mbrtowc.c:76: for(n = 1, i = i ? i : 1; i < seqlen; i++, n++)
+      0003BF 0A               [ 4]  829 	inc	r2
+      0003C0 90s00r00r29      [12]  830 	mov	dptr,#_mbrtowc_sloc7_1_0
+      0003C4 E0               [ 8]  831 	movx	a,@dptr
+      0003C5 24 01            [ 8]  832 	add	a,#0x01
+      0003C7 F0               [ 8]  833 	movx	@dptr,a
+      0003C8 A3               [12]  834 	inc	dptr
+      0003C9 E0               [ 8]  835 	movx	a,@dptr
+      0003CA 34 00            [ 8]  836 	addc	a,#0x00
+      0003CC F0               [ 8]  837 	movx	@dptr,a
+      0003CD 90s00r00r29      [12]  838 	mov	dptr,#_mbrtowc_sloc7_1_0
+                                    839 ;	genAssign: resultIsFar = TRUE
+      0003D1 75 86 21         [12]  840 	mov	dps,#0x21
+      0003D4 90s00r00r04      [12]  841 	mov	dptr,#_mbrtowc_PARM_3
+      0003D8 E0               [ 8]  842 	movx	a,@dptr
+      0003D9 F0               [ 8]  843 	movx	@dptr,a
+      0003DA A3               [12]  844 	inc	dptr
+      0003DB A3               [12]  845 	inc	dptr
+      0003DC E0               [ 8]  846 	movx	a,@dptr
+      0003DD F0               [ 8]  847 	movx	@dptr,a
+      0003DE 75 86 00         [12]  848 	mov	dps,#0
+      0003E1 80 92            [12]  849 	sjmp 00140$
+      0003E3                        850 00121$:
+                                    851 ;	mbrtowc.c:83: codepoint = first_byte;
+      0003E3 90s00r00r0E      [12]  852 	mov	dptr,#_mbrtowc_first_byte_65536_10
+      0003E7 E0               [ 8]  853 	movx	a,@dptr
+      0003E8 FA               [ 4]  854 	mov	r2,a
+      0003E9 7C 00            [ 8]  855 	mov	r4,#0x00
+      0003EB 7D 00            [ 8]  856 	mov	r5,#0x00
+      0003ED 7E 00            [ 8]  857 	mov	r6,#0x00
+                                    858 ;	mbrtowc.c:85: for(s = mbseq + 1, seqlen--; seqlen; seqlen--)
+      0003EF 90s00r00r29      [12]  859 	mov	dptr,#_mbrtowc_sloc7_1_0
+      0003F3 74r10            [ 8]  860 	mov	a,#(_mbrtowc_mbseq_65536_10 + 0x000001)
+      0003F5 F0               [ 8]  861 	movx	@dptr,a
+      0003F6 A3               [12]  862 	inc	dptr
+      0003F7 74s00            [ 8]  863 	mov	a,#((_mbrtowc_mbseq_65536_10 + 0x000001) >> 8)
+      0003F9 F0               [ 8]  864 	movx	@dptr,a
+      0003FA A3               [12]  865 	inc	dptr
+      0003FB 74s00            [ 8]  866 	mov	a,#((_mbrtowc_mbseq_65536_10 + 0x000001) >> 16)
+      0003FD F0               [ 8]  867 	movx	@dptr,a
+      0003FE A3               [12]  868 	inc	dptr
+      0003FF E4               [ 4]  869 	clr	a
+      000400 F0               [ 8]  870 	movx	@dptr,a
+      000401 90s00r00r27      [12]  871 	mov	dptr,#_mbrtowc_sloc6_1_0
+      000405 EB               [ 4]  872 	mov	a,r3
+      000406 14               [ 4]  873 	dec	a
+      000407 F0               [ 8]  874 	movx	@dptr,a
+      000408                        875 00143$:
+      000408 90s00r00r27      [12]  876 	mov	dptr,#_mbrtowc_sloc6_1_0
+      00040C E0               [ 8]  877 	movx	a,@dptr
+      00040D 70 04            [12]  878 	jnz	00301$
+      00040F 02s00r04rAD      [16]  879 	ljmp	00122$
+      000413                        880 00301$:
+                                    881 ;	mbrtowc.c:87: codepoint <<= 6;
+      000413 8D 01            [ 8]  882 	mov	ar1,r5
+      000415 EE               [ 4]  883 	mov	a,r6
+      000416 54 03            [ 8]  884 	anl	a,#0x03
+      000418 A2 E0            [ 8]  885 	mov	c,acc[0]
+      00041A C9               [ 4]  886 	xch	a,r1
+      00041B 13               [ 4]  887 	rrc	a
+      00041C C9               [ 4]  888 	xch	a,r1
+      00041D 13               [ 4]  889 	rrc	a
+      00041E A2 E0            [ 8]  890 	mov	c,acc[0]
+      000420 C9               [ 4]  891 	xch	a,r1
+      000421 13               [ 4]  892 	rrc	a
+      000422 C9               [ 4]  893 	xch	a,r1
+      000423 13               [ 4]  894 	rrc	a
+      000424 C9               [ 4]  895 	xch	a,r1
+      000425 FB               [ 4]  896 	mov	r3,a
+      000426 EC               [ 4]  897 	mov	a,r4
+      000427 03               [ 4]  898 	rr	a
+      000428 03               [ 4]  899 	rr	a
+      000429 54 3F            [ 8]  900 	anl	a,#0x3f
+      00042B 49               [ 4]  901 	orl	a,r1
+      00042C F9               [ 4]  902 	mov	r1,a
+      00042D 8A 07            [ 8]  903 	mov	ar7,r2
+      00042F EC               [ 4]  904 	mov	a,r4
+      000430 54 03            [ 8]  905 	anl	a,#0x03
+      000432 A2 E0            [ 8]  906 	mov	c,acc[0]
+      000434 CF               [ 4]  907 	xch	a,r7
+      000435 13               [ 4]  908 	rrc	a
+      000436 CF               [ 4]  909 	xch	a,r7
+      000437 13               [ 4]  910 	rrc	a
+      000438 A2 E0            [ 8]  911 	mov	c,acc[0]
+      00043A CF               [ 4]  912 	xch	a,r7
+      00043B 13               [ 4]  913 	rrc	a
+      00043C CF               [ 4]  914 	xch	a,r7
+      00043D 13               [ 4]  915 	rrc	a
+      00043E CF               [ 4]  916 	xch	a,r7
+      00043F F8               [ 4]  917 	mov	r0,a
+                                    918 ;	genAssign: resultIsFar = TRUE
+      000440 90s00r00r13      [12]  919 	mov	dptr,#_mbrtowc_codepoint_65536_10
+      000444 EF               [ 4]  920 	mov	a,r7
+      000445 F0               [ 8]  921 	movx	@dptr,a
+      000446 A3               [12]  922 	inc	dptr
+      000447 E8               [ 4]  923 	mov	a,r0
+      000448 F0               [ 8]  924 	movx	@dptr,a
+      000449 A3               [12]  925 	inc	dptr
+      00044A E9               [ 4]  926 	mov	a,r1
+      00044B F0               [ 8]  927 	movx	@dptr,a
+      00044C A3               [12]  928 	inc	dptr
+      00044D EB               [ 4]  929 	mov	a,r3
+      00044E F0               [ 8]  930 	movx	@dptr,a
+                                    931 ;	mbrtowc.c:88: codepoint |= (*s & 0x3f);
+      00044F 90s00r00r29      [12]  932 	mov	dptr,#_mbrtowc_sloc7_1_0
+      000453 E0               [ 8]  933 	movx	a,@dptr
+      000454 C0 E0            [ 8]  934 	push	acc
+      000456 A3               [12]  935 	inc	dptr
+      000457 E0               [ 8]  936 	movx	a,@dptr
+      000458 C0 E0            [ 8]  937 	push	acc
+      00045A A3               [12]  938 	inc	dptr
+      00045B E0               [ 8]  939 	movx	a,@dptr
+      00045C C0 E0            [ 8]  940 	push	acc
+      00045E A3               [12]  941 	inc	dptr
+      00045F E0               [ 8]  942 	movx	a,@dptr
+      000460 F5 F0            [ 8]  943 	mov	b,a
+      000462 D0 93            [ 8]  944 	pop	dpx
+      000464 D0 83            [ 8]  945 	pop	dph
+      000466 D0 82            [ 8]  946 	pop	dpl
+      000468 12s00r00r00      [16]  947 	lcall	__gptrget
+      00046C FB               [ 4]  948 	mov	r3,a
+      00046D 7F 00            [ 8]  949 	mov	r7,#0x00
+      00046F 53 03 3F         [12]  950 	anl	ar3,#0x3f
+      000472 7F 00            [ 8]  951 	mov	r7,#0x00
+      000474 EF               [ 4]  952 	mov	a,r7
+      000475 33               [ 4]  953 	rlc	a
+      000476 95 E0            [ 8]  954 	subb	a,acc
+      000478 F8               [ 4]  955 	mov	r0,a
+      000479 F9               [ 4]  956 	mov	r1,a
+      00047A 90s00r00r13      [12]  957 	mov	dptr,#_mbrtowc_codepoint_65536_10
+      00047E E0               [ 8]  958 	movx	a,@dptr
+      00047F 4B               [ 4]  959 	orl	a,r3
+      000480 FA               [ 4]  960 	mov	r2,a
+      000481 A3               [12]  961 	inc	dptr
+      000482 E0               [ 8]  962 	movx	a,@dptr
+      000483 4F               [ 4]  963 	orl	a,r7
+      000484 FC               [ 4]  964 	mov	r4,a
+      000485 A3               [12]  965 	inc	dptr
+      000486 E0               [ 8]  966 	movx	a,@dptr
+      000487 48               [ 4]  967 	orl	a,r0
+      000488 FD               [ 4]  968 	mov	r5,a
+      000489 A3               [12]  969 	inc	dptr
+      00048A E0               [ 8]  970 	movx	a,@dptr
+      00048B 49               [ 4]  971 	orl	a,r1
+      00048C FE               [ 4]  972 	mov	r6,a
+                                    973 ;	mbrtowc.c:89: s++;
+      00048D 90s00r00r29      [12]  974 	mov	dptr,#_mbrtowc_sloc7_1_0
+      000491 E0               [ 8]  975 	movx	a,@dptr
+      000492 24 01            [ 8]  976 	add	a,#0x01
+      000494 F0               [ 8]  977 	movx	@dptr,a
+      000495 A3               [12]  978 	inc	dptr
+      000496 E0               [ 8]  979 	movx	a,@dptr
+      000497 34 00            [ 8]  980 	addc	a,#0x00
+      000499 F0               [ 8]  981 	movx	@dptr,a
+      00049A A3               [12]  982 	inc	dptr
+      00049B E0               [ 8]  983 	movx	a,@dptr
+      00049C 34 00            [ 8]  984 	addc	a,#0x00
+      00049E F0               [ 8]  985 	movx	@dptr,a
+      00049F A3               [12]  986 	inc	dptr
+      0004A0 E0               [ 8]  987 	movx	a,@dptr
+      0004A1 F0               [ 8]  988 	movx	@dptr,a
+                                    989 ;	mbrtowc.c:85: for(s = mbseq + 1, seqlen--; seqlen; seqlen--)
+      0004A2 90s00r00r27      [12]  990 	mov	dptr,#_mbrtowc_sloc6_1_0
+      0004A6 E0               [ 8]  991 	movx	a,@dptr
+      0004A7 14               [ 4]  992 	dec	a
+      0004A8 F0               [ 8]  993 	movx	@dptr,a
+      0004A9 02s00r04r08      [16]  994 	ljmp	00143$
+      0004AD                        995 00122$:
+                                    996 ;	mbrtowc.c:92: if(codepoint >= 0xd800 && codepoint <= 0xdfff) // UTF-16 surrogate.
+      0004AD C3               [ 4]  997 	clr	c
+      0004AE EA               [ 4]  998 	mov	a,r2
+      0004AF 94 00            [ 8]  999 	subb	a,#0x00
+      0004B1 EC               [ 4] 1000 	mov	a,r4
+      0004B2 94 D8            [ 8] 1001 	subb	a,#0xd8
+      0004B4 ED               [ 4] 1002 	mov	a,r5
+      0004B5 94 00            [ 8] 1003 	subb	a,#0x00
+      0004B7 EE               [ 4] 1004 	mov	a,r6
+      0004B8 94 00            [ 8] 1005 	subb	a,#0x00
+      0004BA 40 13            [12] 1006 	jc   00124$
+      0004BC                       1007 00302$:
+      0004BC C3               [ 4] 1008 	clr	c
+      0004BD 74 FF            [ 8] 1009 	mov	a,#0xff
+      0004BF 9A               [ 4] 1010 	subb	a,r2
+      0004C0 74 DF            [ 8] 1011 	mov	a,#0xdf
+      0004C2 9C               [ 4] 1012 	subb	a,r4
+      0004C3 E4               [ 4] 1013 	clr	a
+      0004C4 9D               [ 4] 1014 	subb	a,r5
+      0004C5 E4               [ 4] 1015 	clr	a
+      0004C6 9E               [ 4] 1016 	subb	a,r6
+      0004C7 40 06            [12] 1017 	jc   00124$
+      0004C9                       1018 00303$:
+                                   1019 ;	mbrtowc.c:93: return(-1);
+      0004C9 90 00 FF FF      [12] 1020 	mov  dptr,#0xffff
+      0004CD 80 5A            [12] 1021 	sjmp 00145$
+      0004CF                       1022 00124$:
+                                   1023 ;	mbrtowc.c:95: if(pwc)
+      0004CF 90s00r00r0A      [12] 1024 	mov	dptr,#_mbrtowc_pwc_65536_9
+      0004D3 E0               [ 8] 1025 	movx	a,@dptr
+      0004D4 F5 F0            [ 8] 1026 	mov	b,a
+      0004D6 A3               [12] 1027 	inc	dptr
+      0004D7 E0               [ 8] 1028 	movx	a,@dptr
+      0004D8 42 F0            [ 8] 1029 	orl	b,a
+      0004DA A3               [12] 1030 	inc	dptr
+      0004DB E0               [ 8] 1031 	movx	a,@dptr
+      0004DC 45 F0            [ 8] 1032 	orl	a,b
+      0004DE 60 28            [12] 1033 	jz  00127$
+      0004E0                       1034 00304$:
+                                   1035 ;	mbrtowc.c:96: *pwc = codepoint;
+      0004E0 90s00r00r0A      [12] 1036 	mov	dptr,#_mbrtowc_pwc_65536_9
+      0004E4 E0               [ 8] 1037 	movx	a,@dptr
+      0004E5 C0 E0            [ 8] 1038 	push	acc
+      0004E7 A3               [12] 1039 	inc	dptr
+      0004E8 E0               [ 8] 1040 	movx	a,@dptr
+      0004E9 C0 E0            [ 8] 1041 	push	acc
+      0004EB A3               [12] 1042 	inc	dptr
+      0004EC E0               [ 8] 1043 	movx	a,@dptr
+      0004ED C0 E0            [ 8] 1044 	push	acc
+      0004EF A3               [12] 1045 	inc	dptr
+      0004F0 E0               [ 8] 1046 	movx	a,@dptr
+      0004F1 F5 F0            [ 8] 1047 	mov	b,a
+      0004F3 D0 93            [ 8] 1048 	pop	dpx
+      0004F5 D0 83            [ 8] 1049 	pop	dph
+      0004F7 D0 82            [ 8] 1050 	pop	dpl
+      0004F9 8A 9C            [ 8] 1051 	mov	acc1, r2
+      0004FB EC               [ 4] 1052 	mov	a,r4
+      0004FC 12s00r00r00      [16] 1053 	lcall	__gptrputWord
+      000500 A3               [12] 1054 	inc	dptr
+      000501 8D 9C            [ 8] 1055 	mov	acc1, r5
+      000503 EE               [ 4] 1056 	mov	a,r6
+      000504 12s00r00r00      [16] 1057 	lcall	__gptrputWord
+      000508                       1058 00127$:
+                                   1059 ;	mbrtowc.c:97: return(n);
+      000508 75 86 01         [12] 1060 	mov     dps, #1
+      00050B 90s00r00r04      [12] 1061 	mov     dptr, #_mbrtowc_PARM_3
+      00050F E0               [ 8] 1062 	movx	a,@dptr
+      000510 F5 82            [ 8] 1063 	mov	dpl,a
+      000512 A3               [12] 1064 	inc	dptr
+      000513 E0               [ 8] 1065 	movx	a,@dptr
+      000514 F5 83            [ 8] 1066 	mov	dph,a
+      000516 75 86 00         [12] 1067 	mov	dps,#0
+                                   1068 ;	mbrtowc.c:99: eilseq:
+      000519 80 0E            [12] 1069 	sjmp 00145$
+      00051B                       1070 00128$:
+                                   1071 ;	mbrtowc.c:100: errno = EILSEQ;
+                                   1072 ;	genAssign: resultIsFar = TRUE
+      00051B 90s00r00r00      [12] 1073 	mov	dptr,#_errno
+      00051F 74 54            [ 8] 1074 	mov	a,#0x54
+      000521 F0               [ 8] 1075 	movx	@dptr,a
+      000522 E4               [ 4] 1076 	clr	a
+      000523 A3               [12] 1077 	inc	dptr
+      000524 F0               [ 8] 1078 	movx	@dptr,a
+                                   1079 ;	mbrtowc.c:101: return(-1);
+      000525 90 00 FF FF      [12] 1080 	mov  dptr,#0xffff
+      000529                       1081 00145$:
+                                   1082 ;	mbrtowc.c:102: }
+      000529 22               [16] 1083 	ret
+                                   1084 	.area CSEG    (CODE)
+                                   1085 	.area CONST   (CODE)
+                                   1086 	.area CONST   (CODE)
+      000000                       1087 ___str_0:
+      000000 00                    1088 	.db 0x00
+                                   1089 	.area CSEG    (CODE)
+                                   1090 	.area XINIT   (CODE)
+                                   1091 	.area CABS    (ABS,CODE)

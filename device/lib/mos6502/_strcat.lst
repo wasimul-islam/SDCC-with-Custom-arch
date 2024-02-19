@@ -1,0 +1,117 @@
+                              1 ;--------------------------------------------------------
+                              2 ; File Created by SDCC : free open source ISO C Compiler 
+                              3 ; Version 4.2.14 #0 (Linux)
+                              4 ;--------------------------------------------------------
+                              5 	.module _strcat
+                              6 	.optsdcc -mmos6502
+                              7 	
+                              8 ;--------------------------------------------------------
+                              9 ; Public variables in this module
+                             10 ;--------------------------------------------------------
+                             11 	.globl _strcat_PARM_2
+                             12 	.globl _strcat
+                             13 ;--------------------------------------------------------
+                             14 ; ZP ram data
+                             15 ;--------------------------------------------------------
+                             16 	.area ZP      (PAG)
+                             17 ;--------------------------------------------------------
+                             18 ; overlayable items in ram
+                             19 ;--------------------------------------------------------
+                             20 	.area	OSEG    (PAG, OVR)
+   0000                      21 _strcat_sloc0_1_0:
+   0000                      22 	.ds 2
+   0002                      23 _strcat_sloc1_1_0:
+   0002                      24 	.ds 2
+                             25 ;--------------------------------------------------------
+                             26 ; uninitialized external ram data
+                             27 ;--------------------------------------------------------
+                             28 	.area BSS
+   0000                      29 _strcat_PARM_2:
+   0000                      30 	.ds 2
+   0002                      31 _strcat_dst_65536_26:
+   0002                      32 	.ds 2
+                             33 ;--------------------------------------------------------
+                             34 ; absolute external ram data
+                             35 ;--------------------------------------------------------
+                             36 	.area DABS    (ABS)
+                             37 ;--------------------------------------------------------
+                             38 ; initialized external ram data
+                             39 ;--------------------------------------------------------
+                             40 	.area DATA
+                             41 ;--------------------------------------------------------
+                             42 ; global & static initialisations
+                             43 ;--------------------------------------------------------
+                             44 	.area _CODE
+                             45 	.area GSINIT
+                             46 	.area GSFINAL
+                             47 	.area GSINIT
+                             48 ;--------------------------------------------------------
+                             49 ; Home
+                             50 ;--------------------------------------------------------
+                             51 	.area _CODE
+                             52 	.area _CODE
+                             53 ;--------------------------------------------------------
+                             54 ; code
+                             55 ;--------------------------------------------------------
+                             56 	.area CODE
+                             57 ;------------------------------------------------------------
+                             58 ;Allocation info for local variables in function 'strcat'
+                             59 ;------------------------------------------------------------
+                             60 ;src                       Allocated with name '_strcat_PARM_2'
+                             61 ;dst                       Allocated with name '_strcat_dst_65536_26'
+                             62 ;cp                        Allocated to registers 
+                             63 ;sloc0                     Allocated with name '_strcat_sloc0_1_0'
+                             64 ;sloc1                     Allocated with name '_strcat_sloc1_1_0'
+                             65 ;------------------------------------------------------------
+                             66 ;	../_strcat.c: 31: char * strcat ( char * dst, const char * src )
+                             67 ;	-----------------------------------------
+                             68 ;	 function strcat
+                             69 ;	-----------------------------------------
+                             70 ;	Register assignment is optimal.
+                             71 ;	Stack space usage: 0 bytes.
+   0000                      72 _strcat:
+                             73 ;	../_strcat.c: 35: while( *cp )
+   0000 8Dr02r00      [ 4]   74 	sta	_strcat_dst_65536_26
+   0003 8Er03r00      [ 4]   75 	stx	(_strcat_dst_65536_26 + 1)
+   0006 85*00         [ 3]   76 	sta	*_strcat_sloc0_1_0
+   0008 86*01         [ 3]   77 	stx	*(_strcat_sloc0_1_0 + 1)
+   000A                      78 00101$:
+   000A A0 00         [ 2]   79 	ldy	#0x00
+   000C B1*00         [ 6]   80 	lda	[*_strcat_sloc0_1_0],y
+   000E F0 09         [ 4]   81 	beq	00111$
+                             82 ;	../_strcat.c: 36: cp++;                   /* find end of dst */
+   0010 E6*00         [ 5]   83 	inc	*_strcat_sloc0_1_0
+   0012 D0 F6         [ 4]   84 	bne	00101$
+   0014 E6*01         [ 5]   85 	inc	*(_strcat_sloc0_1_0 + 1)
+   0016 4Cr0Ar00      [ 3]   86 	jmp	00101$
+                             87 ;	../_strcat.c: 38: while( *cp++ = *src++ ) ;       /* Copy src to end of dst */
+   0019                      88 00111$:
+   0019 ADr00r00      [ 4]   89 	lda	_strcat_PARM_2
+   001C 85*02         [ 3]   90 	sta	*_strcat_sloc1_1_0
+   001E ADr01r00      [ 4]   91 	lda	(_strcat_PARM_2 + 1)
+   0021 85*03         [ 3]   92 	sta	*(_strcat_sloc1_1_0 + 1)
+   0023                      93 00104$:
+   0023 A0 00         [ 2]   94 	ldy	#0x00
+   0025 B1*02         [ 6]   95 	lda	[*_strcat_sloc1_1_0],y
+   0027 AA            [ 2]   96 	tax
+   0028 E6*02         [ 5]   97 	inc	*_strcat_sloc1_1_0
+   002A D0 02         [ 4]   98 	bne	00129$
+   002C E6*03         [ 5]   99 	inc	*(_strcat_sloc1_1_0 + 1)
+   002E                     100 00129$:
+   002E 8A            [ 2]  101 	txa
+   002F 91*00         [ 6]  102 	sta	[*_strcat_sloc0_1_0],y
+   0031 E6*00         [ 5]  103 	inc	*_strcat_sloc0_1_0
+   0033 D0 02         [ 4]  104 	bne	00130$
+   0035 E6*01         [ 5]  105 	inc	*(_strcat_sloc0_1_0 + 1)
+   0037                     106 00130$:
+   0037 E0 00         [ 2]  107 	cpx	#0x00
+   0039 D0 E8         [ 4]  108 	bne	00104$
+                            109 ;	../_strcat.c: 40: return( dst );                  /* return dst */
+   003B AEr03r00      [ 4]  110 	ldx	(_strcat_dst_65536_26 + 1)
+   003E ADr02r00      [ 4]  111 	lda	_strcat_dst_65536_26
+                            112 ;	../_strcat.c: 41: }
+   0041 60            [ 6]  113 	rts
+                            114 	.area CODE
+                            115 	.area RODATA
+                            116 	.area XINIT
+                            117 	.area CABS    (ABS)

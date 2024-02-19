@@ -1,0 +1,2060 @@
+                              1 ;--------------------------------------------------------
+                              2 ; File Created by SDCC : free open source ISO C Compiler 
+                              3 ; Version 4.2.14 #0 (Linux)
+                              4 ;--------------------------------------------------------
+                              5 	.module time
+                              6 	.optsdcc -mmos6502
+                              7 	
+                              8 ;--------------------------------------------------------
+                              9 ; Public variables in this module
+                             10 ;--------------------------------------------------------
+                             11 	.globl ___day
+                             12 	.globl ___month
+                             13 	.globl _RtcRead
+                             14 	.globl _sprintf
+                             15 	.globl _time
+                             16 	.globl _asctime
+                             17 	.globl _ctime
+                             18 	.globl _localtime
+                             19 	.globl _gmtime
+                             20 	.globl _mktime
+                             21 ;--------------------------------------------------------
+                             22 ; ZP ram data
+                             23 ;--------------------------------------------------------
+                             24 	.area ZP      (PAG)
+                             25 ;--------------------------------------------------------
+                             26 ; overlayable items in ram
+                             27 ;--------------------------------------------------------
+                             28 ;--------------------------------------------------------
+                             29 ; uninitialized external ram data
+                             30 ;--------------------------------------------------------
+                             31 	.area BSS
+   0000                      32 _ascTimeBuffer:
+   0000                      33 	.ds 32
+   0020                      34 _lastTime:
+   0020                      35 	.ds 12
+                             36 ;--------------------------------------------------------
+                             37 ; absolute external ram data
+                             38 ;--------------------------------------------------------
+                             39 	.area DABS    (ABS)
+                             40 ;--------------------------------------------------------
+                             41 ; initialized external ram data
+                             42 ;--------------------------------------------------------
+                             43 	.area DATA
+                             44 ;--------------------------------------------------------
+                             45 ; global & static initialisations
+                             46 ;--------------------------------------------------------
+                             47 	.area _CODE
+                             48 	.area GSINIT
+                             49 	.area GSFINAL
+                             50 	.area GSINIT
+                             51 ;--------------------------------------------------------
+                             52 ; Home
+                             53 ;--------------------------------------------------------
+                             54 	.area _CODE
+                             55 	.area _CODE
+                             56 ;--------------------------------------------------------
+                             57 ; code
+                             58 ;--------------------------------------------------------
+                             59 	.area CODE
+                             60 ;------------------------------------------------------------
+                             61 ;Allocation info for local variables in function 'RtcRead'
+                             62 ;------------------------------------------------------------
+                             63 ;timeptr                   Allocated to registers 
+                             64 ;------------------------------------------------------------
+                             65 ;	../time.c: 42: unsigned char RtcRead(struct tm *timeptr) {
+                             66 ;	-----------------------------------------
+                             67 ;	 function RtcRead
+                             68 ;	-----------------------------------------
+                             69 ;	Register assignment is optimal.
+                             70 ;	Stack space usage: 0 bytes.
+   0000                      71 _RtcRead:
+                             72 ;	../time.c: 45: return 0;
+   0000 A9 00         [ 2]   73 	lda	#0x00
+                             74 ;	../time.c: 46: }
+   0002 60            [ 6]   75 	rts
+                             76 ;------------------------------------------------------------
+                             77 ;Allocation info for local variables in function 'time'
+                             78 ;------------------------------------------------------------
+                             79 ;timeptr                   Allocated to stack - sp +19
+                             80 ;now                       Allocated to stack - sp +5
+                             81 ;t                         Allocated to stack - sp +1
+                             82 ;sloc0                     Allocated to stack - sp +17
+                             83 ;------------------------------------------------------------
+                             84 ;	../time.c: 50: time_t time(time_t *timeptr) {
+                             85 ;	-----------------------------------------
+                             86 ;	 function time
+                             87 ;	-----------------------------------------
+                             88 ;	Register assignment is optimal.
+                             89 ;	Stack space usage: 20 bytes.
+   0003                      90 _time:
+   0003 85*00         [ 3]   91 	sta	*(__TEMP+0)
+   0005 8A            [ 2]   92 	txa
+   0006 48            [ 3]   93 	pha
+   0007 A5*00         [ 3]   94 	lda	*(__TEMP+0)
+   0009 48            [ 3]   95 	pha
+   000A 86*01         [ 3]   96 	stx	*(__TEMP+1)
+   000C BA            [ 2]   97 	tsx
+   000D 8A            [ 2]   98 	txa
+   000E 18            [ 2]   99 	clc
+   000F 69 EE         [ 2]  100 	adc	#0xee
+   0011 AA            [ 2]  101 	tax
+   0012 9A            [ 2]  102 	txs
+                            103 ;	../time.c: 52: time_t t=(time_t) -1;
+   0013 BA            [ 2]  104 	tsx
+   0014 A9 FF         [ 2]  105 	lda	#0xff
+   0016 9D 01 01      [ 5]  106 	sta	0x101,x
+   0019 9D 02 01      [ 5]  107 	sta	0x102,x
+   001C 9D 03 01      [ 5]  108 	sta	0x103,x
+   001F 9D 04 01      [ 5]  109 	sta	0x104,x
+                            110 ;	../time.c: 54: if (RtcRead(&now)) {
+   0022 8A            [ 2]  111 	txa
+   0023 18            [ 2]  112 	clc
+   0024 69 05         [ 2]  113 	adc	#0x05
+   0026 9D 11 01      [ 5]  114 	sta	0x111,x
+   0029 A9 01         [ 2]  115 	lda	#0x01
+   002B 9D 12 01      [ 5]  116 	sta	0x112,x
+   002E BD 11 01      [ 5]  117 	lda	0x111,x
+   0031 85*00         [ 3]  118 	sta	*(__TEMP+0)
+   0033 BD 12 01      [ 5]  119 	lda	0x112,x
+   0036 AA            [ 2]  120 	tax
+   0037 A5*00         [ 3]  121 	lda	*(__TEMP+0)
+   0039 20r00r00      [ 6]  122 	jsr	_RtcRead
+   003C C9 00         [ 2]  123 	cmp	#0x00
+   003E F0 29         [ 4]  124 	beq	00102$
+                            125 ;	../time.c: 55: t=mktime(&now);
+   0040 BA            [ 2]  126 	tsx
+   0041 BD 11 01      [ 5]  127 	lda	0x111,x
+   0044 85*00         [ 3]  128 	sta	*(__TEMP+0)
+   0046 BD 12 01      [ 5]  129 	lda	0x112,x
+   0049 AA            [ 2]  130 	tax
+   004A A5*00         [ 3]  131 	lda	*(__TEMP+0)
+   004C 20r6Ar08      [ 6]  132 	jsr	_mktime
+   004F 86*00         [ 3]  133 	stx	*(__TEMP+0)
+   0051 BA            [ 2]  134 	tsx
+   0052 9D 01 01      [ 5]  135 	sta	0x101,x
+   0055 A6*00         [ 3]  136 	ldx	*(__TEMP+0)
+   0057 8A            [ 2]  137 	txa
+   0058 BA            [ 2]  138 	tsx
+   0059 9D 02 01      [ 5]  139 	sta	0x102,x
+   005C A6*00         [ 3]  140 	ldx	*(__TEMP+0)
+   005E A5*00         [ 3]  141 	lda	*___SDCC_m6502_ret2
+   0060 BA            [ 2]  142 	tsx
+   0061 9D 03 01      [ 5]  143 	sta	0x103,x
+   0064 A5*00         [ 3]  144 	lda	*___SDCC_m6502_ret3
+   0066 9D 04 01      [ 5]  145 	sta	0x104,x
+   0069                     146 00102$:
+                            147 ;	../time.c: 57: if (timeptr) {
+   0069 BA            [ 2]  148 	tsx
+   006A BD 13 01      [ 5]  149 	lda	0x113,x
+   006D 1D 14 01      [ 5]  150 	ora	0x114,x
+   0070 F0 23         [ 4]  151 	beq	00104$
+                            152 ;	../time.c: 58: *timeptr=t;
+   0072 BD 13 01      [ 5]  153 	lda	0x113,x
+   0075 85*00         [ 3]  154 	sta	*(__DPTR+0)
+   0077 BD 14 01      [ 5]  155 	lda	0x114,x
+   007A 85*01         [ 3]  156 	sta	*(__DPTR+1)
+   007C BD 01 01      [ 5]  157 	lda	0x101,x
+   007F A0 00         [ 2]  158 	ldy	#0x00
+   0081 91*00         [ 6]  159 	sta	[__DPTR],y
+   0083 BD 02 01      [ 5]  160 	lda	0x102,x
+   0086 C8            [ 2]  161 	iny
+   0087 91*00         [ 6]  162 	sta	[__DPTR],y
+   0089 BD 03 01      [ 5]  163 	lda	0x103,x
+   008C C8            [ 2]  164 	iny
+   008D 91*00         [ 6]  165 	sta	[__DPTR],y
+   008F BD 04 01      [ 5]  166 	lda	0x104,x
+   0092 C8            [ 2]  167 	iny
+   0093 91*00         [ 6]  168 	sta	[__DPTR],y
+   0095                     169 00104$:
+                            170 ;	../time.c: 60: return t;
+   0095 BA            [ 2]  171 	tsx
+   0096 BD 04 01      [ 5]  172 	lda	0x104,x
+   0099 85*00         [ 3]  173 	sta	*___SDCC_m6502_ret3
+   009B BD 03 01      [ 5]  174 	lda	0x103,x
+   009E 85*00         [ 3]  175 	sta	*___SDCC_m6502_ret2
+   00A0 BD 02 01      [ 5]  176 	lda	0x102,x
+   00A3 AA            [ 2]  177 	tax
+   00A4 86*00         [ 3]  178 	stx	*(__TEMP+0)
+   00A6 BA            [ 2]  179 	tsx
+   00A7 BD 01 01      [ 5]  180 	lda	0x101,x
+   00AA 08            [ 3]  181 	php
+   00AB A6*00         [ 3]  182 	ldx	*(__TEMP+0)
+   00AD 28            [ 4]  183 	plp
+                            184 ;	../time.c: 61: }
+   00AE 85*00         [ 3]  185 	sta	*(__TEMP+0)
+   00B0 86*01         [ 3]  186 	stx	*(__TEMP+1)
+   00B2 BA            [ 2]  187 	tsx
+   00B3 8A            [ 2]  188 	txa
+   00B4 18            [ 2]  189 	clc
+   00B5 69 14         [ 2]  190 	adc	#0x14
+   00B7 AA            [ 2]  191 	tax
+   00B8 9A            [ 2]  192 	txs
+   00B9 A6*01         [ 3]  193 	ldx	*(__TEMP+1)
+   00BB A5*00         [ 3]  194 	lda	*(__TEMP+0)
+   00BD 60            [ 6]  195 	rts
+                            196 ;------------------------------------------------------------
+                            197 ;Allocation info for local variables in function 'CheckTime'
+                            198 ;------------------------------------------------------------
+                            199 ;timeptr                   Allocated to stack - sp +3
+                            200 ;sloc0                     Allocated to stack - sp +1
+                            201 ;------------------------------------------------------------
+                            202 ;	../time.c: 73: static void CheckTime(struct tm *timeptr) {
+                            203 ;	-----------------------------------------
+                            204 ;	 function CheckTime
+                            205 ;	-----------------------------------------
+                            206 ;	Register assignment is optimal.
+                            207 ;	Stack space usage: 4 bytes.
+   00BE                     208 _CheckTime:
+   00BE 85*00         [ 3]  209 	sta	*(__TEMP+0)
+   00C0 8A            [ 2]  210 	txa
+   00C1 48            [ 3]  211 	pha
+   00C2 A5*00         [ 3]  212 	lda	*(__TEMP+0)
+   00C4 48            [ 3]  213 	pha
+   00C5 48            [ 3]  214 	pha
+   00C6 48            [ 3]  215 	pha
+                            216 ;	../time.c: 84: if (timeptr->tm_sec>59) timeptr->tm_sec=59;
+   00C7 BA            [ 2]  217 	tsx
+   00C8 BD 03 01      [ 5]  218 	lda	0x103,x
+   00CB 85*00         [ 3]  219 	sta	*(__DPTR+0)
+   00CD BD 04 01      [ 5]  220 	lda	0x104,x
+   00D0 85*01         [ 3]  221 	sta	*(__DPTR+1)
+   00D2 A0 00         [ 2]  222 	ldy	#0x00
+   00D4 B1*00         [ 6]  223 	lda	[__DPTR],y
+   00D6 C9 3B         [ 2]  224 	cmp	#0x3b
+   00D8 F0 10         [ 4]  225 	beq	00102$
+   00DA 90 0E         [ 4]  226 	bcc	00102$
+   00DC BD 03 01      [ 5]  227 	lda	0x103,x
+   00DF 85*00         [ 3]  228 	sta	*(__DPTR+0)
+   00E1 BD 04 01      [ 5]  229 	lda	0x104,x
+   00E4 85*01         [ 3]  230 	sta	*(__DPTR+1)
+   00E6 A9 3B         [ 2]  231 	lda	#0x3b
+   00E8 91*00         [ 6]  232 	sta	[__DPTR],y
+   00EA                     233 00102$:
+                            234 ;	../time.c: 85: if (timeptr->tm_min>59) timeptr->tm_min=59;
+   00EA BA            [ 2]  235 	tsx
+   00EB BD 03 01      [ 5]  236 	lda	0x103,x
+   00EE 9D 01 01      [ 5]  237 	sta	0x101,x
+   00F1 BD 04 01      [ 5]  238 	lda	0x104,x
+   00F4 9D 02 01      [ 5]  239 	sta	0x102,x
+   00F7 BD 01 01      [ 5]  240 	lda	0x101,x
+   00FA 85*00         [ 3]  241 	sta	*(__DPTR+0)
+   00FC BD 02 01      [ 5]  242 	lda	0x102,x
+   00FF 85*01         [ 3]  243 	sta	*(__DPTR+1)
+   0101 A0 01         [ 2]  244 	ldy	#0x01
+   0103 B1*00         [ 6]  245 	lda	[__DPTR],y
+   0105 C9 3B         [ 2]  246 	cmp	#0x3b
+   0107 F0 10         [ 4]  247 	beq	00104$
+   0109 90 0E         [ 4]  248 	bcc	00104$
+   010B BD 01 01      [ 5]  249 	lda	0x101,x
+   010E 85*00         [ 3]  250 	sta	*(__DPTR+0)
+   0110 BD 02 01      [ 5]  251 	lda	0x102,x
+   0113 85*01         [ 3]  252 	sta	*(__DPTR+1)
+   0115 A9 3B         [ 2]  253 	lda	#0x3b
+   0117 91*00         [ 6]  254 	sta	[__DPTR],y
+   0119                     255 00104$:
+                            256 ;	../time.c: 86: if (timeptr->tm_hour>23) timeptr->tm_hour=23;
+   0119 BA            [ 2]  257 	tsx
+   011A BD 03 01      [ 5]  258 	lda	0x103,x
+   011D 9D 01 01      [ 5]  259 	sta	0x101,x
+   0120 BD 04 01      [ 5]  260 	lda	0x104,x
+   0123 9D 02 01      [ 5]  261 	sta	0x102,x
+   0126 BD 01 01      [ 5]  262 	lda	0x101,x
+   0129 85*00         [ 3]  263 	sta	*(__DPTR+0)
+   012B BD 02 01      [ 5]  264 	lda	0x102,x
+   012E 85*01         [ 3]  265 	sta	*(__DPTR+1)
+   0130 A0 02         [ 2]  266 	ldy	#0x02
+   0132 B1*00         [ 6]  267 	lda	[__DPTR],y
+   0134 C9 17         [ 2]  268 	cmp	#0x17
+   0136 F0 10         [ 4]  269 	beq	00106$
+   0138 90 0E         [ 4]  270 	bcc	00106$
+   013A BD 01 01      [ 5]  271 	lda	0x101,x
+   013D 85*00         [ 3]  272 	sta	*(__DPTR+0)
+   013F BD 02 01      [ 5]  273 	lda	0x102,x
+   0142 85*01         [ 3]  274 	sta	*(__DPTR+1)
+   0144 A9 17         [ 2]  275 	lda	#0x17
+   0146 91*00         [ 6]  276 	sta	[__DPTR],y
+   0148                     277 00106$:
+                            278 ;	../time.c: 87: if (timeptr->tm_wday>6) timeptr->tm_wday=6;
+   0148 BA            [ 2]  279 	tsx
+   0149 BD 03 01      [ 5]  280 	lda	0x103,x
+   014C 9D 01 01      [ 5]  281 	sta	0x101,x
+   014F BD 04 01      [ 5]  282 	lda	0x104,x
+   0152 9D 02 01      [ 5]  283 	sta	0x102,x
+   0155 BD 01 01      [ 5]  284 	lda	0x101,x
+   0158 85*00         [ 3]  285 	sta	*(__DPTR+0)
+   015A BD 02 01      [ 5]  286 	lda	0x102,x
+   015D 85*01         [ 3]  287 	sta	*(__DPTR+1)
+   015F A0 07         [ 2]  288 	ldy	#0x07
+   0161 B1*00         [ 6]  289 	lda	[__DPTR],y
+   0163 C9 06         [ 2]  290 	cmp	#0x06
+   0165 F0 10         [ 4]  291 	beq	00108$
+   0167 90 0E         [ 4]  292 	bcc	00108$
+   0169 BD 01 01      [ 5]  293 	lda	0x101,x
+   016C 85*00         [ 3]  294 	sta	*(__DPTR+0)
+   016E BD 02 01      [ 5]  295 	lda	0x102,x
+   0171 85*01         [ 3]  296 	sta	*(__DPTR+1)
+   0173 A9 06         [ 2]  297 	lda	#0x06
+   0175 91*00         [ 6]  298 	sta	[__DPTR],y
+   0177                     299 00108$:
+                            300 ;	../time.c: 88: if (timeptr->tm_mday<1) timeptr->tm_mday=1;
+   0177 BA            [ 2]  301 	tsx
+   0178 BD 03 01      [ 5]  302 	lda	0x103,x
+   017B 9D 01 01      [ 5]  303 	sta	0x101,x
+   017E BD 04 01      [ 5]  304 	lda	0x104,x
+   0181 9D 02 01      [ 5]  305 	sta	0x102,x
+   0184 BD 01 01      [ 5]  306 	lda	0x101,x
+   0187 85*00         [ 3]  307 	sta	*(__DPTR+0)
+   0189 BD 02 01      [ 5]  308 	lda	0x102,x
+   018C 85*01         [ 3]  309 	sta	*(__DPTR+1)
+   018E A0 03         [ 2]  310 	ldy	#0x03
+   0190 B1*00         [ 6]  311 	lda	[__DPTR],y
+   0192 C9 01         [ 2]  312 	cmp	#0x01
+   0194 B0 11         [ 4]  313 	bcs	00112$
+   0196 BD 01 01      [ 5]  314 	lda	0x101,x
+   0199 85*00         [ 3]  315 	sta	*(__DPTR+0)
+   019B BD 02 01      [ 5]  316 	lda	0x102,x
+   019E 85*01         [ 3]  317 	sta	*(__DPTR+1)
+   01A0 A9 01         [ 2]  318 	lda	#0x01
+   01A2 91*00         [ 6]  319 	sta	[__DPTR],y
+   01A4 4CrBEr01      [ 3]  320 	jmp	00113$
+   01A7                     321 00112$:
+                            322 ;	../time.c: 89: else if (timeptr->tm_mday>31) timeptr->tm_mday=31;
+   01A7 C9 1F         [ 2]  323 	cmp	#0x1f
+   01A9 F0 13         [ 4]  324 	beq	00113$
+   01AB 90 11         [ 4]  325 	bcc	00113$
+   01AD BA            [ 2]  326 	tsx
+   01AE BD 01 01      [ 5]  327 	lda	0x101,x
+   01B1 85*00         [ 3]  328 	sta	*(__DPTR+0)
+   01B3 BD 02 01      [ 5]  329 	lda	0x102,x
+   01B6 85*01         [ 3]  330 	sta	*(__DPTR+1)
+   01B8 A9 1F         [ 2]  331 	lda	#0x1f
+   01BA A0 03         [ 2]  332 	ldy	#0x03
+   01BC 91*00         [ 6]  333 	sta	[__DPTR],y
+   01BE                     334 00113$:
+                            335 ;	../time.c: 90: if (timeptr->tm_mon>11) timeptr->tm_mon=11;
+   01BE BA            [ 2]  336 	tsx
+   01BF BD 03 01      [ 5]  337 	lda	0x103,x
+   01C2 9D 01 01      [ 5]  338 	sta	0x101,x
+   01C5 BD 04 01      [ 5]  339 	lda	0x104,x
+   01C8 9D 02 01      [ 5]  340 	sta	0x102,x
+   01CB BD 01 01      [ 5]  341 	lda	0x101,x
+   01CE 85*00         [ 3]  342 	sta	*(__DPTR+0)
+   01D0 BD 02 01      [ 5]  343 	lda	0x102,x
+   01D3 85*01         [ 3]  344 	sta	*(__DPTR+1)
+   01D5 A0 04         [ 2]  345 	ldy	#0x04
+   01D7 B1*00         [ 6]  346 	lda	[__DPTR],y
+   01D9 C9 0B         [ 2]  347 	cmp	#0x0b
+   01DB F0 10         [ 4]  348 	beq	00115$
+   01DD 90 0E         [ 4]  349 	bcc	00115$
+   01DF BD 01 01      [ 5]  350 	lda	0x101,x
+   01E2 85*00         [ 3]  351 	sta	*(__DPTR+0)
+   01E4 BD 02 01      [ 5]  352 	lda	0x102,x
+   01E7 85*01         [ 3]  353 	sta	*(__DPTR+1)
+   01E9 A9 0B         [ 2]  354 	lda	#0x0b
+   01EB 91*00         [ 6]  355 	sta	[__DPTR],y
+   01ED                     356 00115$:
+                            357 ;	../time.c: 91: if (timeptr->tm_year<0) timeptr->tm_year=0;
+   01ED BA            [ 2]  358 	tsx
+   01EE BD 03 01      [ 5]  359 	lda	0x103,x
+   01F1 9D 01 01      [ 5]  360 	sta	0x101,x
+   01F4 BD 04 01      [ 5]  361 	lda	0x104,x
+   01F7 9D 02 01      [ 5]  362 	sta	0x102,x
+   01FA BD 01 01      [ 5]  363 	lda	0x101,x
+   01FD 85*00         [ 3]  364 	sta	*(__DPTR+0)
+   01FF BD 02 01      [ 5]  365 	lda	0x102,x
+   0202 85*01         [ 3]  366 	sta	*(__DPTR+1)
+   0204 A0 06         [ 2]  367 	ldy	#0x06
+   0206 B1*00         [ 6]  368 	lda	[__DPTR],y
+   0208 AA            [ 2]  369 	tax
+   0209 88            [ 2]  370 	dey
+   020A B1*00         [ 6]  371 	lda	[__DPTR],y
+   020C 8A            [ 2]  372 	txa
+   020D 38            [ 2]  373 	sec
+   020E E9 00         [ 2]  374 	sbc	#0x00
+   0210 50 04         [ 4]  375 	bvc	00166$
+   0212 10 04         [ 4]  376 	bpl	00165$
+   0214 30 14         [ 4]  377 	bmi	00118$
+   0216                     378 00166$:
+   0216 10 12         [ 4]  379 	bpl	00118$
+   0218                     380 00165$:
+   0218 BA            [ 2]  381 	tsx
+   0219 BD 01 01      [ 5]  382 	lda	0x101,x
+   021C 85*00         [ 3]  383 	sta	*(__DPTR+0)
+   021E BD 02 01      [ 5]  384 	lda	0x102,x
+   0221 85*01         [ 3]  385 	sta	*(__DPTR+1)
+   0223 A9 00         [ 2]  386 	lda	#0x00
+   0225 91*00         [ 6]  387 	sta	[__DPTR],y
+   0227 C8            [ 2]  388 	iny
+   0228 91*00         [ 6]  389 	sta	[__DPTR],y
+   022A                     390 00118$:
+                            391 ;	../time.c: 92: }
+   022A 85*00         [ 3]  392 	sta	*(__TEMP+0)
+   022C 68            [ 4]  393 	pla
+   022D 68            [ 4]  394 	pla
+   022E 68            [ 4]  395 	pla
+   022F 68            [ 4]  396 	pla
+   0230 A5*00         [ 3]  397 	lda	*(__TEMP+0)
+   0232 60            [ 6]  398 	rts
+                            399 ;------------------------------------------------------------
+                            400 ;Allocation info for local variables in function 'asctime'
+                            401 ;------------------------------------------------------------
+                            402 ;timeptr                   Allocated to stack - sp +15
+                            403 ;sloc0                     Allocated to stack - sp +13
+                            404 ;sloc1                     Allocated to stack - sp +11
+                            405 ;sloc2                     Allocated to stack - sp +9
+                            406 ;sloc3                     Allocated to stack - sp +7
+                            407 ;sloc4                     Allocated to stack - sp +5
+                            408 ;sloc5                     Allocated to stack - sp +3
+                            409 ;sloc6                     Allocated to stack - sp +1
+                            410 ;------------------------------------------------------------
+                            411 ;	../time.c: 95: char *asctime(struct tm *timeptr) {
+                            412 ;	-----------------------------------------
+                            413 ;	 function asctime
+                            414 ;	-----------------------------------------
+                            415 ;	Register assignment is optimal.
+                            416 ;	Stack space usage: 16 bytes.
+   0233                     417 _asctime:
+   0233 85*00         [ 3]  418 	sta	*(__TEMP+0)
+   0235 8A            [ 2]  419 	txa
+   0236 48            [ 3]  420 	pha
+   0237 A5*00         [ 3]  421 	lda	*(__TEMP+0)
+   0239 48            [ 3]  422 	pha
+   023A 86*01         [ 3]  423 	stx	*(__TEMP+1)
+   023C BA            [ 2]  424 	tsx
+   023D 8A            [ 2]  425 	txa
+   023E 18            [ 2]  426 	clc
+   023F 69 F2         [ 2]  427 	adc	#0xf2
+   0241 AA            [ 2]  428 	tax
+   0242 9A            [ 2]  429 	txs
+   0243 A6*01         [ 3]  430 	ldx	*(__TEMP+1)
+   0245 A5*00         [ 3]  431 	lda	*(__TEMP+0)
+                            432 ;	../time.c: 96: CheckTime(timeptr);
+   0247 BA            [ 2]  433 	tsx
+   0248 BD 10 01      [ 5]  434 	lda	0x110,x
+   024B AA            [ 2]  435 	tax
+   024C 86*00         [ 3]  436 	stx	*(__TEMP+0)
+   024E BA            [ 2]  437 	tsx
+   024F BD 0F 01      [ 5]  438 	lda	0x10f,x
+   0252 08            [ 3]  439 	php
+   0253 A6*00         [ 3]  440 	ldx	*(__TEMP+0)
+   0255 28            [ 4]  441 	plp
+   0256 20rBEr00      [ 6]  442 	jsr	_CheckTime
+                            443 ;	../time.c: 100: timeptr->tm_year+1900);
+   0259 BA            [ 2]  444 	tsx
+   025A BD 0F 01      [ 5]  445 	lda	0x10f,x
+   025D 9D 0D 01      [ 5]  446 	sta	0x10d,x
+   0260 BD 10 01      [ 5]  447 	lda	0x110,x
+   0263 9D 0E 01      [ 5]  448 	sta	0x10e,x
+   0266 BD 0D 01      [ 5]  449 	lda	0x10d,x
+   0269 85*00         [ 3]  450 	sta	*(__DPTR+0)
+   026B BD 0E 01      [ 5]  451 	lda	0x10e,x
+   026E 85*01         [ 3]  452 	sta	*(__DPTR+1)
+   0270 A0 06         [ 2]  453 	ldy	#0x06
+   0272 B1*00         [ 6]  454 	lda	[__DPTR],y
+   0274 AA            [ 2]  455 	tax
+   0275 88            [ 2]  456 	dey
+   0276 B1*00         [ 6]  457 	lda	[__DPTR],y
+   0278 18            [ 2]  458 	clc
+   0279 69 6C         [ 2]  459 	adc	#0x6c
+   027B 86*00         [ 3]  460 	stx	*(__TEMP+0)
+   027D BA            [ 2]  461 	tsx
+   027E 9D 0D 01      [ 5]  462 	sta	0x10d,x
+   0281 A6*00         [ 3]  463 	ldx	*(__TEMP+0)
+   0283 8A            [ 2]  464 	txa
+   0284 69 07         [ 2]  465 	adc	#0x07
+   0286 86*00         [ 3]  466 	stx	*(__TEMP+0)
+   0288 BA            [ 2]  467 	tsx
+   0289 9D 0E 01      [ 5]  468 	sta	0x10e,x
+                            469 ;	../time.c: 99: timeptr->tm_hour, timeptr->tm_min, timeptr->tm_sec, 
+   028C BA            [ 2]  470 	tsx
+   028D BD 0F 01      [ 5]  471 	lda	0x10f,x
+   0290 85*00         [ 3]  472 	sta	*(__DPTR+0)
+   0292 BD 10 01      [ 5]  473 	lda	0x110,x
+   0295 85*01         [ 3]  474 	sta	*(__DPTR+1)
+   0297 A0 00         [ 2]  475 	ldy	#0x00
+   0299 B1*00         [ 6]  476 	lda	[__DPTR],y
+   029B A8            [ 2]  477 	tay
+   029C 9D 0B 01      [ 5]  478 	sta	0x10b,x
+   029F A9 00         [ 2]  479 	lda	#0x00
+   02A1 9D 0C 01      [ 5]  480 	sta	0x10c,x
+   02A4 BD 0F 01      [ 5]  481 	lda	0x10f,x
+   02A7 9D 09 01      [ 5]  482 	sta	0x109,x
+   02AA BD 10 01      [ 5]  483 	lda	0x110,x
+   02AD 9D 0A 01      [ 5]  484 	sta	0x10a,x
+   02B0 BD 09 01      [ 5]  485 	lda	0x109,x
+   02B3 85*00         [ 3]  486 	sta	*(__DPTR+0)
+   02B5 BD 0A 01      [ 5]  487 	lda	0x10a,x
+   02B8 85*01         [ 3]  488 	sta	*(__DPTR+1)
+   02BA A0 01         [ 2]  489 	ldy	#0x01
+   02BC B1*00         [ 6]  490 	lda	[__DPTR],y
+   02BE A8            [ 2]  491 	tay
+   02BF 9D 09 01      [ 5]  492 	sta	0x109,x
+   02C2 A9 00         [ 2]  493 	lda	#0x00
+   02C4 9D 0A 01      [ 5]  494 	sta	0x10a,x
+   02C7 BD 0F 01      [ 5]  495 	lda	0x10f,x
+   02CA 9D 07 01      [ 5]  496 	sta	0x107,x
+   02CD BD 10 01      [ 5]  497 	lda	0x110,x
+   02D0 9D 08 01      [ 5]  498 	sta	0x108,x
+   02D3 BD 07 01      [ 5]  499 	lda	0x107,x
+   02D6 85*00         [ 3]  500 	sta	*(__DPTR+0)
+   02D8 BD 08 01      [ 5]  501 	lda	0x108,x
+   02DB 85*01         [ 3]  502 	sta	*(__DPTR+1)
+   02DD A0 02         [ 2]  503 	ldy	#0x02
+   02DF B1*00         [ 6]  504 	lda	[__DPTR],y
+   02E1 A8            [ 2]  505 	tay
+   02E2 9D 07 01      [ 5]  506 	sta	0x107,x
+   02E5 A9 00         [ 2]  507 	lda	#0x00
+   02E7 9D 08 01      [ 5]  508 	sta	0x108,x
+                            509 ;	../time.c: 98: __day[timeptr->tm_wday], __month[timeptr->tm_mon], timeptr->tm_mday,
+   02EA BD 0F 01      [ 5]  510 	lda	0x10f,x
+   02ED 9D 05 01      [ 5]  511 	sta	0x105,x
+   02F0 BD 10 01      [ 5]  512 	lda	0x110,x
+   02F3 9D 06 01      [ 5]  513 	sta	0x106,x
+   02F6 BD 05 01      [ 5]  514 	lda	0x105,x
+   02F9 85*00         [ 3]  515 	sta	*(__DPTR+0)
+   02FB BD 06 01      [ 5]  516 	lda	0x106,x
+   02FE 85*01         [ 3]  517 	sta	*(__DPTR+1)
+   0300 A0 03         [ 2]  518 	ldy	#0x03
+   0302 B1*00         [ 6]  519 	lda	[__DPTR],y
+   0304 A8            [ 2]  520 	tay
+   0305 9D 05 01      [ 5]  521 	sta	0x105,x
+   0308 A9 00         [ 2]  522 	lda	#0x00
+   030A 9D 06 01      [ 5]  523 	sta	0x106,x
+   030D BD 0F 01      [ 5]  524 	lda	0x10f,x
+   0310 9D 03 01      [ 5]  525 	sta	0x103,x
+   0313 BD 10 01      [ 5]  526 	lda	0x110,x
+   0316 9D 04 01      [ 5]  527 	sta	0x104,x
+   0319 BD 03 01      [ 5]  528 	lda	0x103,x
+   031C 85*00         [ 3]  529 	sta	*(__DPTR+0)
+   031E BD 04 01      [ 5]  530 	lda	0x104,x
+   0321 85*01         [ 3]  531 	sta	*(__DPTR+1)
+   0323 A0 04         [ 2]  532 	ldy	#0x04
+   0325 B1*00         [ 6]  533 	lda	[__DPTR],y
+   0327 A2 00         [ 2]  534 	ldx	#0x00
+   0329 86*00         [ 3]  535 	stx	*(__TEMP+0)
+   032B 0A            [ 2]  536 	asl	a
+   032C 26*00         [ 5]  537 	rol	*(__TEMP+0)
+   032E A6*00         [ 3]  538 	ldx	*(__TEMP+0)
+   0330 18            [ 2]  539 	clc
+   0331 69r0C         [ 2]  540 	adc	#<(___month+0)
+   0333 85*00         [ 3]  541 	sta	*(__DPTR+0)
+   0335 8A            [ 2]  542 	txa
+   0336 69s00         [ 2]  543 	adc	#>(___month+0)
+   0338 85*01         [ 3]  544 	sta	*(__DPTR+1)
+   033A A0 00         [ 2]  545 	ldy	#0x00
+   033C B1*00         [ 6]  546 	lda	[__DPTR],y
+   033E 86*00         [ 3]  547 	stx	*(__TEMP+0)
+   0340 BA            [ 2]  548 	tsx
+   0341 9D 03 01      [ 5]  549 	sta	0x103,x
+   0344 A6*00         [ 3]  550 	ldx	*(__TEMP+0)
+   0346 C8            [ 2]  551 	iny
+   0347 B1*00         [ 6]  552 	lda	[__DPTR],y
+   0349 86*00         [ 3]  553 	stx	*(__TEMP+0)
+   034B BA            [ 2]  554 	tsx
+   034C 9D 04 01      [ 5]  555 	sta	0x104,x
+   034F BA            [ 2]  556 	tsx
+   0350 BD 0F 01      [ 5]  557 	lda	0x10f,x
+   0353 9D 01 01      [ 5]  558 	sta	0x101,x
+   0356 BD 10 01      [ 5]  559 	lda	0x110,x
+   0359 9D 02 01      [ 5]  560 	sta	0x102,x
+   035C BD 01 01      [ 5]  561 	lda	0x101,x
+   035F 85*00         [ 3]  562 	sta	*(__DPTR+0)
+   0361 BD 02 01      [ 5]  563 	lda	0x102,x
+   0364 85*01         [ 3]  564 	sta	*(__DPTR+1)
+   0366 A0 07         [ 2]  565 	ldy	#0x07
+   0368 B1*00         [ 6]  566 	lda	[__DPTR],y
+   036A A2 00         [ 2]  567 	ldx	#0x00
+   036C 86*00         [ 3]  568 	stx	*(__TEMP+0)
+   036E 0A            [ 2]  569 	asl	a
+   036F 26*00         [ 5]  570 	rol	*(__TEMP+0)
+   0371 A6*00         [ 3]  571 	ldx	*(__TEMP+0)
+   0373 18            [ 2]  572 	clc
+   0374 69r24         [ 2]  573 	adc	#<(___day+0)
+   0376 85*00         [ 3]  574 	sta	*(__DPTR+0)
+   0378 8A            [ 2]  575 	txa
+   0379 69s00         [ 2]  576 	adc	#>(___day+0)
+   037B 85*01         [ 3]  577 	sta	*(__DPTR+1)
+   037D A0 00         [ 2]  578 	ldy	#0x00
+   037F B1*00         [ 6]  579 	lda	[__DPTR],y
+   0381 86*00         [ 3]  580 	stx	*(__TEMP+0)
+   0383 BA            [ 2]  581 	tsx
+   0384 9D 01 01      [ 5]  582 	sta	0x101,x
+   0387 A6*00         [ 3]  583 	ldx	*(__TEMP+0)
+   0389 C8            [ 2]  584 	iny
+   038A B1*00         [ 6]  585 	lda	[__DPTR],y
+   038C 86*00         [ 3]  586 	stx	*(__TEMP+0)
+   038E BA            [ 2]  587 	tsx
+   038F 9D 02 01      [ 5]  588 	sta	0x102,x
+                            589 ;	../time.c: 97: sprintf (ascTimeBuffer, "%s %s %2d %02d:%02d:%02d %04d\n",
+   0392 BA            [ 2]  590 	tsx
+   0393 BD 0E 01      [ 5]  591 	lda	0x10e,x
+   0396 48            [ 3]  592 	pha
+   0397 BD 0D 01      [ 5]  593 	lda	0x10d,x
+   039A 48            [ 3]  594 	pha
+   039B BD 0C 01      [ 5]  595 	lda	0x10c,x
+   039E 48            [ 3]  596 	pha
+   039F BD 0B 01      [ 5]  597 	lda	0x10b,x
+   03A2 48            [ 3]  598 	pha
+   03A3 BD 0A 01      [ 5]  599 	lda	0x10a,x
+   03A6 48            [ 3]  600 	pha
+   03A7 BD 09 01      [ 5]  601 	lda	0x109,x
+   03AA 48            [ 3]  602 	pha
+   03AB BD 08 01      [ 5]  603 	lda	0x108,x
+   03AE 48            [ 3]  604 	pha
+   03AF BD 07 01      [ 5]  605 	lda	0x107,x
+   03B2 48            [ 3]  606 	pha
+   03B3 BD 06 01      [ 5]  607 	lda	0x106,x
+   03B6 48            [ 3]  608 	pha
+   03B7 BD 05 01      [ 5]  609 	lda	0x105,x
+   03BA 48            [ 3]  610 	pha
+   03BB BD 04 01      [ 5]  611 	lda	0x104,x
+   03BE 48            [ 3]  612 	pha
+   03BF BD 03 01      [ 5]  613 	lda	0x103,x
+   03C2 48            [ 3]  614 	pha
+   03C3 BD 02 01      [ 5]  615 	lda	0x102,x
+   03C6 48            [ 3]  616 	pha
+   03C7 BD 01 01      [ 5]  617 	lda	0x101,x
+   03CA 48            [ 3]  618 	pha
+   03CB A9s00         [ 2]  619 	lda	#>___str_0
+   03CD 48            [ 3]  620 	pha
+   03CE A9r32         [ 2]  621 	lda	#___str_0
+   03D0 48            [ 3]  622 	pha
+   03D1 A9s00         [ 2]  623 	lda	#>_ascTimeBuffer
+   03D3 48            [ 3]  624 	pha
+   03D4 A9r00         [ 2]  625 	lda	#_ascTimeBuffer
+   03D6 48            [ 3]  626 	pha
+   03D7 20r00r00      [ 6]  627 	jsr	_sprintf
+   03DA 85*00         [ 3]  628 	sta	*(__TEMP+0)
+   03DC 86*01         [ 3]  629 	stx	*(__TEMP+1)
+   03DE BA            [ 2]  630 	tsx
+   03DF 8A            [ 2]  631 	txa
+   03E0 18            [ 2]  632 	clc
+   03E1 69 12         [ 2]  633 	adc	#0x12
+   03E3 AA            [ 2]  634 	tax
+   03E4 9A            [ 2]  635 	txs
+                            636 ;	../time.c: 101: return ascTimeBuffer;
+   03E5 A2s00         [ 2]  637 	ldx	#>_ascTimeBuffer
+   03E7 A9r00         [ 2]  638 	lda	#_ascTimeBuffer
+                            639 ;	../time.c: 102: }
+   03E9 85*00         [ 3]  640 	sta	*(__TEMP+0)
+   03EB 86*01         [ 3]  641 	stx	*(__TEMP+1)
+   03ED BA            [ 2]  642 	tsx
+   03EE 8A            [ 2]  643 	txa
+   03EF 18            [ 2]  644 	clc
+   03F0 69 10         [ 2]  645 	adc	#0x10
+   03F2 AA            [ 2]  646 	tax
+   03F3 9A            [ 2]  647 	txs
+   03F4 A6*01         [ 3]  648 	ldx	*(__TEMP+1)
+   03F6 A5*00         [ 3]  649 	lda	*(__TEMP+0)
+   03F8 60            [ 6]  650 	rts
+                            651 ;------------------------------------------------------------
+                            652 ;Allocation info for local variables in function 'ctime'
+                            653 ;------------------------------------------------------------
+                            654 ;timep                     Allocated to registers a x 
+                            655 ;------------------------------------------------------------
+                            656 ;	../time.c: 104: char *ctime(time_t *timep) {
+                            657 ;	-----------------------------------------
+                            658 ;	 function ctime
+                            659 ;	-----------------------------------------
+                            660 ;	Register assignment is optimal.
+                            661 ;	Stack space usage: 0 bytes.
+   03F9                     662 _ctime:
+                            663 ;	../time.c: 105: return asctime(localtime(timep));
+   03F9 20rFFr03      [ 6]  664 	jsr	_localtime
+                            665 ;	../time.c: 106: }
+   03FC 4Cr33r02      [ 3]  666 	jmp	_asctime
+                            667 ;------------------------------------------------------------
+                            668 ;Allocation info for local variables in function 'localtime'
+                            669 ;------------------------------------------------------------
+                            670 ;timep                     Allocated to registers a x 
+                            671 ;------------------------------------------------------------
+                            672 ;	../time.c: 121: struct tm *localtime(time_t *timep) {
+                            673 ;	-----------------------------------------
+                            674 ;	 function localtime
+                            675 ;	-----------------------------------------
+                            676 ;	Register assignment is optimal.
+                            677 ;	Stack space usage: 0 bytes.
+   03FF                     678 _localtime:
+                            679 ;	../time.c: 122: return gmtime(timep);
+                            680 ;	../time.c: 123: }
+   03FF 4Cr02r04      [ 3]  681 	jmp	_gmtime
+                            682 ;------------------------------------------------------------
+                            683 ;Allocation info for local variables in function 'gmtime'
+                            684 ;------------------------------------------------------------
+                            685 ;timep                     Allocated to registers a x 
+                            686 ;epoch                     Allocated to stack - sp +5
+                            687 ;year                      Allocated to stack - sp +22
+                            688 ;month                     Allocated to stack - sp +21
+                            689 ;monthLength               Allocated to registers y 
+                            690 ;days                      Allocated to stack - sp +1
+                            691 ;sloc0                     Allocated to stack - sp +17
+                            692 ;sloc1                     Allocated to stack - sp +13
+                            693 ;sloc2                     Allocated to stack - sp +9
+                            694 ;------------------------------------------------------------
+                            695 ;	../time.c: 125: struct tm *gmtime(time_t *timep) {
+                            696 ;	-----------------------------------------
+                            697 ;	 function gmtime
+                            698 ;	-----------------------------------------
+                            699 ;	Register assignment is optimal.
+                            700 ;	Stack space usage: 23 bytes.
+   0402                     701 _gmtime:
+   0402 85*00         [ 3]  702 	sta	*(__TEMP+0)
+   0404 86*01         [ 3]  703 	stx	*(__TEMP+1)
+   0406 BA            [ 2]  704 	tsx
+   0407 8A            [ 2]  705 	txa
+   0408 18            [ 2]  706 	clc
+   0409 69 E9         [ 2]  707 	adc	#0xe9
+   040B AA            [ 2]  708 	tax
+   040C 9A            [ 2]  709 	txs
+   040D A6*01         [ 3]  710 	ldx	*(__TEMP+1)
+   040F A5*00         [ 3]  711 	lda	*(__TEMP+0)
+                            712 ;	../time.c: 126: unsigned long epoch=*timep;
+   0411 85*00         [ 3]  713 	sta	*(__DPTR+0)
+   0413 86*01         [ 3]  714 	stx	*(__DPTR+1)
+   0415 A0 00         [ 2]  715 	ldy	#0x00
+   0417 B1*00         [ 6]  716 	lda	[__DPTR],y
+   0419 BA            [ 2]  717 	tsx
+   041A 9D 11 01      [ 5]  718 	sta	0x111,x
+   041D C8            [ 2]  719 	iny
+   041E B1*00         [ 6]  720 	lda	[__DPTR],y
+   0420 9D 12 01      [ 5]  721 	sta	0x112,x
+   0423 C8            [ 2]  722 	iny
+   0424 B1*00         [ 6]  723 	lda	[__DPTR],y
+   0426 9D 13 01      [ 5]  724 	sta	0x113,x
+   0429 C8            [ 2]  725 	iny
+   042A B1*00         [ 6]  726 	lda	[__DPTR],y
+   042C 9D 14 01      [ 5]  727 	sta	0x114,x
+                            728 ;	../time.c: 131: lastTime.tm_sec=epoch%60;
+   042F A9 00         [ 2]  729 	lda	#0x00
+   0431 48            [ 3]  730 	pha
+   0432 48            [ 3]  731 	pha
+   0433 48            [ 3]  732 	pha
+   0434 A9 3C         [ 2]  733 	lda	#0x3c
+   0436 48            [ 3]  734 	pha
+   0437 BD 14 01      [ 5]  735 	lda	0x114,x
+   043A 48            [ 3]  736 	pha
+   043B BD 13 01      [ 5]  737 	lda	0x113,x
+   043E 48            [ 3]  738 	pha
+   043F BD 12 01      [ 5]  739 	lda	0x112,x
+   0442 48            [ 3]  740 	pha
+   0443 BD 11 01      [ 5]  741 	lda	0x111,x
+   0446 48            [ 3]  742 	pha
+   0447 20r00r00      [ 6]  743 	jsr	__modulong
+   044A 86*00         [ 3]  744 	stx	*(__TEMP+0)
+   044C BA            [ 2]  745 	tsx
+   044D 9D 15 01      [ 5]  746 	sta	0x115,x
+   0450 A6*00         [ 3]  747 	ldx	*(__TEMP+0)
+   0452 8A            [ 2]  748 	txa
+   0453 BA            [ 2]  749 	tsx
+   0454 9D 16 01      [ 5]  750 	sta	0x116,x
+   0457 A6*00         [ 3]  751 	ldx	*(__TEMP+0)
+   0459 A5*00         [ 3]  752 	lda	*___SDCC_m6502_ret2
+   045B BA            [ 2]  753 	tsx
+   045C 9D 17 01      [ 5]  754 	sta	0x117,x
+   045F A5*00         [ 3]  755 	lda	*___SDCC_m6502_ret3
+   0461 9D 18 01      [ 5]  756 	sta	0x118,x
+   0464 85*00         [ 3]  757 	sta	*(__TEMP+0)
+   0466 86*01         [ 3]  758 	stx	*(__TEMP+1)
+   0468 BA            [ 2]  759 	tsx
+   0469 8A            [ 2]  760 	txa
+   046A 18            [ 2]  761 	clc
+   046B 69 08         [ 2]  762 	adc	#0x08
+   046D AA            [ 2]  763 	tax
+   046E 9A            [ 2]  764 	txs
+   046F A6*01         [ 3]  765 	ldx	*(__TEMP+1)
+   0471 A5*00         [ 3]  766 	lda	*(__TEMP+0)
+   0473 BA            [ 2]  767 	tsx
+   0474 BD 0D 01      [ 5]  768 	lda	0x10d,x
+   0477 8Dr20r00      [ 4]  769 	sta	_lastTime
+                            770 ;	../time.c: 132: epoch/=60; // now it is minutes
+   047A A9 00         [ 2]  771 	lda	#0x00
+   047C 48            [ 3]  772 	pha
+   047D 48            [ 3]  773 	pha
+   047E 48            [ 3]  774 	pha
+   047F A9 3C         [ 2]  775 	lda	#0x3c
+   0481 48            [ 3]  776 	pha
+   0482 BD 14 01      [ 5]  777 	lda	0x114,x
+   0485 48            [ 3]  778 	pha
+   0486 BD 13 01      [ 5]  779 	lda	0x113,x
+   0489 48            [ 3]  780 	pha
+   048A BD 12 01      [ 5]  781 	lda	0x112,x
+   048D 48            [ 3]  782 	pha
+   048E BD 11 01      [ 5]  783 	lda	0x111,x
+   0491 48            [ 3]  784 	pha
+                            785 ;	../time.c: 133: lastTime.tm_min=epoch%60;
+   0492 20r00r00      [ 6]  786 	jsr	__divulong
+   0495 86*00         [ 3]  787 	stx	*(__TEMP+0)
+   0497 BA            [ 2]  788 	tsx
+   0498 9D 15 01      [ 5]  789 	sta	0x115,x
+   049B A6*00         [ 3]  790 	ldx	*(__TEMP+0)
+   049D 8A            [ 2]  791 	txa
+   049E BA            [ 2]  792 	tsx
+   049F 9D 16 01      [ 5]  793 	sta	0x116,x
+   04A2 A6*00         [ 3]  794 	ldx	*(__TEMP+0)
+   04A4 A5*00         [ 3]  795 	lda	*___SDCC_m6502_ret2
+   04A6 BA            [ 2]  796 	tsx
+   04A7 9D 17 01      [ 5]  797 	sta	0x117,x
+   04AA A5*00         [ 3]  798 	lda	*___SDCC_m6502_ret3
+   04AC 9D 18 01      [ 5]  799 	sta	0x118,x
+   04AF 85*00         [ 3]  800 	sta	*(__TEMP+0)
+   04B1 86*01         [ 3]  801 	stx	*(__TEMP+1)
+   04B3 BA            [ 2]  802 	tsx
+   04B4 8A            [ 2]  803 	txa
+   04B5 18            [ 2]  804 	clc
+   04B6 69 08         [ 2]  805 	adc	#0x08
+   04B8 AA            [ 2]  806 	tax
+   04B9 9A            [ 2]  807 	txs
+   04BA A6*01         [ 3]  808 	ldx	*(__TEMP+1)
+   04BC A9 00         [ 2]  809 	lda	#0x00
+   04BE 48            [ 3]  810 	pha
+   04BF 48            [ 3]  811 	pha
+   04C0 48            [ 3]  812 	pha
+   04C1 A9 3C         [ 2]  813 	lda	#0x3c
+   04C3 48            [ 3]  814 	pha
+   04C4 BA            [ 2]  815 	tsx
+   04C5 BD 14 01      [ 5]  816 	lda	0x114,x
+   04C8 48            [ 3]  817 	pha
+   04C9 BD 13 01      [ 5]  818 	lda	0x113,x
+   04CC 48            [ 3]  819 	pha
+   04CD BD 12 01      [ 5]  820 	lda	0x112,x
+   04D0 48            [ 3]  821 	pha
+   04D1 BD 11 01      [ 5]  822 	lda	0x111,x
+   04D4 48            [ 3]  823 	pha
+   04D5 20r00r00      [ 6]  824 	jsr	__modulong
+   04D8 86*00         [ 3]  825 	stx	*(__TEMP+0)
+   04DA BA            [ 2]  826 	tsx
+   04DB 9D 19 01      [ 5]  827 	sta	0x119,x
+   04DE A6*00         [ 3]  828 	ldx	*(__TEMP+0)
+   04E0 8A            [ 2]  829 	txa
+   04E1 BA            [ 2]  830 	tsx
+   04E2 9D 1A 01      [ 5]  831 	sta	0x11a,x
+   04E5 A6*00         [ 3]  832 	ldx	*(__TEMP+0)
+   04E7 A5*00         [ 3]  833 	lda	*___SDCC_m6502_ret2
+   04E9 BA            [ 2]  834 	tsx
+   04EA 9D 1B 01      [ 5]  835 	sta	0x11b,x
+   04ED A5*00         [ 3]  836 	lda	*___SDCC_m6502_ret3
+   04EF 9D 1C 01      [ 5]  837 	sta	0x11c,x
+   04F2 85*00         [ 3]  838 	sta	*(__TEMP+0)
+   04F4 86*01         [ 3]  839 	stx	*(__TEMP+1)
+   04F6 BA            [ 2]  840 	tsx
+   04F7 8A            [ 2]  841 	txa
+   04F8 18            [ 2]  842 	clc
+   04F9 69 08         [ 2]  843 	adc	#0x08
+   04FB AA            [ 2]  844 	tax
+   04FC 9A            [ 2]  845 	txs
+   04FD A6*01         [ 3]  846 	ldx	*(__TEMP+1)
+   04FF A5*00         [ 3]  847 	lda	*(__TEMP+0)
+   0501 BA            [ 2]  848 	tsx
+   0502 BD 11 01      [ 5]  849 	lda	0x111,x
+   0505 8Dr21r00      [ 4]  850 	sta	(_lastTime + 0x0001)
+                            851 ;	../time.c: 134: epoch/=60; // now it is hours
+   0508 A9 00         [ 2]  852 	lda	#0x00
+   050A 48            [ 3]  853 	pha
+   050B 48            [ 3]  854 	pha
+   050C 48            [ 3]  855 	pha
+   050D A9 3C         [ 2]  856 	lda	#0x3c
+   050F 48            [ 3]  857 	pha
+   0510 BD 10 01      [ 5]  858 	lda	0x110,x
+   0513 48            [ 3]  859 	pha
+   0514 BD 0F 01      [ 5]  860 	lda	0x10f,x
+   0517 48            [ 3]  861 	pha
+   0518 BD 0E 01      [ 5]  862 	lda	0x10e,x
+   051B 48            [ 3]  863 	pha
+   051C BD 0D 01      [ 5]  864 	lda	0x10d,x
+   051F 48            [ 3]  865 	pha
+                            866 ;	../time.c: 135: lastTime.tm_hour=epoch%24;
+   0520 20r00r00      [ 6]  867 	jsr	__divulong
+   0523 86*00         [ 3]  868 	stx	*(__TEMP+0)
+   0525 BA            [ 2]  869 	tsx
+   0526 9D 15 01      [ 5]  870 	sta	0x115,x
+   0529 A6*00         [ 3]  871 	ldx	*(__TEMP+0)
+   052B 8A            [ 2]  872 	txa
+   052C BA            [ 2]  873 	tsx
+   052D 9D 16 01      [ 5]  874 	sta	0x116,x
+   0530 A6*00         [ 3]  875 	ldx	*(__TEMP+0)
+   0532 A5*00         [ 3]  876 	lda	*___SDCC_m6502_ret2
+   0534 BA            [ 2]  877 	tsx
+   0535 9D 17 01      [ 5]  878 	sta	0x117,x
+   0538 A5*00         [ 3]  879 	lda	*___SDCC_m6502_ret3
+   053A 9D 18 01      [ 5]  880 	sta	0x118,x
+   053D 85*00         [ 3]  881 	sta	*(__TEMP+0)
+   053F 86*01         [ 3]  882 	stx	*(__TEMP+1)
+   0541 BA            [ 2]  883 	tsx
+   0542 8A            [ 2]  884 	txa
+   0543 18            [ 2]  885 	clc
+   0544 69 08         [ 2]  886 	adc	#0x08
+   0546 AA            [ 2]  887 	tax
+   0547 9A            [ 2]  888 	txs
+   0548 A6*01         [ 3]  889 	ldx	*(__TEMP+1)
+   054A A9 00         [ 2]  890 	lda	#0x00
+   054C 48            [ 3]  891 	pha
+   054D 48            [ 3]  892 	pha
+   054E 48            [ 3]  893 	pha
+   054F A9 18         [ 2]  894 	lda	#0x18
+   0551 48            [ 3]  895 	pha
+   0552 BA            [ 2]  896 	tsx
+   0553 BD 14 01      [ 5]  897 	lda	0x114,x
+   0556 48            [ 3]  898 	pha
+   0557 BD 13 01      [ 5]  899 	lda	0x113,x
+   055A 48            [ 3]  900 	pha
+   055B BD 12 01      [ 5]  901 	lda	0x112,x
+   055E 48            [ 3]  902 	pha
+   055F BD 11 01      [ 5]  903 	lda	0x111,x
+   0562 48            [ 3]  904 	pha
+   0563 20r00r00      [ 6]  905 	jsr	__modulong
+   0566 86*00         [ 3]  906 	stx	*(__TEMP+0)
+   0568 BA            [ 2]  907 	tsx
+   0569 9D 19 01      [ 5]  908 	sta	0x119,x
+   056C A6*00         [ 3]  909 	ldx	*(__TEMP+0)
+   056E 8A            [ 2]  910 	txa
+   056F BA            [ 2]  911 	tsx
+   0570 9D 1A 01      [ 5]  912 	sta	0x11a,x
+   0573 A6*00         [ 3]  913 	ldx	*(__TEMP+0)
+   0575 A5*00         [ 3]  914 	lda	*___SDCC_m6502_ret2
+   0577 BA            [ 2]  915 	tsx
+   0578 9D 1B 01      [ 5]  916 	sta	0x11b,x
+   057B A5*00         [ 3]  917 	lda	*___SDCC_m6502_ret3
+   057D 9D 1C 01      [ 5]  918 	sta	0x11c,x
+   0580 85*00         [ 3]  919 	sta	*(__TEMP+0)
+   0582 86*01         [ 3]  920 	stx	*(__TEMP+1)
+   0584 BA            [ 2]  921 	tsx
+   0585 8A            [ 2]  922 	txa
+   0586 18            [ 2]  923 	clc
+   0587 69 08         [ 2]  924 	adc	#0x08
+   0589 AA            [ 2]  925 	tax
+   058A 9A            [ 2]  926 	txs
+   058B A6*01         [ 3]  927 	ldx	*(__TEMP+1)
+   058D A5*00         [ 3]  928 	lda	*(__TEMP+0)
+   058F BA            [ 2]  929 	tsx
+   0590 BD 11 01      [ 5]  930 	lda	0x111,x
+   0593 8Dr22r00      [ 4]  931 	sta	(_lastTime + 0x0002)
+                            932 ;	../time.c: 136: epoch/=24; // now it is days
+   0596 A9 00         [ 2]  933 	lda	#0x00
+   0598 48            [ 3]  934 	pha
+   0599 48            [ 3]  935 	pha
+   059A 48            [ 3]  936 	pha
+   059B A9 18         [ 2]  937 	lda	#0x18
+   059D 48            [ 3]  938 	pha
+   059E BD 10 01      [ 5]  939 	lda	0x110,x
+   05A1 48            [ 3]  940 	pha
+   05A2 BD 0F 01      [ 5]  941 	lda	0x10f,x
+   05A5 48            [ 3]  942 	pha
+   05A6 BD 0E 01      [ 5]  943 	lda	0x10e,x
+   05A9 48            [ 3]  944 	pha
+   05AA BD 0D 01      [ 5]  945 	lda	0x10d,x
+   05AD 48            [ 3]  946 	pha
+                            947 ;	../time.c: 137: lastTime.tm_wday=(epoch+4)%7;
+   05AE 20r00r00      [ 6]  948 	jsr	__divulong
+   05B1 86*00         [ 3]  949 	stx	*(__TEMP+0)
+   05B3 BA            [ 2]  950 	tsx
+   05B4 9D 15 01      [ 5]  951 	sta	0x115,x
+   05B7 A6*00         [ 3]  952 	ldx	*(__TEMP+0)
+   05B9 8A            [ 2]  953 	txa
+   05BA BA            [ 2]  954 	tsx
+   05BB 9D 16 01      [ 5]  955 	sta	0x116,x
+   05BE A6*00         [ 3]  956 	ldx	*(__TEMP+0)
+   05C0 A5*00         [ 3]  957 	lda	*___SDCC_m6502_ret2
+   05C2 BA            [ 2]  958 	tsx
+   05C3 9D 17 01      [ 5]  959 	sta	0x117,x
+   05C6 A5*00         [ 3]  960 	lda	*___SDCC_m6502_ret3
+   05C8 9D 18 01      [ 5]  961 	sta	0x118,x
+   05CB 85*00         [ 3]  962 	sta	*(__TEMP+0)
+   05CD 86*01         [ 3]  963 	stx	*(__TEMP+1)
+   05CF BA            [ 2]  964 	tsx
+   05D0 8A            [ 2]  965 	txa
+   05D1 18            [ 2]  966 	clc
+   05D2 69 08         [ 2]  967 	adc	#0x08
+   05D4 AA            [ 2]  968 	tax
+   05D5 9A            [ 2]  969 	txs
+   05D6 A6*01         [ 3]  970 	ldx	*(__TEMP+1)
+   05D8 A5*00         [ 3]  971 	lda	*(__TEMP+0)
+   05DA BA            [ 2]  972 	tsx
+   05DB BD 0D 01      [ 5]  973 	lda	0x10d,x
+   05DE 18            [ 2]  974 	clc
+   05DF 69 04         [ 2]  975 	adc	#0x04
+   05E1 9D 11 01      [ 5]  976 	sta	0x111,x
+   05E4 BD 0E 01      [ 5]  977 	lda	0x10e,x
+   05E7 69 00         [ 2]  978 	adc	#0x00
+   05E9 9D 12 01      [ 5]  979 	sta	0x112,x
+   05EC BD 0F 01      [ 5]  980 	lda	0x10f,x
+   05EF 69 00         [ 2]  981 	adc	#0x00
+   05F1 9D 13 01      [ 5]  982 	sta	0x113,x
+   05F4 BD 10 01      [ 5]  983 	lda	0x110,x
+   05F7 69 00         [ 2]  984 	adc	#0x00
+   05F9 9D 14 01      [ 5]  985 	sta	0x114,x
+   05FC A9 00         [ 2]  986 	lda	#0x00
+   05FE 48            [ 3]  987 	pha
+   05FF 48            [ 3]  988 	pha
+   0600 48            [ 3]  989 	pha
+   0601 A9 07         [ 2]  990 	lda	#0x07
+   0603 48            [ 3]  991 	pha
+   0604 BD 14 01      [ 5]  992 	lda	0x114,x
+   0607 48            [ 3]  993 	pha
+   0608 BD 13 01      [ 5]  994 	lda	0x113,x
+   060B 48            [ 3]  995 	pha
+   060C BD 12 01      [ 5]  996 	lda	0x112,x
+   060F 48            [ 3]  997 	pha
+   0610 BD 11 01      [ 5]  998 	lda	0x111,x
+   0613 48            [ 3]  999 	pha
+   0614 20r00r00      [ 6] 1000 	jsr	__modulong
+   0617 86*00         [ 3] 1001 	stx	*(__TEMP+0)
+   0619 BA            [ 2] 1002 	tsx
+   061A 9D 19 01      [ 5] 1003 	sta	0x119,x
+   061D A6*00         [ 3] 1004 	ldx	*(__TEMP+0)
+   061F 8A            [ 2] 1005 	txa
+   0620 BA            [ 2] 1006 	tsx
+   0621 9D 1A 01      [ 5] 1007 	sta	0x11a,x
+   0624 A6*00         [ 3] 1008 	ldx	*(__TEMP+0)
+   0626 A5*00         [ 3] 1009 	lda	*___SDCC_m6502_ret2
+   0628 BA            [ 2] 1010 	tsx
+   0629 9D 1B 01      [ 5] 1011 	sta	0x11b,x
+   062C A5*00         [ 3] 1012 	lda	*___SDCC_m6502_ret3
+   062E 9D 1C 01      [ 5] 1013 	sta	0x11c,x
+   0631 85*00         [ 3] 1014 	sta	*(__TEMP+0)
+   0633 86*01         [ 3] 1015 	stx	*(__TEMP+1)
+   0635 BA            [ 2] 1016 	tsx
+   0636 8A            [ 2] 1017 	txa
+   0637 18            [ 2] 1018 	clc
+   0638 69 08         [ 2] 1019 	adc	#0x08
+   063A AA            [ 2] 1020 	tax
+   063B 9A            [ 2] 1021 	txs
+   063C A6*01         [ 3] 1022 	ldx	*(__TEMP+1)
+   063E A5*00         [ 3] 1023 	lda	*(__TEMP+0)
+   0640 BA            [ 2] 1024 	tsx
+   0641 BD 11 01      [ 5] 1025 	lda	0x111,x
+   0644 8Dr27r00      [ 4] 1026 	sta	(_lastTime + 0x0007)
+                           1027 ;	../time.c: 140: days=0;
+   0647 A9 00         [ 2] 1028 	lda	#0x00
+   0649 9D 01 01      [ 5] 1029 	sta	0x101,x
+   064C 9D 02 01      [ 5] 1030 	sta	0x102,x
+   064F 9D 03 01      [ 5] 1031 	sta	0x103,x
+   0652 9D 04 01      [ 5] 1032 	sta	0x104,x
+                           1033 ;	../time.c: 141: while((days += (LEAP_YEAR(year) ? 366 : 365)) <= epoch) {
+   0655 A9 B2         [ 2] 1034 	lda	#0xb2
+   0657 9D 16 01      [ 5] 1035 	sta	0x116,x
+   065A A9 07         [ 2] 1036 	lda	#0x07
+   065C 9D 17 01      [ 5] 1037 	sta	0x117,x
+   065F                    1038 00101$:
+   065F BA            [ 2] 1039 	tsx
+   0660 A9 03         [ 2] 1040 	lda	#0x03
+   0662 3D 16 01      [ 5] 1041 	and	0x116,x
+   0665 D0 07         [ 4] 1042 	bne	00118$
+   0667 A9 6E         [ 2] 1043 	lda	#0x6e
+   0669 A2 01         [ 2] 1044 	ldx	#0x01
+   066B 4Cr72r06      [ 3] 1045 	jmp	00119$
+   066E                    1046 00118$:
+   066E A9 6D         [ 2] 1047 	lda	#0x6d
+   0670 A2 01         [ 2] 1048 	ldx	#0x01
+   0672                    1049 00119$:
+   0672 48            [ 3] 1050 	pha
+   0673 8A            [ 2] 1051 	txa
+   0674 BA            [ 2] 1052 	tsx
+   0675 9D 13 01      [ 5] 1053 	sta	0x113,x
+   0678 68            [ 4] 1054 	pla
+   0679 9D 12 01      [ 5] 1055 	sta	0x112,x
+   067C BD 13 01      [ 5] 1056 	lda	0x113,x
+   067F 0A            [ 2] 1057 	asl	a
+   0680 A9 00         [ 2] 1058 	lda	#0x00
+   0682 69 FF         [ 2] 1059 	adc	#0xff
+   0684 49 FF         [ 2] 1060 	eor	#0xff
+   0686 9D 14 01      [ 5] 1061 	sta	0x114,x
+   0689 9D 15 01      [ 5] 1062 	sta	0x115,x
+   068C BD 02 01      [ 5] 1063 	lda	0x102,x
+   068F 18            [ 2] 1064 	clc
+   0690 7D 12 01      [ 5] 1065 	adc	0x112,x
+   0693 9D 12 01      [ 5] 1066 	sta	0x112,x
+   0696 BD 03 01      [ 5] 1067 	lda	0x103,x
+   0699 7D 13 01      [ 5] 1068 	adc	0x113,x
+   069C 9D 13 01      [ 5] 1069 	sta	0x113,x
+   069F BD 04 01      [ 5] 1070 	lda	0x104,x
+   06A2 7D 14 01      [ 5] 1071 	adc	0x114,x
+   06A5 9D 14 01      [ 5] 1072 	sta	0x114,x
+   06A8 BD 05 01      [ 5] 1073 	lda	0x105,x
+   06AB 7D 15 01      [ 5] 1074 	adc	0x115,x
+   06AE 9D 15 01      [ 5] 1075 	sta	0x115,x
+   06B1 BD 12 01      [ 5] 1076 	lda	0x112,x
+   06B4 9D 02 01      [ 5] 1077 	sta	0x102,x
+   06B7 BD 13 01      [ 5] 1078 	lda	0x113,x
+   06BA 9D 03 01      [ 5] 1079 	sta	0x103,x
+   06BD BD 14 01      [ 5] 1080 	lda	0x114,x
+   06C0 9D 04 01      [ 5] 1081 	sta	0x104,x
+   06C3 BD 15 01      [ 5] 1082 	lda	0x115,x
+   06C6 9D 05 01      [ 5] 1083 	sta	0x105,x
+   06C9 BD 0E 01      [ 5] 1084 	lda	0x10e,x
+   06CC 38            [ 2] 1085 	sec
+   06CD FD 12 01      [ 5] 1086 	sbc	0x112,x
+   06D0 BD 0F 01      [ 5] 1087 	lda	0x10f,x
+   06D3 FD 13 01      [ 5] 1088 	sbc	0x113,x
+   06D6 BD 10 01      [ 5] 1089 	lda	0x110,x
+   06D9 FD 14 01      [ 5] 1090 	sbc	0x114,x
+   06DC BD 11 01      [ 5] 1091 	lda	0x111,x
+   06DF FD 15 01      [ 5] 1092 	sbc	0x115,x
+   06E2 90 14         [ 4] 1093 	bcc	00103$
+                           1094 ;	../time.c: 142: year++;
+   06E4 BD 17 01      [ 5] 1095 	lda	0x117,x
+   06E7 18            [ 2] 1096 	clc
+   06E8 69 01         [ 2] 1097 	adc	#0x01
+   06EA 9D 17 01      [ 5] 1098 	sta	0x117,x
+   06ED BD 18 01      [ 5] 1099 	lda	0x118,x
+   06F0 69 00         [ 2] 1100 	adc	#0x00
+   06F2 9D 18 01      [ 5] 1101 	sta	0x118,x
+   06F5 4Cr5Fr06      [ 3] 1102 	jmp	00101$
+   06F8                    1103 00103$:
+                           1104 ;	../time.c: 144: lastTime.tm_year=year-1900;
+   06F8 BA            [ 2] 1105 	tsx
+   06F9 BD 16 01      [ 5] 1106 	lda	0x116,x
+   06FC 38            [ 2] 1107 	sec
+   06FD E9 6C         [ 2] 1108 	sbc	#0x6c
+   06FF 48            [ 3] 1109 	pha
+   0700 BD 17 01      [ 5] 1110 	lda	0x117,x
+   0703 E9 07         [ 2] 1111 	sbc	#0x07
+   0705 AA            [ 2] 1112 	tax
+   0706 68            [ 4] 1113 	pla
+   0707 8Er26r00      [ 4] 1114 	stx	((_lastTime + 0x0005) + 1)
+   070A 8Dr25r00      [ 4] 1115 	sta	(_lastTime + 0x0005)
+                           1116 ;	../time.c: 146: days -= LEAP_YEAR(year) ? 366 : 365;
+   070D BA            [ 2] 1117 	tsx
+   070E BD 16 01      [ 5] 1118 	lda	0x116,x
+   0711 29 03         [ 2] 1119 	and	#0x03
+   0713 9D 11 01      [ 5] 1120 	sta	0x111,x
+   0716 48            [ 3] 1121 	pha
+   0717 A9 00         [ 2] 1122 	lda	#0x00
+   0719 9D 12 01      [ 5] 1123 	sta	0x112,x
+   071C 68            [ 4] 1124 	pla
+   071D BD 11 01      [ 5] 1125 	lda	0x111,x
+   0720 1D 12 01      [ 5] 1126 	ora	0x112,x
+   0723 D0 07         [ 4] 1127 	bne	00120$
+   0725 A9 6E         [ 2] 1128 	lda	#0x6e
+   0727 A2 01         [ 2] 1129 	ldx	#0x01
+   0729 4Cr30r07      [ 3] 1130 	jmp	00121$
+   072C                    1131 00120$:
+   072C A9 6D         [ 2] 1132 	lda	#0x6d
+   072E A2 01         [ 2] 1133 	ldx	#0x01
+   0730                    1134 00121$:
+   0730 48            [ 3] 1135 	pha
+   0731 8A            [ 2] 1136 	txa
+   0732 BA            [ 2] 1137 	tsx
+   0733 9D 0B 01      [ 5] 1138 	sta	0x10b,x
+   0736 68            [ 4] 1139 	pla
+   0737 9D 0A 01      [ 5] 1140 	sta	0x10a,x
+   073A BD 0B 01      [ 5] 1141 	lda	0x10b,x
+   073D 0A            [ 2] 1142 	asl	a
+   073E A9 00         [ 2] 1143 	lda	#0x00
+   0740 69 FF         [ 2] 1144 	adc	#0xff
+   0742 49 FF         [ 2] 1145 	eor	#0xff
+   0744 9D 0C 01      [ 5] 1146 	sta	0x10c,x
+   0747 9D 0D 01      [ 5] 1147 	sta	0x10d,x
+   074A BD 02 01      [ 5] 1148 	lda	0x102,x
+   074D 38            [ 2] 1149 	sec
+   074E FD 0A 01      [ 5] 1150 	sbc	0x10a,x
+   0751 9D 02 01      [ 5] 1151 	sta	0x102,x
+   0754 BD 03 01      [ 5] 1152 	lda	0x103,x
+   0757 FD 0B 01      [ 5] 1153 	sbc	0x10b,x
+   075A 9D 03 01      [ 5] 1154 	sta	0x103,x
+   075D BD 04 01      [ 5] 1155 	lda	0x104,x
+   0760 FD 0C 01      [ 5] 1156 	sbc	0x10c,x
+   0763 9D 04 01      [ 5] 1157 	sta	0x104,x
+   0766 BD 05 01      [ 5] 1158 	lda	0x105,x
+   0769 FD 0D 01      [ 5] 1159 	sbc	0x10d,x
+   076C 9D 05 01      [ 5] 1160 	sta	0x105,x
+                           1161 ;	../time.c: 147: epoch -= days; // now it is days in this year, starting at 0
+   076F BD 0E 01      [ 5] 1162 	lda	0x10e,x
+   0772 38            [ 2] 1163 	sec
+   0773 FD 02 01      [ 5] 1164 	sbc	0x102,x
+   0776 9D 0A 01      [ 5] 1165 	sta	0x10a,x
+   0779 BD 0F 01      [ 5] 1166 	lda	0x10f,x
+   077C FD 03 01      [ 5] 1167 	sbc	0x103,x
+   077F 9D 0B 01      [ 5] 1168 	sta	0x10b,x
+   0782 BD 10 01      [ 5] 1169 	lda	0x110,x
+   0785 FD 04 01      [ 5] 1170 	sbc	0x104,x
+   0788 9D 0C 01      [ 5] 1171 	sta	0x10c,x
+   078B BD 11 01      [ 5] 1172 	lda	0x111,x
+   078E FD 05 01      [ 5] 1173 	sbc	0x105,x
+   0791 9D 0D 01      [ 5] 1174 	sta	0x10d,x
+   0794 BD 0A 01      [ 5] 1175 	lda	0x10a,x
+   0797 9D 06 01      [ 5] 1176 	sta	0x106,x
+   079A BD 0B 01      [ 5] 1177 	lda	0x10b,x
+   079D 9D 07 01      [ 5] 1178 	sta	0x107,x
+   07A0 BD 0C 01      [ 5] 1179 	lda	0x10c,x
+   07A3 9D 08 01      [ 5] 1180 	sta	0x108,x
+   07A6 BD 0D 01      [ 5] 1181 	lda	0x10d,x
+   07A9 9D 09 01      [ 5] 1182 	sta	0x109,x
+                           1183 ;	../time.c: 148: lastTime.tm_yday=epoch;
+   07AC BD 0A 01      [ 5] 1184 	lda	0x10a,x
+   07AF 85*00         [ 3] 1185 	sta	*(__TEMP+0)
+   07B1 BD 0B 01      [ 5] 1186 	lda	0x10b,x
+   07B4 AA            [ 2] 1187 	tax
+   07B5 A5*00         [ 3] 1188 	lda	*(__TEMP+0)
+   07B7 8Er29r00      [ 4] 1189 	stx	((_lastTime + 0x0008) + 1)
+   07BA 8Dr28r00      [ 4] 1190 	sta	(_lastTime + 0x0008)
+                           1191 ;	../time.c: 153: for (month=0; month<12; month++) {
+   07BD BA            [ 2] 1192 	tsx
+   07BE A9 00         [ 2] 1193 	lda	#0x00
+   07C0 9D 15 01      [ 5] 1194 	sta	0x115,x
+   07C3                    1195 00114$:
+                           1196 ;	../time.c: 154: if (month==1) { // februari
+   07C3 BA            [ 2] 1197 	tsx
+   07C4 BD 15 01      [ 5] 1198 	lda	0x115,x
+   07C7 C9 01         [ 2] 1199 	cmp	#0x01
+   07C9 D0 12         [ 4] 1200 	bne	00108$
+                           1201 ;	../time.c: 155: if (LEAP_YEAR(year)) {
+   07CB BD 11 01      [ 5] 1202 	lda	0x111,x
+   07CE 1D 12 01      [ 5] 1203 	ora	0x112,x
+   07D1 D0 05         [ 4] 1204 	bne	00105$
+                           1205 ;	../time.c: 156: monthLength=29;
+   07D3 A0 1D         [ 2] 1206 	ldy	#0x1d
+   07D5 4CrE5r07      [ 3] 1207 	jmp	00109$
+   07D8                    1208 00105$:
+                           1209 ;	../time.c: 158: monthLength=28;
+   07D8 A0 1C         [ 2] 1210 	ldy	#0x1c
+   07DA 4CrE5r07      [ 3] 1211 	jmp	00109$
+   07DD                    1212 00108$:
+                           1213 ;	../time.c: 161: monthLength = monthDays[month];
+   07DD BA            [ 2] 1214 	tsx
+   07DE BD 15 01      [ 5] 1215 	lda	0x115,x
+   07E1 AA            [ 2] 1216 	tax
+   07E2 BCr00r00      [ 5] 1217 	ldy	(_monthDays+0+0x0000),x
+   07E5                    1218 00109$:
+                           1219 ;	../time.c: 164: if (epoch>=monthLength) {
+   07E5 BA            [ 2] 1220 	tsx
+   07E6 98            [ 2] 1221 	tya
+   07E7 9D 09 01      [ 5] 1222 	sta	0x109,x
+   07EA A9 00         [ 2] 1223 	lda	#0x00
+   07EC 9D 0A 01      [ 5] 1224 	sta	0x10a,x
+   07EF 9D 0B 01      [ 5] 1225 	sta	0x10b,x
+   07F2 9D 0C 01      [ 5] 1226 	sta	0x10c,x
+   07F5 BD 05 01      [ 5] 1227 	lda	0x105,x
+   07F8 38            [ 2] 1228 	sec
+   07F9 FD 09 01      [ 5] 1229 	sbc	0x109,x
+   07FC BD 06 01      [ 5] 1230 	lda	0x106,x
+   07FF FD 0A 01      [ 5] 1231 	sbc	0x10a,x
+   0802 BD 07 01      [ 5] 1232 	lda	0x107,x
+   0805 FD 0B 01      [ 5] 1233 	sbc	0x10b,x
+   0808 BD 08 01      [ 5] 1234 	lda	0x108,x
+   080B FD 0C 01      [ 5] 1235 	sbc	0x10c,x
+   080E 90 32         [ 4] 1236 	bcc	00113$
+                           1237 ;	../time.c: 165: epoch-=monthLength;
+   0810 BD 05 01      [ 5] 1238 	lda	0x105,x
+   0813 38            [ 2] 1239 	sec
+   0814 FD 09 01      [ 5] 1240 	sbc	0x109,x
+   0817 9D 05 01      [ 5] 1241 	sta	0x105,x
+   081A BD 06 01      [ 5] 1242 	lda	0x106,x
+   081D FD 0A 01      [ 5] 1243 	sbc	0x10a,x
+   0820 9D 06 01      [ 5] 1244 	sta	0x106,x
+   0823 BD 07 01      [ 5] 1245 	lda	0x107,x
+   0826 FD 0B 01      [ 5] 1246 	sbc	0x10b,x
+   0829 9D 07 01      [ 5] 1247 	sta	0x107,x
+   082C BD 08 01      [ 5] 1248 	lda	0x108,x
+   082F FD 0C 01      [ 5] 1249 	sbc	0x10c,x
+   0832 9D 08 01      [ 5] 1250 	sta	0x108,x
+                           1251 ;	../time.c: 153: for (month=0; month<12; month++) {
+   0835 BD 15 01      [ 5] 1252 	lda	0x115,x
+   0838 18            [ 2] 1253 	clc
+   0839 69 01         [ 2] 1254 	adc	#0x01
+   083B 9D 15 01      [ 5] 1255 	sta	0x115, x
+   083E C9 0C         [ 2] 1256 	cmp	#0x0c
+   0840 90 81         [ 4] 1257 	bcc	00114$
+   0842                    1258 00113$:
+                           1259 ;	../time.c: 170: lastTime.tm_mon=month;
+   0842 BA            [ 2] 1260 	tsx
+   0843 BD 15 01      [ 5] 1261 	lda	0x115,x
+   0846 8Dr24r00      [ 4] 1262 	sta	(_lastTime + 0x0004)
+                           1263 ;	../time.c: 171: lastTime.tm_mday=epoch+1;
+   0849 BD 05 01      [ 5] 1264 	lda	0x105,x
+   084C AA            [ 2] 1265 	tax
+   084D E8            [ 2] 1266 	inx
+   084E 8Er23r00      [ 4] 1267 	stx	(_lastTime + 0x0003)
+                           1268 ;	../time.c: 173: lastTime.tm_isdst=0;
+   0851 A2 00         [ 2] 1269 	ldx	#0x00
+   0853 8Er2Ar00      [ 4] 1270 	stx	(_lastTime + 0x000a)
+                           1271 ;	../time.c: 175: return &lastTime;
+   0856 A2s00         [ 2] 1272 	ldx	#>_lastTime
+   0858 A9r20         [ 2] 1273 	lda	#_lastTime
+                           1274 ;	../time.c: 176: }
+   085A 85*00         [ 3] 1275 	sta	*(__TEMP+0)
+   085C 86*01         [ 3] 1276 	stx	*(__TEMP+1)
+   085E BA            [ 2] 1277 	tsx
+   085F 8A            [ 2] 1278 	txa
+   0860 18            [ 2] 1279 	clc
+   0861 69 17         [ 2] 1280 	adc	#0x17
+   0863 AA            [ 2] 1281 	tax
+   0864 9A            [ 2] 1282 	txs
+   0865 A6*01         [ 3] 1283 	ldx	*(__TEMP+1)
+   0867 A5*00         [ 3] 1284 	lda	*(__TEMP+0)
+   0869 60            [ 6] 1285 	rts
+                           1286 ;------------------------------------------------------------
+                           1287 ;Allocation info for local variables in function 'mktime'
+                           1288 ;------------------------------------------------------------
+                           1289 ;timeptr                   Allocated to stack - sp +21
+                           1290 ;year                      Allocated to stack - sp +19
+                           1291 ;month                     Allocated to stack - sp +17
+                           1292 ;i                         Allocated to stack - sp +15
+                           1293 ;seconds                   Allocated to stack - sp +1
+                           1294 ;sloc0                     Allocated to stack - sp +13
+                           1295 ;sloc1                     Allocated to stack - sp +9
+                           1296 ;sloc2                     Allocated to stack - sp +5
+                           1297 ;------------------------------------------------------------
+                           1298 ;	../time.c: 179: time_t mktime(struct tm *timeptr) {
+                           1299 ;	-----------------------------------------
+                           1300 ;	 function mktime
+                           1301 ;	-----------------------------------------
+                           1302 ;	Register assignment is optimal.
+                           1303 ;	Stack space usage: 22 bytes.
+   086A                    1304 _mktime:
+   086A 85*00         [ 3] 1305 	sta	*(__TEMP+0)
+   086C 8A            [ 2] 1306 	txa
+   086D 48            [ 3] 1307 	pha
+   086E A5*00         [ 3] 1308 	lda	*(__TEMP+0)
+   0870 48            [ 3] 1309 	pha
+   0871 86*01         [ 3] 1310 	stx	*(__TEMP+1)
+   0873 BA            [ 2] 1311 	tsx
+   0874 8A            [ 2] 1312 	txa
+   0875 18            [ 2] 1313 	clc
+   0876 69 EC         [ 2] 1314 	adc	#0xec
+   0878 AA            [ 2] 1315 	tax
+   0879 9A            [ 2] 1316 	txs
+   087A A6*01         [ 3] 1317 	ldx	*(__TEMP+1)
+   087C A5*00         [ 3] 1318 	lda	*(__TEMP+0)
+                           1319 ;	../time.c: 180: int year=timeptr->tm_year+1900, month=timeptr->tm_mon, i;
+   087E BA            [ 2] 1320 	tsx
+   087F BD 15 01      [ 5] 1321 	lda	0x115,x
+   0882 9D 0D 01      [ 5] 1322 	sta	0x10d,x
+   0885 BD 16 01      [ 5] 1323 	lda	0x116,x
+   0888 9D 0E 01      [ 5] 1324 	sta	0x10e,x
+   088B BD 0D 01      [ 5] 1325 	lda	0x10d,x
+   088E 85*00         [ 3] 1326 	sta	*(__DPTR+0)
+   0890 BD 0E 01      [ 5] 1327 	lda	0x10e,x
+   0893 85*01         [ 3] 1328 	sta	*(__DPTR+1)
+   0895 A0 06         [ 2] 1329 	ldy	#0x06
+   0897 B1*00         [ 6] 1330 	lda	[__DPTR],y
+   0899 AA            [ 2] 1331 	tax
+   089A 88            [ 2] 1332 	dey
+   089B B1*00         [ 6] 1333 	lda	[__DPTR],y
+   089D 18            [ 2] 1334 	clc
+   089E 69 6C         [ 2] 1335 	adc	#0x6c
+   08A0 86*00         [ 3] 1336 	stx	*(__TEMP+0)
+   08A2 BA            [ 2] 1337 	tsx
+   08A3 9D 13 01      [ 5] 1338 	sta	0x113,x
+   08A6 A6*00         [ 3] 1339 	ldx	*(__TEMP+0)
+   08A8 8A            [ 2] 1340 	txa
+   08A9 69 07         [ 2] 1341 	adc	#0x07
+   08AB 86*00         [ 3] 1342 	stx	*(__TEMP+0)
+   08AD BA            [ 2] 1343 	tsx
+   08AE 9D 14 01      [ 5] 1344 	sta	0x114,x
+   08B1 BA            [ 2] 1345 	tsx
+   08B2 BD 15 01      [ 5] 1346 	lda	0x115,x
+   08B5 9D 0D 01      [ 5] 1347 	sta	0x10d,x
+   08B8 BD 16 01      [ 5] 1348 	lda	0x116,x
+   08BB 9D 0E 01      [ 5] 1349 	sta	0x10e,x
+   08BE BD 0D 01      [ 5] 1350 	lda	0x10d,x
+   08C1 85*00         [ 3] 1351 	sta	*(__DPTR+0)
+   08C3 BD 0E 01      [ 5] 1352 	lda	0x10e,x
+   08C6 85*01         [ 3] 1353 	sta	*(__DPTR+1)
+   08C8 88            [ 2] 1354 	dey
+   08C9 B1*00         [ 6] 1355 	lda	[__DPTR],y
+   08CB A8            [ 2] 1356 	tay
+   08CC 9D 11 01      [ 5] 1357 	sta	0x111,x
+   08CF A9 00         [ 2] 1358 	lda	#0x00
+   08D1 9D 12 01      [ 5] 1359 	sta	0x112,x
+                           1360 ;	../time.c: 183: CheckTime(timeptr);
+   08D4 BD 16 01      [ 5] 1361 	lda	0x116,x
+   08D7 AA            [ 2] 1362 	tax
+   08D8 86*00         [ 3] 1363 	stx	*(__TEMP+0)
+   08DA BA            [ 2] 1364 	tsx
+   08DB BD 15 01      [ 5] 1365 	lda	0x115,x
+   08DE 08            [ 3] 1366 	php
+   08DF A6*00         [ 3] 1367 	ldx	*(__TEMP+0)
+   08E1 28            [ 4] 1368 	plp
+   08E2 20rBEr00      [ 6] 1369 	jsr	_CheckTime
+                           1370 ;	../time.c: 186: seconds= (year-1970)*(60*60*24L*365);
+   08E5 BA            [ 2] 1371 	tsx
+   08E6 BD 13 01      [ 5] 1372 	lda	0x113,x
+   08E9 38            [ 2] 1373 	sec
+   08EA E9 B2         [ 2] 1374 	sbc	#0xb2
+   08EC 9D 0D 01      [ 5] 1375 	sta	0x10d,x
+   08EF BD 14 01      [ 5] 1376 	lda	0x114,x
+   08F2 E9 07         [ 2] 1377 	sbc	#0x07
+   08F4 9D 0E 01      [ 5] 1378 	sta	0x10e,x
+   08F7 BD 0D 01      [ 5] 1379 	lda	0x10d,x
+   08FA 9D 09 01      [ 5] 1380 	sta	0x109,x
+   08FD BD 0E 01      [ 5] 1381 	lda	0x10e,x
+   0900 9D 0A 01      [ 5] 1382 	sta	0x10a,x
+   0903 0A            [ 2] 1383 	asl	a
+   0904 A9 00         [ 2] 1384 	lda	#0x00
+   0906 69 FF         [ 2] 1385 	adc	#0xff
+   0908 49 FF         [ 2] 1386 	eor	#0xff
+   090A 9D 0B 01      [ 5] 1387 	sta	0x10b,x
+   090D 9D 0C 01      [ 5] 1388 	sta	0x10c, x
+   0910 48            [ 3] 1389 	pha
+   0911 BD 0B 01      [ 5] 1390 	lda	0x10b,x
+   0914 48            [ 3] 1391 	pha
+   0915 BD 0A 01      [ 5] 1392 	lda	0x10a,x
+   0918 48            [ 3] 1393 	pha
+   0919 BD 09 01      [ 5] 1394 	lda	0x109,x
+   091C 48            [ 3] 1395 	pha
+   091D A9 01         [ 2] 1396 	lda	#0x01
+   091F 48            [ 3] 1397 	pha
+   0920 A9 E1         [ 2] 1398 	lda	#0xe1
+   0922 48            [ 3] 1399 	pha
+   0923 A9 33         [ 2] 1400 	lda	#0x33
+   0925 48            [ 3] 1401 	pha
+   0926 A9 80         [ 2] 1402 	lda	#0x80
+   0928 48            [ 3] 1403 	pha
+                           1404 ;	../time.c: 189: for (i=1970; i<year; i++) {
+   0929 20r00r00      [ 6] 1405 	jsr	__mullong
+   092C 86*00         [ 3] 1406 	stx	*(__TEMP+0)
+   092E BA            [ 2] 1407 	tsx
+   092F 9D 11 01      [ 5] 1408 	sta	0x111,x
+   0932 A6*00         [ 3] 1409 	ldx	*(__TEMP+0)
+   0934 8A            [ 2] 1410 	txa
+   0935 BA            [ 2] 1411 	tsx
+   0936 9D 12 01      [ 5] 1412 	sta	0x112,x
+   0939 A6*00         [ 3] 1413 	ldx	*(__TEMP+0)
+   093B A5*00         [ 3] 1414 	lda	*___SDCC_m6502_ret2
+   093D BA            [ 2] 1415 	tsx
+   093E 9D 13 01      [ 5] 1416 	sta	0x113,x
+   0941 A5*00         [ 3] 1417 	lda	*___SDCC_m6502_ret3
+   0943 9D 14 01      [ 5] 1418 	sta	0x114,x
+   0946 85*00         [ 3] 1419 	sta	*(__TEMP+0)
+   0948 86*01         [ 3] 1420 	stx	*(__TEMP+1)
+   094A BA            [ 2] 1421 	tsx
+   094B 8A            [ 2] 1422 	txa
+   094C 18            [ 2] 1423 	clc
+   094D 69 08         [ 2] 1424 	adc	#0x08
+   094F AA            [ 2] 1425 	tax
+   0950 9A            [ 2] 1426 	txs
+   0951 BA            [ 2] 1427 	tsx
+   0952 A9 B2         [ 2] 1428 	lda	#0xb2
+   0954 9D 0F 01      [ 5] 1429 	sta	0x10f,x
+   0957 A9 07         [ 2] 1430 	lda	#0x07
+   0959 9D 10 01      [ 5] 1431 	sta	0x110,x
+   095C                    1432 00110$:
+   095C BA            [ 2] 1433 	tsx
+   095D BD 0F 01      [ 5] 1434 	lda	0x10f,x
+   0960 38            [ 2] 1435 	sec
+   0961 FD 13 01      [ 5] 1436 	sbc	0x113,x
+   0964 BD 10 01      [ 5] 1437 	lda	0x110,x
+   0967 FD 14 01      [ 5] 1438 	sbc	0x114,x
+   096A 50 04         [ 4] 1439 	bvc	00148$
+   096C 10 04         [ 4] 1440 	bpl	00147$
+   096E 30 5C         [ 4] 1441 	bmi	00124$
+   0970                    1442 00148$:
+   0970 10 5A         [ 4] 1443 	bpl	00124$
+   0972                    1444 00147$:
+                           1445 ;	../time.c: 190: if (LEAP_YEAR(i)) {
+   0972 A9 00         [ 2] 1446 	lda	#0x00
+   0974 48            [ 3] 1447 	pha
+   0975 A9 04         [ 2] 1448 	lda	#0x04
+   0977 48            [ 3] 1449 	pha
+   0978 BD 10 01      [ 5] 1450 	lda	0x110,x
+   097B AA            [ 2] 1451 	tax
+   097C 86*00         [ 3] 1452 	stx	*(__TEMP+0)
+   097E BA            [ 2] 1453 	tsx
+   097F BD 11 01      [ 5] 1454 	lda	0x111,x
+   0982 08            [ 3] 1455 	php
+   0983 A6*00         [ 3] 1456 	ldx	*(__TEMP+0)
+   0985 28            [ 4] 1457 	plp
+   0986 20r00r00      [ 6] 1458 	jsr	__modsint
+   0989 85*00         [ 3] 1459 	sta	*(__TEMP+0)
+   098B 68            [ 4] 1460 	pla
+   098C 68            [ 4] 1461 	pla
+   098D A5*00         [ 3] 1462 	lda	*(__TEMP+0)
+   098F D0 02         [ 4] 1463 	bne	00150$
+   0991 E0 00         [ 2] 1464 	cpx	#0x00
+   0993                    1465 00150$:
+   0993 D0 22         [ 4] 1466 	bne	00111$
+                           1467 ;	../time.c: 191: seconds+= 60*60*24L;
+   0995 BA            [ 2] 1468 	tsx
+   0996 BD 09 01      [ 5] 1469 	lda	0x109,x
+   0999 18            [ 2] 1470 	clc
+   099A 69 80         [ 2] 1471 	adc	#0x80
+   099C 9D 09 01      [ 5] 1472 	sta	0x109,x
+   099F BD 0A 01      [ 5] 1473 	lda	0x10a,x
+   09A2 69 51         [ 2] 1474 	adc	#0x51
+   09A4 9D 0A 01      [ 5] 1475 	sta	0x10a,x
+   09A7 BD 0B 01      [ 5] 1476 	lda	0x10b,x
+   09AA 69 01         [ 2] 1477 	adc	#0x01
+   09AC 9D 0B 01      [ 5] 1478 	sta	0x10b,x
+   09AF BD 0C 01      [ 5] 1479 	lda	0x10c,x
+   09B2 69 00         [ 2] 1480 	adc	#0x00
+   09B4 9D 0C 01      [ 5] 1481 	sta	0x10c,x
+   09B7                    1482 00111$:
+                           1483 ;	../time.c: 189: for (i=1970; i<year; i++) {
+   09B7 BA            [ 2] 1484 	tsx
+   09B8 BD 0F 01      [ 5] 1485 	lda	0x10f,x
+   09BB 18            [ 2] 1486 	clc
+   09BC 69 01         [ 2] 1487 	adc	#0x01
+   09BE 9D 0F 01      [ 5] 1488 	sta	0x10f,x
+   09C1 BD 10 01      [ 5] 1489 	lda	0x110,x
+   09C4 69 00         [ 2] 1490 	adc	#0x00
+   09C6 9D 10 01      [ 5] 1491 	sta	0x110,x
+   09C9 4Cr5Cr09      [ 3] 1492 	jmp	00110$
+   09CC                    1493 00124$:
+   09CC BA            [ 2] 1494 	tsx
+   09CD BD 09 01      [ 5] 1495 	lda	0x109,x
+   09D0 9D 01 01      [ 5] 1496 	sta	0x101,x
+   09D3 BD 0A 01      [ 5] 1497 	lda	0x10a,x
+   09D6 9D 02 01      [ 5] 1498 	sta	0x102,x
+   09D9 BD 0B 01      [ 5] 1499 	lda	0x10b,x
+   09DC 9D 03 01      [ 5] 1500 	sta	0x103,x
+   09DF BD 0C 01      [ 5] 1501 	lda	0x10c,x
+   09E2 9D 04 01      [ 5] 1502 	sta	0x104,x
+                           1503 ;	../time.c: 196: for (i=0; i<month; i++) {
+   09E5 A9 00         [ 2] 1504 	lda	#0x00
+   09E7 48            [ 3] 1505 	pha
+   09E8 A9 04         [ 2] 1506 	lda	#0x04
+   09EA 48            [ 3] 1507 	pha
+   09EB BD 14 01      [ 5] 1508 	lda	0x114,x
+   09EE AA            [ 2] 1509 	tax
+   09EF 86*00         [ 3] 1510 	stx	*(__TEMP+0)
+   09F1 BA            [ 2] 1511 	tsx
+   09F2 BD 15 01      [ 5] 1512 	lda	0x115,x
+   09F5 08            [ 3] 1513 	php
+   09F6 A6*00         [ 3] 1514 	ldx	*(__TEMP+0)
+   09F8 28            [ 4] 1515 	plp
+   09F9 20r00r00      [ 6] 1516 	jsr	__modsint
+   09FC 86*00         [ 3] 1517 	stx	*(__TEMP+0)
+   09FE BA            [ 2] 1518 	tsx
+   09FF 9D 0B 01      [ 5] 1519 	sta	0x10b,x
+   0A02 A6*00         [ 3] 1520 	ldx	*(__TEMP+0)
+   0A04 8A            [ 2] 1521 	txa
+   0A05 BA            [ 2] 1522 	tsx
+   0A06 9D 0C 01      [ 5] 1523 	sta	0x10c,x
+   0A09 A6*00         [ 3] 1524 	ldx	*(__TEMP+0)
+   0A0B 85*00         [ 3] 1525 	sta	*(__TEMP+0)
+   0A0D 68            [ 4] 1526 	pla
+   0A0E 68            [ 4] 1527 	pla
+   0A0F BA            [ 2] 1528 	tsx 
+   0A10 A9 00         [ 2] 1529 	lda	#0x00
+   0A12 9D 0F 01      [ 5] 1530 	sta	0x10f,x
+   0A15 9D 10 01      [ 5] 1531 	sta	0x110,x
+   0A18                    1532 00113$:
+   0A18 BA            [ 2] 1533 	tsx
+   0A19 BD 0F 01      [ 5] 1534 	lda	0x10f,x
+   0A1C 38            [ 2] 1535 	sec
+   0A1D FD 11 01      [ 5] 1536 	sbc	0x111,x
+   0A20 BD 10 01      [ 5] 1537 	lda	0x110,x
+   0A23 FD 12 01      [ 5] 1538 	sbc	0x112,x
+   0A26 50 04         [ 4] 1539 	bvc	00153$
+   0A28 10 07         [ 4] 1540 	bpl	00152$
+   0A2A 30 02         [ 4] 1541 	bmi	00154$
+   0A2C                    1542 00153$:
+   0A2C 30 03         [ 4] 1543 	bmi	00152$
+   0A2E                    1544 00154$:
+   0A2E 4Cr18r0B      [ 3] 1545 	jmp	00108$
+   0A31                    1546 00152$:
+                           1547 ;	../time.c: 197: if (i==1 && LEAP_YEAR(year)) { 
+   0A31 BD 0F 01      [ 5] 1548 	lda	0x10f,x
+   0A34 C9 01         [ 2] 1549 	cmp	#0x01
+   0A36 D0 31         [ 4] 1550 	bne	00105$
+   0A38 BD 10 01      [ 5] 1551 	lda	0x110,x
+   0A3B D0 2C         [ 4] 1552 	bne	00105$
+   0A3D BD 09 01      [ 5] 1553 	lda	0x109,x
+   0A40 1D 0A 01      [ 5] 1554 	ora	0x10a,x
+   0A43 D0 24         [ 4] 1555 	bne	00105$
+                           1556 ;	../time.c: 198: seconds+= 60*60*24L*29;
+   0A45 BD 01 01      [ 5] 1557 	lda	0x101,x
+   0A48 18            [ 2] 1558 	clc
+   0A49 69 80         [ 2] 1559 	adc	#0x80
+   0A4B 9D 01 01      [ 5] 1560 	sta	0x101,x
+   0A4E BD 02 01      [ 5] 1561 	lda	0x102,x
+   0A51 69 3B         [ 2] 1562 	adc	#0x3b
+   0A53 9D 02 01      [ 5] 1563 	sta	0x102,x
+   0A56 BD 03 01      [ 5] 1564 	lda	0x103,x
+   0A59 69 26         [ 2] 1565 	adc	#0x26
+   0A5B 9D 03 01      [ 5] 1566 	sta	0x103,x
+   0A5E BD 04 01      [ 5] 1567 	lda	0x104,x
+   0A61 69 00         [ 2] 1568 	adc	#0x00
+   0A63 9D 04 01      [ 5] 1569 	sta	0x104,x
+   0A66 4Cr03r0B      [ 3] 1570 	jmp	00114$
+   0A69                    1571 00105$:
+                           1572 ;	../time.c: 200: seconds+= 60*60*24L*monthDays[i];
+   0A69 BA            [ 2] 1573 	tsx
+   0A6A BD 0F 01      [ 5] 1574 	lda	0x10f,x
+   0A6D 9D 0D 01      [ 5] 1575 	sta	0x10d,x
+   0A70 BD 10 01      [ 5] 1576 	lda	0x110,x
+   0A73 9D 0E 01      [ 5] 1577 	sta	0x10e,x
+   0A76 18            [ 2] 1578 	clc
+   0A77 BD 0D 01      [ 5] 1579 	lda	0x10d,x
+   0A7A 69r00         [ 2] 1580 	adc	#<(_monthDays+0)
+   0A7C 85*00         [ 3] 1581 	sta	*(__DPTR+0)
+   0A7E BD 0E 01      [ 5] 1582 	lda	0x10e,x
+   0A81 69s00         [ 2] 1583 	adc	#>(_monthDays+0)
+   0A83 85*01         [ 3] 1584 	sta	*(__DPTR+1)
+   0A85 A0 00         [ 2] 1585 	ldy	#0x00
+   0A87 B1*00         [ 6] 1586 	lda	[__DPTR],y
+   0A89 A8            [ 2] 1587 	tay
+   0A8A 9D 05 01      [ 5] 1588 	sta	0x105,x
+   0A8D A9 00         [ 2] 1589 	lda	#0x00
+   0A8F 9D 06 01      [ 5] 1590 	sta	0x106,x
+   0A92 9D 07 01      [ 5] 1591 	sta	0x107,x
+   0A95 9D 08 01      [ 5] 1592 	sta	0x108, x
+   0A98 48            [ 3] 1593 	pha
+   0A99 BD 07 01      [ 5] 1594 	lda	0x107,x
+   0A9C 48            [ 3] 1595 	pha
+   0A9D BD 06 01      [ 5] 1596 	lda	0x106,x
+   0AA0 48            [ 3] 1597 	pha
+   0AA1 BD 05 01      [ 5] 1598 	lda	0x105,x
+   0AA4 48            [ 3] 1599 	pha
+   0AA5 A9 00         [ 2] 1600 	lda	#0x00
+   0AA7 48            [ 3] 1601 	pha
+   0AA8 A9 01         [ 2] 1602 	lda	#0x01
+   0AAA 48            [ 3] 1603 	pha
+   0AAB A9 51         [ 2] 1604 	lda	#0x51
+   0AAD 48            [ 3] 1605 	pha
+   0AAE A9 80         [ 2] 1606 	lda	#0x80
+   0AB0 48            [ 3] 1607 	pha
+   0AB1 20r00r00      [ 6] 1608 	jsr	__mullong
+   0AB4 86*00         [ 3] 1609 	stx	*(__TEMP+0)
+   0AB6 BA            [ 2] 1610 	tsx
+   0AB7 9D 0D 01      [ 5] 1611 	sta	0x10d,x
+   0ABA A6*00         [ 3] 1612 	ldx	*(__TEMP+0)
+   0ABC 8A            [ 2] 1613 	txa
+   0ABD BA            [ 2] 1614 	tsx
+   0ABE 9D 0E 01      [ 5] 1615 	sta	0x10e,x
+   0AC1 A6*00         [ 3] 1616 	ldx	*(__TEMP+0)
+   0AC3 A5*00         [ 3] 1617 	lda	*___SDCC_m6502_ret2
+   0AC5 BA            [ 2] 1618 	tsx
+   0AC6 9D 0F 01      [ 5] 1619 	sta	0x10f,x
+   0AC9 A5*00         [ 3] 1620 	lda	*___SDCC_m6502_ret3
+   0ACB 9D 10 01      [ 5] 1621 	sta	0x110,x
+   0ACE 85*00         [ 3] 1622 	sta	*(__TEMP+0)
+   0AD0 86*01         [ 3] 1623 	stx	*(__TEMP+1)
+   0AD2 BA            [ 2] 1624 	tsx
+   0AD3 8A            [ 2] 1625 	txa
+   0AD4 18            [ 2] 1626 	clc
+   0AD5 69 08         [ 2] 1627 	adc	#0x08
+   0AD7 AA            [ 2] 1628 	tax
+   0AD8 9A            [ 2] 1629 	txs
+   0AD9 A6*01         [ 3] 1630 	ldx	*(__TEMP+1)
+   0ADB A5*00         [ 3] 1631 	lda	*(__TEMP+0)
+   0ADD BA            [ 2] 1632 	tsx
+   0ADE BD 01 01      [ 5] 1633 	lda	0x101,x
+   0AE1 18            [ 2] 1634 	clc
+   0AE2 7D 05 01      [ 5] 1635 	adc	0x105,x
+   0AE5 9D 01 01      [ 5] 1636 	sta	0x101,x
+   0AE8 BD 02 01      [ 5] 1637 	lda	0x102,x
+   0AEB 7D 06 01      [ 5] 1638 	adc	0x106,x
+   0AEE 9D 02 01      [ 5] 1639 	sta	0x102,x
+   0AF1 BD 03 01      [ 5] 1640 	lda	0x103,x
+   0AF4 7D 07 01      [ 5] 1641 	adc	0x107,x
+   0AF7 9D 03 01      [ 5] 1642 	sta	0x103,x
+   0AFA BD 04 01      [ 5] 1643 	lda	0x104,x
+   0AFD 7D 08 01      [ 5] 1644 	adc	0x108,x
+   0B00 9D 04 01      [ 5] 1645 	sta	0x104,x
+   0B03                    1646 00114$:
+                           1647 ;	../time.c: 196: for (i=0; i<month; i++) {
+   0B03 BA            [ 2] 1648 	tsx
+   0B04 BD 0F 01      [ 5] 1649 	lda	0x10f,x
+   0B07 18            [ 2] 1650 	clc
+   0B08 69 01         [ 2] 1651 	adc	#0x01
+   0B0A 9D 0F 01      [ 5] 1652 	sta	0x10f,x
+   0B0D BD 10 01      [ 5] 1653 	lda	0x110,x
+   0B10 69 00         [ 2] 1654 	adc	#0x00
+   0B12 9D 10 01      [ 5] 1655 	sta	0x110,x
+   0B15 4Cr18r0A      [ 3] 1656 	jmp	00113$
+   0B18                    1657 00108$:
+                           1658 ;	../time.c: 204: seconds+= (timeptr->tm_mday-1)*60*60*24L;
+   0B18 BA            [ 2] 1659 	tsx
+   0B19 BD 15 01      [ 5] 1660 	lda	0x115,x
+   0B1C 9D 05 01      [ 5] 1661 	sta	0x105,x
+   0B1F BD 16 01      [ 5] 1662 	lda	0x116,x
+   0B22 9D 06 01      [ 5] 1663 	sta	0x106,x
+   0B25 BD 05 01      [ 5] 1664 	lda	0x105,x
+   0B28 85*00         [ 3] 1665 	sta	*(__DPTR+0)
+   0B2A BD 06 01      [ 5] 1666 	lda	0x106,x
+   0B2D 85*01         [ 3] 1667 	sta	*(__DPTR+1)
+   0B2F A0 03         [ 2] 1668 	ldy	#0x03
+   0B31 B1*00         [ 6] 1669 	lda	[__DPTR],y
+   0B33 A2 00         [ 2] 1670 	ldx	#0x00
+   0B35 38            [ 2] 1671 	sec
+   0B36 E9 01         [ 2] 1672 	sbc	#0x01
+   0B38 B0 01         [ 4] 1673 	bcs	00159$
+   0B3A CA            [ 2] 1674 	dex
+   0B3B                    1675 00159$:
+   0B3B 48            [ 3] 1676 	pha
+   0B3C 8A            [ 2] 1677 	txa
+   0B3D BA            [ 2] 1678 	tsx
+   0B3E 9D 07 01      [ 5] 1679 	sta	0x107,x
+   0B41 68            [ 4] 1680 	pla
+   0B42 9D 06 01      [ 5] 1681 	sta	0x106,x
+   0B45 BD 07 01      [ 5] 1682 	lda	0x107,x
+   0B48 0A            [ 2] 1683 	asl	a
+   0B49 A9 00         [ 2] 1684 	lda	#0x00
+   0B4B 69 FF         [ 2] 1685 	adc	#0xff
+   0B4D 49 FF         [ 2] 1686 	eor	#0xff
+   0B4F 9D 08 01      [ 5] 1687 	sta	0x108,x
+   0B52 9D 09 01      [ 5] 1688 	sta	0x109, x
+   0B55 48            [ 3] 1689 	pha
+   0B56 BD 08 01      [ 5] 1690 	lda	0x108,x
+   0B59 48            [ 3] 1691 	pha
+   0B5A BD 07 01      [ 5] 1692 	lda	0x107,x
+   0B5D 48            [ 3] 1693 	pha
+   0B5E BD 06 01      [ 5] 1694 	lda	0x106,x
+   0B61 48            [ 3] 1695 	pha
+   0B62 A9 00         [ 2] 1696 	lda	#0x00
+   0B64 48            [ 3] 1697 	pha
+   0B65 A9 01         [ 2] 1698 	lda	#0x01
+   0B67 48            [ 3] 1699 	pha
+   0B68 A9 51         [ 2] 1700 	lda	#0x51
+   0B6A 48            [ 3] 1701 	pha
+   0B6B A9 80         [ 2] 1702 	lda	#0x80
+   0B6D 48            [ 3] 1703 	pha
+   0B6E 20r00r00      [ 6] 1704 	jsr	__mullong
+   0B71 86*00         [ 3] 1705 	stx	*(__TEMP+0)
+   0B73 BA            [ 2] 1706 	tsx
+   0B74 9D 0D 01      [ 5] 1707 	sta	0x10d,x
+   0B77 A6*00         [ 3] 1708 	ldx	*(__TEMP+0)
+   0B79 8A            [ 2] 1709 	txa
+   0B7A BA            [ 2] 1710 	tsx
+   0B7B 9D 0E 01      [ 5] 1711 	sta	0x10e,x
+   0B7E A6*00         [ 3] 1712 	ldx	*(__TEMP+0)
+   0B80 A5*00         [ 3] 1713 	lda	*___SDCC_m6502_ret2
+   0B82 BA            [ 2] 1714 	tsx
+   0B83 9D 0F 01      [ 5] 1715 	sta	0x10f,x
+   0B86 A5*00         [ 3] 1716 	lda	*___SDCC_m6502_ret3
+   0B88 9D 10 01      [ 5] 1717 	sta	0x110,x
+   0B8B 85*00         [ 3] 1718 	sta	*(__TEMP+0)
+   0B8D 86*01         [ 3] 1719 	stx	*(__TEMP+1)
+   0B8F BA            [ 2] 1720 	tsx
+   0B90 8A            [ 2] 1721 	txa
+   0B91 18            [ 2] 1722 	clc
+   0B92 69 08         [ 2] 1723 	adc	#0x08
+   0B94 AA            [ 2] 1724 	tax
+   0B95 9A            [ 2] 1725 	txs
+   0B96 A6*01         [ 3] 1726 	ldx	*(__TEMP+1)
+   0B98 A5*00         [ 3] 1727 	lda	*(__TEMP+0)
+   0B9A BA            [ 2] 1728 	tsx
+   0B9B BD 01 01      [ 5] 1729 	lda	0x101,x
+   0B9E 18            [ 2] 1730 	clc
+   0B9F 7D 05 01      [ 5] 1731 	adc	0x105,x
+   0BA2 9D 01 01      [ 5] 1732 	sta	0x101,x
+   0BA5 BD 02 01      [ 5] 1733 	lda	0x102,x
+   0BA8 7D 06 01      [ 5] 1734 	adc	0x106,x
+   0BAB 9D 02 01      [ 5] 1735 	sta	0x102,x
+   0BAE BD 03 01      [ 5] 1736 	lda	0x103,x
+   0BB1 7D 07 01      [ 5] 1737 	adc	0x107,x
+   0BB4 9D 03 01      [ 5] 1738 	sta	0x103,x
+   0BB7 BD 04 01      [ 5] 1739 	lda	0x104,x
+   0BBA 7D 08 01      [ 5] 1740 	adc	0x108,x
+   0BBD 9D 04 01      [ 5] 1741 	sta	0x104,x
+                           1742 ;	../time.c: 205: seconds+= timeptr->tm_hour*60*60L;
+   0BC0 BD 15 01      [ 5] 1743 	lda	0x115,x
+   0BC3 9D 05 01      [ 5] 1744 	sta	0x105,x
+   0BC6 BD 16 01      [ 5] 1745 	lda	0x116,x
+   0BC9 9D 06 01      [ 5] 1746 	sta	0x106,x
+   0BCC BD 05 01      [ 5] 1747 	lda	0x105,x
+   0BCF 85*00         [ 3] 1748 	sta	*(__DPTR+0)
+   0BD1 BD 06 01      [ 5] 1749 	lda	0x106,x
+   0BD4 85*01         [ 3] 1750 	sta	*(__DPTR+1)
+   0BD6 A0 02         [ 2] 1751 	ldy	#0x02
+   0BD8 B1*00         [ 6] 1752 	lda	[__DPTR],y
+   0BDA A8            [ 2] 1753 	tay
+   0BDB 9D 05 01      [ 5] 1754 	sta	0x105,x
+   0BDE A9 00         [ 2] 1755 	lda	#0x00
+   0BE0 9D 06 01      [ 5] 1756 	sta	0x106,x
+   0BE3 9D 07 01      [ 5] 1757 	sta	0x107,x
+   0BE6 9D 08 01      [ 5] 1758 	sta	0x108, x
+   0BE9 48            [ 3] 1759 	pha
+   0BEA BD 07 01      [ 5] 1760 	lda	0x107,x
+   0BED 48            [ 3] 1761 	pha
+   0BEE BD 06 01      [ 5] 1762 	lda	0x106,x
+   0BF1 48            [ 3] 1763 	pha
+   0BF2 BD 05 01      [ 5] 1764 	lda	0x105,x
+   0BF5 48            [ 3] 1765 	pha
+   0BF6 A9 00         [ 2] 1766 	lda	#0x00
+   0BF8 48            [ 3] 1767 	pha
+   0BF9 48            [ 3] 1768 	pha
+   0BFA A9 0E         [ 2] 1769 	lda	#0x0e
+   0BFC 48            [ 3] 1770 	pha
+   0BFD A9 10         [ 2] 1771 	lda	#0x10
+   0BFF 48            [ 3] 1772 	pha
+   0C00 20r00r00      [ 6] 1773 	jsr	__mullong
+   0C03 86*00         [ 3] 1774 	stx	*(__TEMP+0)
+   0C05 BA            [ 2] 1775 	tsx
+   0C06 9D 0D 01      [ 5] 1776 	sta	0x10d,x
+   0C09 A6*00         [ 3] 1777 	ldx	*(__TEMP+0)
+   0C0B 8A            [ 2] 1778 	txa
+   0C0C BA            [ 2] 1779 	tsx
+   0C0D 9D 0E 01      [ 5] 1780 	sta	0x10e,x
+   0C10 A6*00         [ 3] 1781 	ldx	*(__TEMP+0)
+   0C12 A5*00         [ 3] 1782 	lda	*___SDCC_m6502_ret2
+   0C14 BA            [ 2] 1783 	tsx
+   0C15 9D 0F 01      [ 5] 1784 	sta	0x10f,x
+   0C18 A5*00         [ 3] 1785 	lda	*___SDCC_m6502_ret3
+   0C1A 9D 10 01      [ 5] 1786 	sta	0x110,x
+   0C1D 85*00         [ 3] 1787 	sta	*(__TEMP+0)
+   0C1F 86*01         [ 3] 1788 	stx	*(__TEMP+1)
+   0C21 BA            [ 2] 1789 	tsx
+   0C22 8A            [ 2] 1790 	txa
+   0C23 18            [ 2] 1791 	clc
+   0C24 69 08         [ 2] 1792 	adc	#0x08
+   0C26 AA            [ 2] 1793 	tax
+   0C27 9A            [ 2] 1794 	txs
+   0C28 A6*01         [ 3] 1795 	ldx	*(__TEMP+1)
+   0C2A A5*00         [ 3] 1796 	lda	*(__TEMP+0)
+   0C2C BA            [ 2] 1797 	tsx
+   0C2D BD 01 01      [ 5] 1798 	lda	0x101,x
+   0C30 18            [ 2] 1799 	clc
+   0C31 7D 05 01      [ 5] 1800 	adc	0x105,x
+   0C34 9D 01 01      [ 5] 1801 	sta	0x101,x
+   0C37 BD 02 01      [ 5] 1802 	lda	0x102,x
+   0C3A 7D 06 01      [ 5] 1803 	adc	0x106,x
+   0C3D 9D 02 01      [ 5] 1804 	sta	0x102,x
+   0C40 BD 03 01      [ 5] 1805 	lda	0x103,x
+   0C43 7D 07 01      [ 5] 1806 	adc	0x107,x
+   0C46 9D 03 01      [ 5] 1807 	sta	0x103,x
+   0C49 BD 04 01      [ 5] 1808 	lda	0x104,x
+   0C4C 7D 08 01      [ 5] 1809 	adc	0x108,x
+   0C4F 9D 04 01      [ 5] 1810 	sta	0x104,x
+                           1811 ;	../time.c: 206: seconds+= timeptr->tm_min*60;
+   0C52 BD 15 01      [ 5] 1812 	lda	0x115,x
+   0C55 9D 05 01      [ 5] 1813 	sta	0x105,x
+   0C58 BD 16 01      [ 5] 1814 	lda	0x116,x
+   0C5B 9D 06 01      [ 5] 1815 	sta	0x106,x
+   0C5E BD 05 01      [ 5] 1816 	lda	0x105,x
+   0C61 85*00         [ 3] 1817 	sta	*(__DPTR+0)
+   0C63 BD 06 01      [ 5] 1818 	lda	0x106,x
+   0C66 85*01         [ 3] 1819 	sta	*(__DPTR+1)
+   0C68 A0 01         [ 2] 1820 	ldy	#0x01
+   0C6A B1*00         [ 6] 1821 	lda	[__DPTR],y
+   0C6C A2 00         [ 2] 1822 	ldx	#0x00
+   0C6E 85*00         [ 3] 1823 	sta	*(__TEMP+0)
+   0C70 8A            [ 2] 1824 	txa
+   0C71 48            [ 3] 1825 	pha
+   0C72 A5*00         [ 3] 1826 	lda	*(__TEMP+0)
+   0C74 48            [ 3] 1827 	pha
+   0C75 A9 3C         [ 2] 1828 	lda	#0x3c
+   0C77 20r00r00      [ 6] 1829 	jsr	__mulint
+   0C7A 85*00         [ 3] 1830 	sta	*(__TEMP+0)
+   0C7C 68            [ 4] 1831 	pla
+   0C7D 68            [ 4] 1832 	pla
+   0C7E A5*00         [ 3] 1833 	lda	*(__TEMP+0)
+   0C80 48            [ 3] 1834 	pha
+   0C81 8A            [ 2] 1835 	txa
+   0C82 BA            [ 2] 1836 	tsx
+   0C83 9D 07 01      [ 5] 1837 	sta	0x107,x
+   0C86 68            [ 4] 1838 	pla
+   0C87 9D 06 01      [ 5] 1839 	sta	0x106,x
+   0C8A BD 07 01      [ 5] 1840 	lda	0x107,x
+   0C8D 0A            [ 2] 1841 	asl	a
+   0C8E A9 00         [ 2] 1842 	lda	#0x00
+   0C90 69 FF         [ 2] 1843 	adc	#0xff
+   0C92 49 FF         [ 2] 1844 	eor	#0xff
+   0C94 9D 08 01      [ 5] 1845 	sta	0x108,x
+   0C97 9D 09 01      [ 5] 1846 	sta	0x109,x
+   0C9A BD 02 01      [ 5] 1847 	lda	0x102,x
+   0C9D 18            [ 2] 1848 	clc
+   0C9E 7D 06 01      [ 5] 1849 	adc	0x106,x
+   0CA1 9D 02 01      [ 5] 1850 	sta	0x102,x
+   0CA4 BD 03 01      [ 5] 1851 	lda	0x103,x
+   0CA7 7D 07 01      [ 5] 1852 	adc	0x107,x
+   0CAA 9D 03 01      [ 5] 1853 	sta	0x103,x
+   0CAD BD 04 01      [ 5] 1854 	lda	0x104,x
+   0CB0 7D 08 01      [ 5] 1855 	adc	0x108,x
+   0CB3 9D 04 01      [ 5] 1856 	sta	0x104,x
+   0CB6 BD 05 01      [ 5] 1857 	lda	0x105,x
+   0CB9 7D 09 01      [ 5] 1858 	adc	0x109,x
+   0CBC 9D 05 01      [ 5] 1859 	sta	0x105,x
+                           1860 ;	../time.c: 207: seconds+= timeptr->tm_sec;
+   0CBF BD 16 01      [ 5] 1861 	lda	0x116,x
+   0CC2 85*00         [ 3] 1862 	sta	*(__DPTR+0)
+   0CC4 BD 17 01      [ 5] 1863 	lda	0x117,x
+   0CC7 85*01         [ 3] 1864 	sta	*(__DPTR+1)
+   0CC9 A0 00         [ 2] 1865 	ldy	#0x00
+   0CCB B1*00         [ 6] 1866 	lda	[__DPTR],y
+   0CCD A2 00         [ 2] 1867 	ldx	#0x00
+   0CCF 48            [ 3] 1868 	pha
+   0CD0 8A            [ 2] 1869 	txa
+   0CD1 BA            [ 2] 1870 	tsx
+   0CD2 9D 07 01      [ 5] 1871 	sta	0x107,x
+   0CD5 68            [ 4] 1872 	pla
+   0CD6 9D 06 01      [ 5] 1873 	sta	0x106,x
+   0CD9 BD 07 01      [ 5] 1874 	lda	0x107,x
+   0CDC 0A            [ 2] 1875 	asl	a
+   0CDD 98            [ 2] 1876 	tya
+   0CDE 69 FF         [ 2] 1877 	adc	#0xff
+   0CE0 49 FF         [ 2] 1878 	eor	#0xff
+   0CE2 9D 08 01      [ 5] 1879 	sta	0x108,x
+   0CE5 9D 09 01      [ 5] 1880 	sta	0x109,x
+   0CE8 BD 02 01      [ 5] 1881 	lda	0x102,x
+   0CEB 18            [ 2] 1882 	clc
+   0CEC 7D 06 01      [ 5] 1883 	adc	0x106,x
+   0CEF 9D 02 01      [ 5] 1884 	sta	0x102,x
+   0CF2 BD 03 01      [ 5] 1885 	lda	0x103,x
+   0CF5 7D 07 01      [ 5] 1886 	adc	0x107,x
+   0CF8 9D 03 01      [ 5] 1887 	sta	0x103,x
+   0CFB BD 04 01      [ 5] 1888 	lda	0x104,x
+   0CFE 7D 08 01      [ 5] 1889 	adc	0x108,x
+   0D01 9D 04 01      [ 5] 1890 	sta	0x104,x
+   0D04 BD 05 01      [ 5] 1891 	lda	0x105,x
+   0D07 7D 09 01      [ 5] 1892 	adc	0x109,x
+                           1893 ;	../time.c: 208: return seconds;
+   0D0A 9D 05 01      [ 5] 1894 	sta	0x105, x
+   0D0D 85*00         [ 3] 1895 	sta	*___SDCC_m6502_ret3
+   0D0F BD 04 01      [ 5] 1896 	lda	0x104,x
+   0D12 85*00         [ 3] 1897 	sta	*___SDCC_m6502_ret2
+   0D14 BD 03 01      [ 5] 1898 	lda	0x103,x
+   0D17 AA            [ 2] 1899 	tax
+   0D18 86*00         [ 3] 1900 	stx	*(__TEMP+0)
+   0D1A BA            [ 2] 1901 	tsx
+   0D1B BD 01 01      [ 5] 1902 	lda	0x101,x
+   0D1E 08            [ 3] 1903 	php
+   0D1F A6*00         [ 3] 1904 	ldx	*(__TEMP+0)
+   0D21 28            [ 4] 1905 	plp
+                           1906 ;	../time.c: 209: }
+   0D22 85*00         [ 3] 1907 	sta	*(__TEMP+0)
+   0D24 86*01         [ 3] 1908 	stx	*(__TEMP+1)
+   0D26 BA            [ 2] 1909 	tsx
+   0D27 8A            [ 2] 1910 	txa
+   0D28 18            [ 2] 1911 	clc
+   0D29 69 16         [ 2] 1912 	adc	#0x16
+   0D2B AA            [ 2] 1913 	tax
+   0D2C 9A            [ 2] 1914 	txs
+   0D2D A6*01         [ 3] 1915 	ldx	*(__TEMP+1)
+   0D2F A5*00         [ 3] 1916 	lda	*(__TEMP+0)
+   0D31 60            [ 6] 1917 	rts
+                           1918 	.area CODE
+                           1919 	.area RODATA
+   0000                    1920 _monthDays:
+   0000 1F                 1921 	.db #0x1f	; 31
+   0001 1C                 1922 	.db #0x1c	; 28
+   0002 1F                 1923 	.db #0x1f	; 31
+   0003 1E                 1924 	.db #0x1e	; 30
+   0004 1F                 1925 	.db #0x1f	; 31
+   0005 1E                 1926 	.db #0x1e	; 30
+   0006 1F                 1927 	.db #0x1f	; 31
+   0007 1F                 1928 	.db #0x1f	; 31
+   0008 1E                 1929 	.db #0x1e	; 30
+   0009 1F                 1930 	.db #0x1f	; 31
+   000A 1E                 1931 	.db #0x1e	; 30
+   000B 1F                 1932 	.db #0x1f	; 31
+   000C                    1933 ___month:
+   000Cr51r00              1934 	.dw __str_1
+   000Er55r00              1935 	.dw __str_2
+   0010r59r00              1936 	.dw __str_3
+   0012r5Dr00              1937 	.dw __str_4
+   0014r61r00              1938 	.dw __str_5
+   0016r65r00              1939 	.dw __str_6
+   0018r69r00              1940 	.dw __str_7
+   001Ar6Dr00              1941 	.dw __str_8
+   001Cr71r00              1942 	.dw __str_9
+   001Er75r00              1943 	.dw __str_10
+   0020r79r00              1944 	.dw __str_11
+   0022r7Dr00              1945 	.dw __str_12
+   0024                    1946 ___day:
+   0024r81r00              1947 	.dw __str_13
+   0026r85r00              1948 	.dw __str_14
+   0028r89r00              1949 	.dw __str_15
+   002Ar8Dr00              1950 	.dw __str_16
+   002Cr91r00              1951 	.dw __str_17
+   002Er95r00              1952 	.dw __str_18
+   0030r99r00              1953 	.dw __str_19
+                           1954 	.area RODATA
+   0032                    1955 ___str_0:
+   0032 25 73 20 25 73 20  1956 	.ascii "%s %s %2d %02d:%02d:%02d %04d"
+        25 32 64 20 25 30
+        32 64 3A 25 30 32
+        64 3A 25 30 32 64
+        20 25 30 34 64
+   004F 0A                 1957 	.db 0x0a
+   0050 00                 1958 	.db 0x00
+                           1959 	.area CODE
+                           1960 	.area RODATA
+   0051                    1961 __str_1:
+   0051 4A 61 6E           1962 	.ascii "Jan"
+   0054 00                 1963 	.db 0x00
+                           1964 	.area CODE
+                           1965 	.area RODATA
+   0055                    1966 __str_2:
+   0055 46 65 62           1967 	.ascii "Feb"
+   0058 00                 1968 	.db 0x00
+                           1969 	.area CODE
+                           1970 	.area RODATA
+   0059                    1971 __str_3:
+   0059 4D 61 72           1972 	.ascii "Mar"
+   005C 00                 1973 	.db 0x00
+                           1974 	.area CODE
+                           1975 	.area RODATA
+   005D                    1976 __str_4:
+   005D 41 70 72           1977 	.ascii "Apr"
+   0060 00                 1978 	.db 0x00
+                           1979 	.area CODE
+                           1980 	.area RODATA
+   0061                    1981 __str_5:
+   0061 4D 61 79           1982 	.ascii "May"
+   0064 00                 1983 	.db 0x00
+                           1984 	.area CODE
+                           1985 	.area RODATA
+   0065                    1986 __str_6:
+   0065 4A 75 6E           1987 	.ascii "Jun"
+   0068 00                 1988 	.db 0x00
+                           1989 	.area CODE
+                           1990 	.area RODATA
+   0069                    1991 __str_7:
+   0069 4A 75 6C           1992 	.ascii "Jul"
+   006C 00                 1993 	.db 0x00
+                           1994 	.area CODE
+                           1995 	.area RODATA
+   006D                    1996 __str_8:
+   006D 41 75 67           1997 	.ascii "Aug"
+   0070 00                 1998 	.db 0x00
+                           1999 	.area CODE
+                           2000 	.area RODATA
+   0071                    2001 __str_9:
+   0071 53 65 70           2002 	.ascii "Sep"
+   0074 00                 2003 	.db 0x00
+                           2004 	.area CODE
+                           2005 	.area RODATA
+   0075                    2006 __str_10:
+   0075 4F 63 74           2007 	.ascii "Oct"
+   0078 00                 2008 	.db 0x00
+                           2009 	.area CODE
+                           2010 	.area RODATA
+   0079                    2011 __str_11:
+   0079 4E 6F 76           2012 	.ascii "Nov"
+   007C 00                 2013 	.db 0x00
+                           2014 	.area CODE
+                           2015 	.area RODATA
+   007D                    2016 __str_12:
+   007D 44 65 63           2017 	.ascii "Dec"
+   0080 00                 2018 	.db 0x00
+                           2019 	.area CODE
+                           2020 	.area RODATA
+   0081                    2021 __str_13:
+   0081 53 75 6E           2022 	.ascii "Sun"
+   0084 00                 2023 	.db 0x00
+                           2024 	.area CODE
+                           2025 	.area RODATA
+   0085                    2026 __str_14:
+   0085 4D 6F 6E           2027 	.ascii "Mon"
+   0088 00                 2028 	.db 0x00
+                           2029 	.area CODE
+                           2030 	.area RODATA
+   0089                    2031 __str_15:
+   0089 54 75 65           2032 	.ascii "Tue"
+   008C 00                 2033 	.db 0x00
+                           2034 	.area CODE
+                           2035 	.area RODATA
+   008D                    2036 __str_16:
+   008D 57 65 64           2037 	.ascii "Wed"
+   0090 00                 2038 	.db 0x00
+                           2039 	.area CODE
+                           2040 	.area RODATA
+   0091                    2041 __str_17:
+   0091 54 68 75           2042 	.ascii "Thu"
+   0094 00                 2043 	.db 0x00
+                           2044 	.area CODE
+                           2045 	.area RODATA
+   0095                    2046 __str_18:
+   0095 46 72 69           2047 	.ascii "Fri"
+   0098 00                 2048 	.db 0x00
+                           2049 	.area CODE
+                           2050 	.area RODATA
+   0099                    2051 __str_19:
+   0099 53 61 74           2052 	.ascii "Sat"
+   009C 00                 2053 	.db 0x00
+                           2054 	.area CODE
+                           2055 	.area XINIT
+                           2056 	.area CABS    (ABS)

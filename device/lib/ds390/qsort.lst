@@ -1,0 +1,802 @@
+                                      1 ;--------------------------------------------------------
+                                      2 ; File Created by SDCC : free open source ISO C Compiler 
+                                      3 ; Version 4.2.14 #0 (Linux)
+                                      4 ;--------------------------------------------------------
+                                      5 	.module qsort
+                                      6 	.optsdcc -mds390 --model-flat24
+                                      7 	
+                                      8 ;--------------------------------------------------------
+                                      9 ; CPU specific extensions
+                                     10 ;--------------------------------------------------------
+                                     11 	.DS80C390
+                                     12 	.amode	2	; 24 bit flat addressing
+                           000082    13 dpl	=	0x82
+                           000083    14 dph	=	0x83
+                           000084    15 dpl1	=	0x84
+                           000085    16 dph1	=	0x85
+                           000086    17 dps	=	0x86
+                           000093    18 dpx	=	0x93
+                           000095    19 dpx1	=	0x95
+                           00009B    20 esp	=	0x9B
+                           00009C    21 ap	=	0x9C
+                           00009C    22 acc1	=	0x9C
+                           0000D1    23 mcnt0	=	0xD1
+                           0000D2    24 mcnt1	=	0xD2
+                           0000D3    25 ma	=	0xD3
+                           0000D4    26 mb	=	0xD4
+                           0000D5    27 mc	=	0xD5
+                           00009D    28 acon	=	0x9D
+                           0000C6    29 mcon	=	0xC6
+                           0000D1    30 F1	=	0xD1	; user flag
+                                     31 ;--------------------------------------------------------
+                                     32 ; Public variables in this module
+                                     33 ;--------------------------------------------------------
+                                     34 	.globl _qsort_PARM_4
+                                     35 	.globl _qsort_PARM_3
+                                     36 	.globl _qsort_PARM_2
+                                     37 	.globl _qsort
+                                     38 ;--------------------------------------------------------
+                                     39 ; special function registers
+                                     40 ;--------------------------------------------------------
+                                     41 ;--------------------------------------------------------
+                                     42 ; special function bits
+                                     43 ;--------------------------------------------------------
+                                     44 ;--------------------------------------------------------
+                                     45 ; overlayable register banks
+                                     46 ;--------------------------------------------------------
+                                     47 	.area REG_BANK_0	(REL,OVR,DATA)
+      000000                         48 	.ds 8
+                                     49 ;--------------------------------------------------------
+                                     50 ; internal ram data
+                                     51 ;--------------------------------------------------------
+                                     52 	.area DSEG    (DATA)
+                                     53 ;--------------------------------------------------------
+                                     54 ; overlayable items in internal ram
+                                     55 ;--------------------------------------------------------
+                                     56 ;--------------------------------------------------------
+                                     57 ; indirectly addressable internal ram data
+                                     58 ;--------------------------------------------------------
+                                     59 	.area ISEG    (DATA)
+                                     60 ;--------------------------------------------------------
+                                     61 ; absolute internal ram data
+                                     62 ;--------------------------------------------------------
+                                     63 	.area IABS    (ABS,DATA)
+                                     64 	.area IABS    (ABS,DATA)
+                                     65 ;--------------------------------------------------------
+                                     66 ; bit data
+                                     67 ;--------------------------------------------------------
+                                     68 	.area BSEG    (BIT)
+                                     69 ;--------------------------------------------------------
+                                     70 ; paged external ram data
+                                     71 ;--------------------------------------------------------
+                                     72 	.area PSEG    (PAG,XDATA)
+                                     73 ;--------------------------------------------------------
+                                     74 ; uninitialized external ram data
+                                     75 ;--------------------------------------------------------
+                                     76 	.area XSEG    (XDATA)
+      000000                         77 _swap_PARM_2:
+      000000                         78 	.ds 4
+      000004                         79 _swap_PARM_3:
+      000004                         80 	.ds 2
+      000006                         81 _swap_sloc1_1_0:
+      000006                         82 	.ds 4
+      00000A                         83 _qsort_PARM_2:
+      00000A                         84 	.ds 2
+      00000C                         85 _qsort_PARM_3:
+      00000C                         86 	.ds 2
+      00000E                         87 _qsort_PARM_4:
+      00000E                         88 	.ds 3
+      000011                         89 _qsort_b_65536_41:
+      000011                         90 	.ds 4
+      000015                         91 _qsort_i_131072_42:
+      000015                         92 	.ds 4
+      000019                         93 _qsort_j_262144_44:
+      000019                         94 	.ds 4
+      00001D                         95 _qsort_sloc0_1_0:
+      00001D                         96 	.ds 2
+      00001F                         97 _qsort_sloc1_1_0:
+      00001F                         98 	.ds 4
+      000023                         99 _qsort_sloc2_1_0:
+      000023                        100 	.ds 4
+                                    101 ;--------------------------------------------------------
+                                    102 ; absolute external ram data
+                                    103 ;--------------------------------------------------------
+                                    104 	.area XABS    (ABS,XDATA)
+                                    105 ;--------------------------------------------------------
+                                    106 ; initialized external ram data
+                                    107 ;--------------------------------------------------------
+                                    108 	.area XISEG   (XDATA)
+                                    109 ;--------------------------------------------------------
+                                    110 ; global & static initialisations
+                                    111 ;--------------------------------------------------------
+                                    112 	.area HOME    (CODE)
+                                    113 	.area GSINIT  (CODE)
+                                    114 	.area GSFINAL (CODE)
+                                    115 	.area GSINIT  (CODE)
+                                    116 ;--------------------------------------------------------
+                                    117 ; Home
+                                    118 ;--------------------------------------------------------
+                                    119 	.area HOME    (CODE)
+                                    120 	.area HOME    (CODE)
+                                    121 ;--------------------------------------------------------
+                                    122 ; code
+                                    123 ;--------------------------------------------------------
+                                    124 	.area CSEG    (CODE)
+                                    125 ;------------------------------------------------------------
+                                    126 ;Allocation info for local variables in function 'swap'
+                                    127 ;------------------------------------------------------------
+                                    128 ;src                       Allocated with name '_swap_PARM_2'
+                                    129 ;n                         Allocated with name '_swap_PARM_3'
+                                    130 ;dst                       Allocated to registers 
+                                    131 ;d                         Allocated to registers 
+                                    132 ;s                         Allocated to registers 
+                                    133 ;tmp                       Allocated to registers 
+                                    134 ;sloc0                     Allocated with name '_swap_sloc0_1_0'
+                                    135 ;sloc1                     Allocated with name '_swap_sloc1_1_0'
+                                    136 ;------------------------------------------------------------
+                                    137 ;	qsort.c:33: static void swap(void *restrict dst, void *restrict src, size_t n)
+                                    138 ;	-----------------------------------------
+                                    139 ;	 function swap
+                                    140 ;	-----------------------------------------
+      000000                        141 _swap:
+                           000002   142 	ar2 = 0x02
+                           000003   143 	ar3 = 0x03
+                           000004   144 	ar4 = 0x04
+                           000005   145 	ar5 = 0x05
+                           000006   146 	ar6 = 0x06
+                           000007   147 	ar7 = 0x07
+                           000000   148 	ar0 = 0x00
+                           000001   149 	ar1 = 0x01
+      000000 AA 82            [ 8]  150 	mov	r2,dpl
+      000002 AB 83            [ 8]  151 	mov	r3,dph
+      000004 AC 93            [ 8]  152 	mov	r4,dpx
+      000006 AD F0            [ 8]  153 	mov	r5,b
+                                    154 ;	qsort.c:35: unsigned char *restrict d = dst;
+                                    155 ;	qsort.c:36: unsigned char *restrict s = src;
+      000008 90s00r00r00      [12]  156 	mov	dptr,#_swap_PARM_2
+                                    157 ;	genAssign: resultIsFar = FALSE
+      00000C E0               [ 8]  158 	movx	a,@dptr
+      00000D FE               [ 4]  159 	mov	r6,a
+      00000E A3               [12]  160 	inc	dptr
+      00000F E0               [ 8]  161 	movx	a,@dptr
+      000010 FF               [ 4]  162 	mov	r7,a
+      000011 A3               [12]  163 	inc	dptr
+      000012 E0               [ 8]  164 	movx	a,@dptr
+      000013 F8               [ 4]  165 	mov	r0,a
+      000014 A3               [12]  166 	inc	dptr
+      000015 E0               [ 8]  167 	movx	a,@dptr
+      000016 F9               [ 4]  168 	mov	r1,a
+      000017 90s00r00r06      [12]  169 	mov	dptr,#_swap_sloc1_1_0
+      00001B EE               [ 4]  170 	mov	a,r6
+      00001C F0               [ 8]  171 	movx	@dptr,a
+      00001D A3               [12]  172 	inc	dptr
+      00001E EF               [ 4]  173 	mov	a,r7
+      00001F F0               [ 8]  174 	movx	@dptr,a
+      000020 A3               [12]  175 	inc	dptr
+      000021 E8               [ 4]  176 	mov	a,r0
+      000022 F0               [ 8]  177 	movx	@dptr,a
+      000023 A3               [12]  178 	inc	dptr
+      000024 E9               [ 4]  179 	mov	a,r1
+      000025 F0               [ 8]  180 	movx	@dptr,a
+                                    181 ;	qsort.c:38: while(n--)
+      000026 90s00r00r04      [12]  182 	mov	dptr,#_swap_PARM_3
+                                    183 ;	genAssign: resultIsFar = FALSE
+      00002A E0               [ 8]  184 	movx	a,@dptr
+      00002B F8               [ 4]  185 	mov	r0,a
+      00002C A3               [12]  186 	inc	dptr
+      00002D E0               [ 8]  187 	movx	a,@dptr
+      00002E F9               [ 4]  188 	mov	r1,a
+      00002F                        189 00101$:
+                                    190 ;	genAssign: resultIsFar = FALSE
+      00002F 88 06            [ 8]  191 	mov	ar6,r0
+      000031 89 07            [ 8]  192 	mov	ar7,r1
+      000033 18               [ 4]  193 	dec	r0
+      000034 B8 FF 01         [16]  194 	cjne	r0,#0xff,00115$
+      000037 19               [ 4]  195 	dec	r1
+      000038                        196 00115$:
+      000038 EE               [ 4]  197 	mov	a,r6
+      000039 4F               [ 4]  198 	orl	a,r7
+      00003A 60 78            [12]  199 	jz  00104$
+      00003C                        200 00116$:
+                                    201 ;	qsort.c:40: unsigned char tmp = *d;
+      00003C 8A 82            [ 8]  202 	mov	dpl,r2
+      00003E 8B 83            [ 8]  203 	mov	dph,r3
+      000040 8C 93            [ 8]  204 	mov	dpx,r4
+      000042 8D F0            [ 8]  205 	mov	b,r5
+      000044 12s00r00r00      [16]  206 	lcall	__gptrget
+      000048 FE               [ 4]  207 	mov	r6,a
+                                    208 ;	qsort.c:41: *d = *s;
+      000049 90s00r00r06      [12]  209 	mov	dptr,#_swap_sloc1_1_0
+      00004D E0               [ 8]  210 	movx	a,@dptr
+      00004E C0 E0            [ 8]  211 	push	acc
+      000050 A3               [12]  212 	inc	dptr
+      000051 E0               [ 8]  213 	movx	a,@dptr
+      000052 C0 E0            [ 8]  214 	push	acc
+      000054 A3               [12]  215 	inc	dptr
+      000055 E0               [ 8]  216 	movx	a,@dptr
+      000056 C0 E0            [ 8]  217 	push	acc
+      000058 A3               [12]  218 	inc	dptr
+      000059 E0               [ 8]  219 	movx	a,@dptr
+      00005A F5 F0            [ 8]  220 	mov	b,a
+      00005C D0 93            [ 8]  221 	pop	dpx
+      00005E D0 83            [ 8]  222 	pop	dph
+      000060 D0 82            [ 8]  223 	pop	dpl
+      000062 12s00r00r00      [16]  224 	lcall	__gptrget
+      000066 FF               [ 4]  225 	mov	r7,a
+      000067 8A 82            [ 8]  226 	mov	dpl,r2
+      000069 8B 83            [ 8]  227 	mov	dph,r3
+      00006B 8C 93            [ 8]  228 	mov	dpx,r4
+      00006D 8D F0            [ 8]  229 	mov	b,r5
+      00006F EF               [ 4]  230 	mov	a,r7
+      000070 12s00r00r00      [16]  231 	lcall	__gptrput
+      000074 A3               [12]  232 	inc	dptr
+      000075 AA 82            [ 8]  233 	mov	r2,dpl
+      000077 AB 83            [ 8]  234 	mov	r3,dph
+      000079 AC 93            [ 8]  235 	mov	r4,dpx
+      00007B AD F0            [ 8]  236 	mov	r5,b
+                                    237 ;	qsort.c:42: *s = tmp;
+      00007D 90s00r00r06      [12]  238 	mov	dptr,#_swap_sloc1_1_0
+      000081 E0               [ 8]  239 	movx	a,@dptr
+      000082 C0 E0            [ 8]  240 	push	acc
+      000084 A3               [12]  241 	inc	dptr
+      000085 E0               [ 8]  242 	movx	a,@dptr
+      000086 C0 E0            [ 8]  243 	push	acc
+      000088 A3               [12]  244 	inc	dptr
+      000089 E0               [ 8]  245 	movx	a,@dptr
+      00008A C0 E0            [ 8]  246 	push	acc
+      00008C A3               [12]  247 	inc	dptr
+      00008D E0               [ 8]  248 	movx	a,@dptr
+      00008E F5 F0            [ 8]  249 	mov	b,a
+      000090 D0 93            [ 8]  250 	pop	dpx
+      000092 D0 83            [ 8]  251 	pop	dph
+      000094 D0 82            [ 8]  252 	pop	dpl
+      000096 EE               [ 4]  253 	mov	a,r6
+      000097 12s00r00r00      [16]  254 	lcall	__gptrput
+                                    255 ;	qsort.c:43: d++;
+                                    256 ;	qsort.c:44: s++;
+      00009B 90s00r00r06      [12]  257 	mov	dptr,#_swap_sloc1_1_0
+      00009F E0               [ 8]  258 	movx	a,@dptr
+      0000A0 24 01            [ 8]  259 	add	a,#0x01
+      0000A2 F0               [ 8]  260 	movx	@dptr,a
+      0000A3 A3               [12]  261 	inc	dptr
+      0000A4 E0               [ 8]  262 	movx	a,@dptr
+      0000A5 34 00            [ 8]  263 	addc	a,#0x00
+      0000A7 F0               [ 8]  264 	movx	@dptr,a
+      0000A8 A3               [12]  265 	inc	dptr
+      0000A9 E0               [ 8]  266 	movx	a,@dptr
+      0000AA 34 00            [ 8]  267 	addc	a,#0x00
+      0000AC F0               [ 8]  268 	movx	@dptr,a
+      0000AD A3               [12]  269 	inc	dptr
+      0000AE E0               [ 8]  270 	movx	a,@dptr
+      0000AF F0               [ 8]  271 	movx	@dptr,a
+      0000B0 02s00r00r2F      [16]  272 	ljmp	00101$
+      0000B4                        273 00104$:
+                                    274 ;	qsort.c:46: }
+      0000B4 22               [16]  275 	ret
+                                    276 ;------------------------------------------------------------
+                                    277 ;Allocation info for local variables in function 'qsort'
+                                    278 ;------------------------------------------------------------
+                                    279 ;nmemb                     Allocated with name '_qsort_PARM_2'
+                                    280 ;size                      Allocated with name '_qsort_PARM_3'
+                                    281 ;compar                    Allocated with name '_qsort_PARM_4'
+                                    282 ;base                      Allocated to registers r2 r3 r4 r5 
+                                    283 ;b                         Allocated with name '_qsort_b_65536_41'
+                                    284 ;i                         Allocated with name '_qsort_i_131072_42'
+                                    285 ;j                         Allocated with name '_qsort_j_262144_44'
+                                    286 ;sloc0                     Allocated with name '_qsort_sloc0_1_0'
+                                    287 ;sloc1                     Allocated with name '_qsort_sloc1_1_0'
+                                    288 ;sloc2                     Allocated with name '_qsort_sloc2_1_0'
+                                    289 ;------------------------------------------------------------
+                                    290 ;	qsort.c:48: void qsort(void *base, size_t nmemb, size_t size, int (*compar)(const void *, const void *) __reentrant)
+                                    291 ;	-----------------------------------------
+                                    292 ;	 function qsort
+                                    293 ;	-----------------------------------------
+      0000B5                        294 _qsort:
+      0000B5 AA 82            [ 8]  295 	mov	r2,dpl
+      0000B7 AB 83            [ 8]  296 	mov	r3,dph
+      0000B9 AC 93            [ 8]  297 	mov	r4,dpx
+      0000BB AD F0            [ 8]  298 	mov	r5,b
+                                    299 ;	qsort.c:50: unsigned char *b = base;
+                                    300 ;	genAssign: resultIsFar = FALSE
+      0000BD 8A 06            [ 8]  301 	mov	ar6,r2
+      0000BF 8B 07            [ 8]  302 	mov	ar7,r3
+      0000C1 8C 00            [ 8]  303 	mov	ar0,r4
+      0000C3 8D 01            [ 8]  304 	mov	ar1,r5
+      0000C5 90s00r00r11      [12]  305 	mov	dptr,#_qsort_b_65536_41
+      0000C9 EE               [ 4]  306 	mov	a,r6
+      0000CA F0               [ 8]  307 	movx	@dptr,a
+      0000CB A3               [12]  308 	inc	dptr
+      0000CC EF               [ 4]  309 	mov	a,r7
+      0000CD F0               [ 8]  310 	movx	@dptr,a
+      0000CE A3               [12]  311 	inc	dptr
+      0000CF E8               [ 4]  312 	mov	a,r0
+      0000D0 F0               [ 8]  313 	movx	@dptr,a
+      0000D1 A3               [12]  314 	inc	dptr
+      0000D2 E9               [ 4]  315 	mov	a,r1
+      0000D3 F0               [ 8]  316 	movx	@dptr,a
+                                    317 ;	qsort.c:52: if(nmemb <= 1)
+      0000D4 90s00r00r0A      [12]  318 	mov	dptr,#_qsort_PARM_2
+      0000D8 C3               [ 4]  319 	clr	c
+      0000D9 74 01            [ 8]  320 	mov	a,#0x01
+      0000DB C5 F0            [ 8]  321 	xch	a, b
+      0000DD E0               [ 8]  322 	movx	a,@dptr
+      0000DE C5 F0            [ 8]  323 	xch	a, b
+      0000E0 95 F0            [ 8]  324 	subb	a,b
+      0000E2 E4               [ 4]  325 	clr	a
+      0000E3 C5 F0            [ 8]  326 	xch	a, b
+      0000E5 A3               [12]  327 	inc	dptr
+      0000E6 E0               [ 8]  328 	movx	a,@dptr
+      0000E7 C5 F0            [ 8]  329 	xch	a, b
+      0000E9 95 F0            [ 8]  330 	subb	a,b
+      0000EB 40 04            [12]  331 	jc   00102$
+      0000ED                        332 00138$:
+                                    333 ;	qsort.c:53: return;
+      0000ED 02s00r03rDF      [16]  334 	ljmp	00112$
+      0000F1                        335 00102$:
+                                    336 ;	qsort.c:55: for(unsigned char *i = base; i < b + nmemb * size; i += size)
+                                    337 ;	genAssign: resultIsFar = FALSE
+      0000F1 90s00r00r15      [12]  338 	mov	dptr,#_qsort_i_131072_42
+      0000F5 EA               [ 4]  339 	mov	a,r2
+      0000F6 F0               [ 8]  340 	movx	@dptr,a
+      0000F7 A3               [12]  341 	inc	dptr
+      0000F8 EB               [ 4]  342 	mov	a,r3
+      0000F9 F0               [ 8]  343 	movx	@dptr,a
+      0000FA A3               [12]  344 	inc	dptr
+      0000FB EC               [ 4]  345 	mov	a,r4
+      0000FC F0               [ 8]  346 	movx	@dptr,a
+      0000FD A3               [12]  347 	inc	dptr
+      0000FE ED               [ 4]  348 	mov	a,r5
+      0000FF F0               [ 8]  349 	movx	@dptr,a
+      000100 90s00r00r11      [12]  350 	mov	dptr,#_qsort_b_65536_41
+                                    351 ;	genAssign: resultIsFar = FALSE
+      000104 E0               [ 8]  352 	movx	a,@dptr
+      000105 FE               [ 4]  353 	mov	r6,a
+      000106 A3               [12]  354 	inc	dptr
+      000107 E0               [ 8]  355 	movx	a,@dptr
+      000108 FF               [ 4]  356 	mov	r7,a
+      000109 A3               [12]  357 	inc	dptr
+      00010A E0               [ 8]  358 	movx	a,@dptr
+      00010B F8               [ 4]  359 	mov	r0,a
+      00010C A3               [12]  360 	inc	dptr
+      00010D E0               [ 8]  361 	movx	a,@dptr
+      00010E F9               [ 4]  362 	mov	r1,a
+      00010F 90s00r00r0C      [12]  363 	mov	dptr,#_qsort_PARM_3
+                                    364 ;	genAssign: resultIsFar = TRUE
+      000113 75 86 21         [12]  365 	mov	dps,#0x21
+      000116 90s00r00r1D      [12]  366 	mov	dptr,#_qsort_sloc0_1_0
+      00011A E0               [ 8]  367 	movx	a,@dptr
+      00011B F0               [ 8]  368 	movx	@dptr,a
+      00011C A3               [12]  369 	inc	dptr
+      00011D A3               [12]  370 	inc	dptr
+      00011E E0               [ 8]  371 	movx	a,@dptr
+      00011F F0               [ 8]  372 	movx	@dptr,a
+      000120 75 86 00         [12]  373 	mov	dps,#0
+      000123 90s00r00r1D      [12]  374 	mov	dptr,#_qsort_sloc0_1_0
+                                    375 ;	genAssign: resultIsFar = TRUE
+      000127 75 86 21         [12]  376 	mov	dps,#0x21
+      00012A 90s00r00r00      [12]  377 	mov	dptr,#__mulint_PARM_2
+      00012E E0               [ 8]  378 	movx	a,@dptr
+      00012F F0               [ 8]  379 	movx	@dptr,a
+      000130 A3               [12]  380 	inc	dptr
+      000131 A3               [12]  381 	inc	dptr
+      000132 E0               [ 8]  382 	movx	a,@dptr
+      000133 F0               [ 8]  383 	movx	@dptr,a
+      000134 75 86 00         [12]  384 	mov	dps,#0
+      000137 C0 06            [ 8]  385 	push	ar6
+      000139 C0 07            [ 8]  386 	push	ar7
+      00013B C0 00            [ 8]  387 	push	ar0
+      00013D C0 01            [ 8]  388 	push	ar1
+      00013F 05 86            [ 8]  389 	inc	dps
+      000141 90s00r00r0A      [12]  390 	mov	dptr,#_qsort_PARM_2
+      000145 E0               [ 8]  391 	movx	a,@dptr
+      000146 F5 82            [ 8]  392 	mov	dpl,a
+      000148 A3               [12]  393 	inc	dptr
+      000149 E0               [ 8]  394 	movx	a,@dptr
+      00014A F5 83            [ 8]  395 	mov	dph,a
+      00014C 75 86 00         [12]  396 	mov	dps,#0
+      00014F 12s00r00r00      [16]  397 	lcall	__mulint
+      000153 AA 82            [ 8]  398 	mov	r2,dpl
+      000155 AB 83            [ 8]  399 	mov	r3,dph
+      000157 D0 01            [ 8]  400 	pop	ar1
+      000159 D0 00            [ 8]  401 	pop	ar0
+      00015B D0 07            [ 8]  402 	pop	ar7
+      00015D D0 06            [ 8]  403 	pop	ar6
+      00015F 90s00r00r11      [12]  404 	mov	dptr,#_qsort_b_65536_41
+      000163 75 86 01         [12]  405 	mov	dps, #1
+      000166 90s00r00r1F      [12]  406 	mov	dptr, #_qsort_sloc1_1_0
+      00016A 15 86            [ 8]  407 	dec	dps
+      00016C E0               [ 8]  408 	movx	a,@dptr
+      00016D 2A               [ 4]  409 	add	a,r2
+      00016E 05 86            [ 8]  410 	inc	dps
+      000170 F0               [ 8]  411 	movx	@dptr,a
+      000171 15 86            [ 8]  412 	dec	dps
+      000173 A3               [12]  413 	inc	dptr
+      000174 E0               [ 8]  414 	movx	a,@dptr
+      000175 3B               [ 4]  415 	addc	a,r3
+      000176 05 86            [ 8]  416 	inc	dps
+      000178 A3               [12]  417 	inc	dptr
+      000179 F0               [ 8]  418 	movx	@dptr,a
+      00017A 15 86            [ 8]  419 	dec	dps
+      00017C A3               [12]  420 	inc	dptr
+      00017D E0               [ 8]  421 	movx	a,@dptr
+      00017E 34 00            [ 8]  422 	addc	a,#0x00
+      000180 05 86            [ 8]  423 	inc	dps
+      000182 A3               [12]  424 	inc	dptr
+      000183 F0               [ 8]  425 	movx	@dptr,a
+      000184 75 86 00         [12]  426 	mov	dps,#0
+      000187 A3               [12]  427 	inc	dptr
+      000188 E0               [ 8]  428 	movx	a,@dptr
+      000189 75 86 01         [12]  429 	mov	dps,#1
+      00018C A3               [12]  430 	inc	dptr
+      00018D F0               [ 8]  431 	movx	@dptr,a
+      00018E 75 86 00         [12]  432 	mov	dps,#0
+      000191                        433 00110$:
+      000191 C0 06            [ 8]  434 	push	ar6
+      000193 C0 07            [ 8]  435 	push	ar7
+      000195 C0 00            [ 8]  436 	push	ar0
+      000197 C0 01            [ 8]  437 	push	ar1
+      000199 90s00r00r15      [12]  438 	mov	dptr,#_qsort_i_131072_42
+                                    439 ;	genAssign: resultIsFar = FALSE
+      00019D E0               [ 8]  440 	movx	a,@dptr
+      00019E FE               [ 4]  441 	mov	r6,a
+      00019F A3               [12]  442 	inc	dptr
+      0001A0 E0               [ 8]  443 	movx	a,@dptr
+      0001A1 FF               [ 4]  444 	mov	r7,a
+      0001A2 A3               [12]  445 	inc	dptr
+      0001A3 E0               [ 8]  446 	movx	a,@dptr
+      0001A4 F8               [ 4]  447 	mov	r0,a
+      0001A5 A3               [12]  448 	inc	dptr
+      0001A6 E0               [ 8]  449 	movx	a,@dptr
+      0001A7 F9               [ 4]  450 	mov	r1,a
+      0001A8 90s00r00r1F      [12]  451 	mov	dptr,#_qsort_sloc1_1_0
+      0001AC C0 06            [ 8]  452 	push	ar6
+      0001AE C0 07            [ 8]  453 	push	ar7
+      0001B0 C0 00            [ 8]  454 	push	ar0
+      0001B2 C0 01            [ 8]  455 	push	ar1
+      0001B4 E0               [ 8]  456 	movx	a,@dptr
+      0001B5 C0 E0            [ 8]  457 	push	acc
+      0001B7 A3               [12]  458 	inc	dptr
+      0001B8 E0               [ 8]  459 	movx	a,@dptr
+      0001B9 C0 E0            [ 8]  460 	push	acc
+      0001BB A3               [12]  461 	inc	dptr
+      0001BC E0               [ 8]  462 	movx	a,@dptr
+      0001BD C0 E0            [ 8]  463 	push	acc
+      0001BF A3               [12]  464 	inc	dptr
+      0001C0 E0               [ 8]  465 	movx	a,@dptr
+      0001C1 F5 F0            [ 8]  466 	mov	b,a
+      0001C3 D0 93            [ 8]  467 	pop	dpx
+      0001C5 D0 83            [ 8]  468 	pop	dph
+      0001C7 D0 82            [ 8]  469 	pop	dpl
+      0001C9 12s00r00r00      [16]  470 	lcall	___gptr_cmp
+      0001CD 15 81            [ 8]  471 	dec	sp
+      0001CF 15 81            [ 8]  472 	dec	sp
+      0001D1 15 81            [ 8]  473 	dec	sp
+      0001D3 15 81            [ 8]  474 	dec	sp
+      0001D5 D0 01            [ 8]  475 	pop	ar1
+      0001D7 D0 00            [ 8]  476 	pop	ar0
+      0001D9 D0 07            [ 8]  477 	pop	ar7
+      0001DB D0 06            [ 8]  478 	pop	ar6
+      0001DD 40 04            [12]  479 	jc	00139$
+      0001DF 02s00r03rDF      [16]  480 	ljmp	00112$
+      0001E3                        481 00139$:
+                                    482 ;	qsort.c:57: for(unsigned char *j = i; (j > b) && (*compar)(j, j - size) < 0; j -= size)
+      0001E3 90s00r00r15      [12]  483 	mov	dptr,#_qsort_i_131072_42
+                                    484 ;	genAssign: resultIsFar = TRUE
+      0001E7 75 86 21         [12]  485 	mov	dps,#0x21
+      0001EA 90s00r00r19      [12]  486 	mov	dptr,#_qsort_j_262144_44
+      0001EE E0               [ 8]  487 	movx	a,@dptr
+      0001EF F0               [ 8]  488 	movx	@dptr,a
+      0001F0 A3               [12]  489 	inc	dptr
+      0001F1 A3               [12]  490 	inc	dptr
+      0001F2 E0               [ 8]  491 	movx	a,@dptr
+      0001F3 F0               [ 8]  492 	movx	@dptr,a
+      0001F4 A3               [12]  493 	inc	dptr
+      0001F5 A3               [12]  494 	inc	dptr
+      0001F6 E0               [ 8]  495 	movx	a,@dptr
+      0001F7 F0               [ 8]  496 	movx	@dptr,a
+      0001F8 A3               [12]  497 	inc	dptr
+      0001F9 A3               [12]  498 	inc	dptr
+      0001FA E0               [ 8]  499 	movx	a,@dptr
+      0001FB F0               [ 8]  500 	movx	@dptr,a
+      0001FC 75 86 00         [12]  501 	mov	dps,#0
+      0001FF                        502 00107$:
+      0001FF 90s00r00r19      [12]  503 	mov	dptr,#_qsort_j_262144_44
+                                    504 ;	genAssign: resultIsFar = FALSE
+      000203 E0               [ 8]  505 	movx	a,@dptr
+      000204 FA               [ 4]  506 	mov	r2,a
+      000205 A3               [12]  507 	inc	dptr
+      000206 E0               [ 8]  508 	movx	a,@dptr
+      000207 FB               [ 4]  509 	mov	r3,a
+      000208 A3               [12]  510 	inc	dptr
+      000209 E0               [ 8]  511 	movx	a,@dptr
+      00020A FC               [ 4]  512 	mov	r4,a
+      00020B A3               [12]  513 	inc	dptr
+      00020C E0               [ 8]  514 	movx	a,@dptr
+      00020D FD               [ 4]  515 	mov	r5,a
+      00020E C0 06            [ 8]  516 	push	ar6
+      000210 C0 07            [ 8]  517 	push	ar7
+      000212 C0 00            [ 8]  518 	push	ar0
+      000214 C0 01            [ 8]  519 	push	ar1
+      000216 8A 82            [ 8]  520 	mov	dpl,r2
+      000218 8B 83            [ 8]  521 	mov	dph,r3
+      00021A 8C 93            [ 8]  522 	mov	dpx,r4
+      00021C 8D F0            [ 8]  523 	mov	b,r5
+      00021E 12s00r00r00      [16]  524 	lcall	___gptr_cmp
+      000222 15 81            [ 8]  525 	dec	sp
+      000224 15 81            [ 8]  526 	dec	sp
+      000226 15 81            [ 8]  527 	dec	sp
+      000228 15 81            [ 8]  528 	dec	sp
+      00022A 40 04            [12]  529 	jc	00140$
+      00022C 02s00r03r9E      [16]  530 	ljmp	00111$
+      000230                        531 00140$:
+      000230 C0 06            [ 8]  532 	push	ar6
+      000232 C0 07            [ 8]  533 	push	ar7
+      000234 C0 00            [ 8]  534 	push	ar0
+      000236 C0 01            [ 8]  535 	push	ar1
+      000238 90s00r00r1D      [12]  536 	mov	dptr,#_qsort_sloc0_1_0
+      00023C 75 86 01         [12]  537 	mov	dps, #1
+      00023F 90s00r00r19      [12]  538 	mov	dptr, #_qsort_j_262144_44
+      000243 15 86            [ 8]  539 	dec	dps
+      000245 C3               [ 4]  540 	clr	c
+      000246 E0               [ 8]  541 	movx	a,@dptr
+      000247 F5 F0            [ 8]  542 	mov	b,a
+      000249 05 86            [ 8]  543 	inc	dps
+      00024B E0               [ 8]  544 	movx	a,@dptr
+      00024C 95 F0            [ 8]  545 	subb	a,b
+      00024E FA               [ 4]  546 	mov	r2,a
+      00024F 15 86            [ 8]  547 	dec	dps
+      000251 A3               [12]  548 	inc	dptr
+      000252 E0               [ 8]  549 	movx	a,@dptr
+      000253 F5 F0            [ 8]  550 	mov	b,a
+      000255 05 86            [ 8]  551 	inc	dps
+      000257 A3               [12]  552 	inc	dptr
+      000258 E0               [ 8]  553 	movx	a,@dptr
+      000259 95 F0            [ 8]  554 	subb	a,b
+      00025B FB               [ 4]  555 	mov	r3,a
+      00025C 75 F0 00         [12]  556 	mov	b,#0x00
+      00025F A3               [12]  557 	inc	dptr
+      000260 E0               [ 8]  558 	movx	a,@dptr
+      000261 95 F0            [ 8]  559 	subb	a,b
+      000263 FC               [ 4]  560 	mov	r4,a
+      000264 75 86 01         [12]  561 	mov     dps, #1
+      000267 A3               [12]  562 	inc	dptr
+      000268 E0               [ 8]  563 	movx	a,@dptr
+      000269 75 86 00         [12]  564 	mov	dps,#0
+      00026C FD               [ 4]  565 	mov	r5,a
+      00026D 90s00r00r23      [12]  566 	mov	dptr,#_qsort_sloc2_1_0
+      000271 EA               [ 4]  567 	mov	a,r2
+      000272 F0               [ 8]  568 	movx	@dptr,a
+      000273 A3               [12]  569 	inc	dptr
+      000274 EB               [ 4]  570 	mov	a,r3
+      000275 F0               [ 8]  571 	movx	@dptr,a
+      000276 A3               [12]  572 	inc	dptr
+      000277 EC               [ 4]  573 	mov	a,r4
+      000278 F0               [ 8]  574 	movx	@dptr,a
+      000279 A3               [12]  575 	inc	dptr
+      00027A ED               [ 4]  576 	mov	a,r5
+      00027B F0               [ 8]  577 	movx	@dptr,a
+      00027C 90s00r00r19      [12]  578 	mov	dptr,#_qsort_j_262144_44
+                                    579 ;	genAssign: resultIsFar = FALSE
+      000280 E0               [ 8]  580 	movx	a,@dptr
+      000281 FE               [ 4]  581 	mov	r6,a
+      000282 A3               [12]  582 	inc	dptr
+      000283 E0               [ 8]  583 	movx	a,@dptr
+      000284 FF               [ 4]  584 	mov	r7,a
+      000285 A3               [12]  585 	inc	dptr
+      000286 E0               [ 8]  586 	movx	a,@dptr
+      000287 F8               [ 4]  587 	mov	r0,a
+      000288 A3               [12]  588 	inc	dptr
+      000289 E0               [ 8]  589 	movx	a,@dptr
+      00028A F9               [ 4]  590 	mov	r1,a
+      00028B C0 02            [ 8]  591 	push	ar2
+      00028D C0 03            [ 8]  592 	push	ar3
+      00028F C0 04            [ 8]  593 	push	ar4
+      000291 C0 05            [ 8]  594 	push	ar5
+      000293 C0 00            [ 8]  595 	push	ar0
+      000295 C0 01            [ 8]  596 	push	ar1
+      000297 90s00r00r23      [12]  597 	mov	dptr,#_qsort_sloc2_1_0
+      00029B E0               [ 8]  598 	movx	a,@dptr
+      00029C C0 E0            [ 8]  599 	push	acc
+      00029E A3               [12]  600 	inc	dptr
+      00029F E0               [ 8]  601 	movx	a,@dptr
+      0002A0 C0 E0            [ 8]  602 	push	acc
+      0002A2 A3               [12]  603 	inc	dptr
+      0002A3 E0               [ 8]  604 	movx	a,@dptr
+      0002A4 C0 E0            [ 8]  605 	push	acc
+      0002A6 A3               [12]  606 	inc	dptr
+      0002A7 E0               [ 8]  607 	movx	a,@dptr
+      0002A8 C0 E0            [ 8]  608 	push	acc
+      0002AA 74rCE            [ 8]  609 	mov	a,#00141$
+      0002AC C0 E0            [ 8]  610 	push	acc
+      0002AE 74s02            [ 8]  611 	mov	a,#(00141$ >> 8)
+      0002B0 C0 E0            [ 8]  612 	push	acc
+      0002B2 74s00            [ 8]  613 	mov	a,#(00141$ >> 16)
+      0002B4 C0 E0            [ 8]  614 	push	acc
+      0002B6 90s00r00r0E      [12]  615 	mov	dptr,#_qsort_PARM_4
+      0002BA E0               [ 8]  616 	movx	a,@dptr
+      0002BB C0 E0            [ 8]  617 	push	acc
+      0002BD A3               [12]  618 	inc	dptr
+      0002BE E0               [ 8]  619 	movx	a,@dptr
+      0002BF C0 E0            [ 8]  620 	push	acc
+      0002C1 A3               [12]  621 	inc	dptr
+      0002C2 E0               [ 8]  622 	movx	a,@dptr
+      0002C3 C0 E0            [ 8]  623 	push	acc
+      0002C5 8E 82            [ 8]  624 	mov	dpl,r6
+      0002C7 8F 83            [ 8]  625 	mov	dph,r7
+      0002C9 88 93            [ 8]  626 	mov	dpx,r0
+      0002CB 89 F0            [ 8]  627 	mov	b,r1
+      0002CD 22               [16]  628 	ret
+      0002CE                        629 00141$:
+      0002CE AE 82            [ 8]  630 	mov	r6,dpl
+      0002D0 AF 83            [ 8]  631 	mov	r7,dph
+                                    632 ;	stack adjustment for parms
+      0002D2 D0 E0            [ 8]  633 	pop	acc
+      0002D4 D0 E0            [ 8]  634 	pop	acc
+      0002D6 D0 E0            [ 8]  635 	pop	acc
+      0002D8 D0 E0            [ 8]  636 	pop	acc
+      0002DA D0 01            [ 8]  637 	pop	ar1
+      0002DC D0 00            [ 8]  638 	pop	ar0
+      0002DE D0 05            [ 8]  639 	pop	ar5
+      0002E0 D0 04            [ 8]  640 	pop	ar4
+      0002E2 D0 03            [ 8]  641 	pop	ar3
+      0002E4 D0 02            [ 8]  642 	pop	ar2
+      0002E6 EF               [ 4]  643 	mov	a,r7
+      0002E7 D0 01            [ 8]  644 	pop	ar1
+      0002E9 D0 00            [ 8]  645 	pop	ar0
+      0002EB D0 07            [ 8]  646 	pop	ar7
+      0002ED D0 06            [ 8]  647 	pop	ar6
+      0002EF 20 E7 04         [12]  648 	jb	acc[7],00142$
+      0002F2 02s00r03r9E      [16]  649 	ljmp	00111$
+      0002F6                        650 00142$:
+                                    651 ;	qsort.c:58: swap(j, j - size, size);
+      0002F6 C0 06            [ 8]  652 	push	ar6
+      0002F8 C0 07            [ 8]  653 	push	ar7
+      0002FA C0 00            [ 8]  654 	push	ar0
+      0002FC C0 01            [ 8]  655 	push	ar1
+      0002FE 90s00r00r19      [12]  656 	mov	dptr,#_qsort_j_262144_44
+                                    657 ;	genAssign: resultIsFar = FALSE
+      000302 E0               [ 8]  658 	movx	a,@dptr
+      000303 FE               [ 4]  659 	mov	r6,a
+      000304 A3               [12]  660 	inc	dptr
+      000305 E0               [ 8]  661 	movx	a,@dptr
+      000306 FF               [ 4]  662 	mov	r7,a
+      000307 A3               [12]  663 	inc	dptr
+      000308 E0               [ 8]  664 	movx	a,@dptr
+      000309 F8               [ 4]  665 	mov	r0,a
+      00030A A3               [12]  666 	inc	dptr
+      00030B E0               [ 8]  667 	movx	a,@dptr
+      00030C F9               [ 4]  668 	mov	r1,a
+      00030D 90s00r00r23      [12]  669 	mov	dptr,#_qsort_sloc2_1_0
+      000311 EE               [ 4]  670 	mov	a,r6
+      000312 F0               [ 8]  671 	movx	@dptr,a
+      000313 A3               [12]  672 	inc	dptr
+      000314 EF               [ 4]  673 	mov	a,r7
+      000315 F0               [ 8]  674 	movx	@dptr,a
+      000316 A3               [12]  675 	inc	dptr
+      000317 E8               [ 4]  676 	mov	a,r0
+      000318 F0               [ 8]  677 	movx	@dptr,a
+      000319 A3               [12]  678 	inc	dptr
+      00031A E9               [ 4]  679 	mov	a,r1
+      00031B F0               [ 8]  680 	movx	@dptr,a
+                                    681 ;	genAssign: resultIsFar = FALSE
+      00031C 8A 06            [ 8]  682 	mov	ar6,r2
+      00031E 8B 07            [ 8]  683 	mov	ar7,r3
+      000320 8C 00            [ 8]  684 	mov	ar0,r4
+      000322 8D 01            [ 8]  685 	mov	ar1,r5
+      000324 90s00r00r00      [12]  686 	mov	dptr,#_swap_PARM_2
+      000328 EE               [ 4]  687 	mov	a,r6
+      000329 F0               [ 8]  688 	movx	@dptr,a
+      00032A A3               [12]  689 	inc	dptr
+      00032B EF               [ 4]  690 	mov	a,r7
+      00032C F0               [ 8]  691 	movx	@dptr,a
+      00032D A3               [12]  692 	inc	dptr
+      00032E E8               [ 4]  693 	mov	a,r0
+      00032F F0               [ 8]  694 	movx	@dptr,a
+      000330 A3               [12]  695 	inc	dptr
+      000331 E9               [ 4]  696 	mov	a,r1
+      000332 F0               [ 8]  697 	movx	@dptr,a
+      000333 90s00r00r1D      [12]  698 	mov	dptr,#_qsort_sloc0_1_0
+                                    699 ;	genAssign: resultIsFar = TRUE
+      000337 75 86 21         [12]  700 	mov	dps,#0x21
+      00033A 90s00r00r04      [12]  701 	mov	dptr,#_swap_PARM_3
+      00033E E0               [ 8]  702 	movx	a,@dptr
+      00033F F0               [ 8]  703 	movx	@dptr,a
+      000340 A3               [12]  704 	inc	dptr
+      000341 A3               [12]  705 	inc	dptr
+      000342 E0               [ 8]  706 	movx	a,@dptr
+      000343 F0               [ 8]  707 	movx	@dptr,a
+      000344 75 86 00         [12]  708 	mov	dps,#0
+      000347 C0 02            [ 8]  709 	push	ar2
+      000349 C0 03            [ 8]  710 	push	ar3
+      00034B C0 04            [ 8]  711 	push	ar4
+      00034D C0 05            [ 8]  712 	push	ar5
+      00034F C0 06            [ 8]  713 	push	ar6
+      000351 C0 07            [ 8]  714 	push	ar7
+      000353 C0 00            [ 8]  715 	push	ar0
+      000355 C0 01            [ 8]  716 	push	ar1
+      000357 05 86            [ 8]  717 	inc	dps
+      000359 90s00r00r23      [12]  718 	mov	dptr,#_qsort_sloc2_1_0
+      00035D E0               [ 8]  719 	movx	a,@dptr
+      00035E F5 82            [ 8]  720 	mov	dpl,a
+      000360 A3               [12]  721 	inc	dptr
+      000361 E0               [ 8]  722 	movx	a,@dptr
+      000362 F5 83            [ 8]  723 	mov	dph,a
+      000364 A3               [12]  724 	inc	dptr
+      000365 E0               [ 8]  725 	movx	a,@dptr
+      000366 F5 93            [ 8]  726 	mov	dpx,a
+      000368 A3               [12]  727 	inc	dptr
+      000369 E0               [ 8]  728 	movx	a,@dptr
+      00036A F5 F0            [ 8]  729 	mov	b,a
+      00036C 75 86 00         [12]  730 	mov	dps,#0
+      00036F 12s00r00r00      [16]  731 	lcall	_swap
+      000373 D0 01            [ 8]  732 	pop	ar1
+      000375 D0 00            [ 8]  733 	pop	ar0
+      000377 D0 07            [ 8]  734 	pop	ar7
+      000379 D0 06            [ 8]  735 	pop	ar6
+      00037B D0 05            [ 8]  736 	pop	ar5
+      00037D D0 04            [ 8]  737 	pop	ar4
+      00037F D0 03            [ 8]  738 	pop	ar3
+      000381 D0 02            [ 8]  739 	pop	ar2
+                                    740 ;	qsort.c:57: for(unsigned char *j = i; (j > b) && (*compar)(j, j - size) < 0; j -= size)
+                                    741 ;	genAssign: resultIsFar = TRUE
+      000383 90s00r00r19      [12]  742 	mov	dptr,#_qsort_j_262144_44
+      000387 EA               [ 4]  743 	mov	a,r2
+      000388 F0               [ 8]  744 	movx	@dptr,a
+      000389 A3               [12]  745 	inc	dptr
+      00038A EB               [ 4]  746 	mov	a,r3
+      00038B F0               [ 8]  747 	movx	@dptr,a
+      00038C A3               [12]  748 	inc	dptr
+      00038D EC               [ 4]  749 	mov	a,r4
+      00038E F0               [ 8]  750 	movx	@dptr,a
+      00038F A3               [12]  751 	inc	dptr
+      000390 ED               [ 4]  752 	mov	a,r5
+      000391 F0               [ 8]  753 	movx	@dptr,a
+      000392 D0 01            [ 8]  754 	pop	ar1
+      000394 D0 00            [ 8]  755 	pop	ar0
+      000396 D0 07            [ 8]  756 	pop	ar7
+      000398 D0 06            [ 8]  757 	pop	ar6
+      00039A 02s00r01rFF      [16]  758 	ljmp	00107$
+      00039E                        759 00111$:
+                                    760 ;	qsort.c:55: for(unsigned char *i = base; i < b + nmemb * size; i += size)
+      00039E 90s00r00r1D      [12]  761 	mov	dptr,#_qsort_sloc0_1_0
+      0003A2 75 86 01         [12]  762 	mov	dps, #1
+      0003A5 90s00r00r15      [12]  763 	mov	dptr, #_qsort_i_131072_42
+      0003A9 15 86            [ 8]  764 	dec	dps
+      0003AB E0               [ 8]  765 	movx	a,@dptr
+      0003AC C5 9C            [ 8]  766 	xch	a, acc1
+      0003AE 05 86            [ 8]  767 	inc	dps
+      0003B0 E0               [ 8]  768 	movx	a,@dptr
+      0003B1 C5 9C            [ 8]  769 	xch	a, acc1
+      0003B3 25 9C            [ 8]  770 	add	a,acc1
+      0003B5 F0               [ 8]  771 	movx	@dptr,a
+      0003B6 15 86            [ 8]  772 	dec	dps
+      0003B8 A3               [12]  773 	inc	dptr
+      0003B9 E0               [ 8]  774 	movx	a,@dptr
+      0003BA C5 9C            [ 8]  775 	xch	a, acc1
+      0003BC 05 86            [ 8]  776 	inc	dps
+      0003BE A3               [12]  777 	inc	dptr
+      0003BF E0               [ 8]  778 	movx	a,@dptr
+      0003C0 C5 9C            [ 8]  779 	xch	a, acc1
+      0003C2 35 9C            [ 8]  780 	addc	a,acc1
+      0003C4 F0               [ 8]  781 	movx	@dptr,a
+      0003C5 E4               [ 4]  782 	clr	a
+      0003C6 C5 9C            [ 8]  783 	xch	a, acc1
+      0003C8 A3               [12]  784 	inc	dptr
+      0003C9 E0               [ 8]  785 	movx	a,@dptr
+      0003CA C5 9C            [ 8]  786 	xch	a, acc1
+      0003CC 35 9C            [ 8]  787 	addc	a,acc1
+      0003CE F0               [ 8]  788 	movx	@dptr,a
+      0003CF 75 86 01         [12]  789 	mov     dps, #1
+      0003D2 A3               [12]  790 	inc	dptr
+      0003D3 E0               [ 8]  791 	movx	a,@dptr
+      0003D4 75 86 01         [12]  792 	mov     dps, #1
+      0003D7 F0               [ 8]  793 	movx	@dptr,a
+      0003D8 75 86 00         [12]  794 	mov	dps,#0
+      0003DB 02s00r01r91      [16]  795 	ljmp	00110$
+      0003DF                        796 00112$:
+                                    797 ;	qsort.c:60: }
+      0003DF 22               [16]  798 	ret
+                                    799 	.area CSEG    (CODE)
+                                    800 	.area CONST   (CODE)
+                                    801 	.area XINIT   (CODE)
+                                    802 	.area CABS    (ABS,CODE)

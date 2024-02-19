@@ -1,0 +1,155 @@
+                                      1 ;--------------------------------------------------------
+                                      2 ; File Created by SDCC : free open source ISO C Compiler 
+                                      3 ; Version 4.2.14 #0 (Linux)
+                                      4 ;--------------------------------------------------------
+                                      5 	.module _memset
+                                      6 	.optsdcc -mmcs51 --model-small
+                                      7 	
+                                      8 ;--------------------------------------------------------
+                                      9 ; Public variables in this module
+                                     10 ;--------------------------------------------------------
+                                     11 ;--------------------------------------------------------
+                                     12 ; special function registers
+                                     13 ;--------------------------------------------------------
+                                     14 	.area RSEG    (ABS,DATA)
+      000000                         15 	.org 0x0000
+                                     16 ;--------------------------------------------------------
+                                     17 ; special function bits
+                                     18 ;--------------------------------------------------------
+                                     19 	.area RSEG    (ABS,DATA)
+      000000                         20 	.org 0x0000
+                                     21 ;--------------------------------------------------------
+                                     22 ; overlayable register banks
+                                     23 ;--------------------------------------------------------
+                                     24 	.area REG_BANK_0	(REL,OVR,DATA)
+      000000                         25 	.ds 8
+                                     26 ;--------------------------------------------------------
+                                     27 ; internal ram data
+                                     28 ;--------------------------------------------------------
+                                     29 	.area DSEG    (DATA)
+                                     30 ;--------------------------------------------------------
+                                     31 ; overlayable items in internal ram
+                                     32 ;--------------------------------------------------------
+                                     33 ;--------------------------------------------------------
+                                     34 ; indirectly addressable internal ram data
+                                     35 ;--------------------------------------------------------
+                                     36 	.area ISEG    (DATA)
+                                     37 ;--------------------------------------------------------
+                                     38 ; absolute internal ram data
+                                     39 ;--------------------------------------------------------
+                                     40 	.area IABS    (ABS,DATA)
+                                     41 	.area IABS    (ABS,DATA)
+                                     42 ;--------------------------------------------------------
+                                     43 ; bit data
+                                     44 ;--------------------------------------------------------
+                                     45 	.area BSEG    (BIT)
+                                     46 ;--------------------------------------------------------
+                                     47 ; paged external ram data
+                                     48 ;--------------------------------------------------------
+                                     49 	.area PSEG    (PAG,XDATA)
+                                     50 ;--------------------------------------------------------
+                                     51 ; uninitialized external ram data
+                                     52 ;--------------------------------------------------------
+                                     53 	.area XSEG    (XDATA)
+                                     54 ;--------------------------------------------------------
+                                     55 ; absolute external ram data
+                                     56 ;--------------------------------------------------------
+                                     57 	.area XABS    (ABS,XDATA)
+                                     58 ;--------------------------------------------------------
+                                     59 ; initialized external ram data
+                                     60 ;--------------------------------------------------------
+                                     61 	.area XISEG   (XDATA)
+                                     62 	.area HOME    (CODE)
+                                     63 	.area GSINIT0 (CODE)
+                                     64 	.area GSINIT1 (CODE)
+                                     65 	.area GSINIT2 (CODE)
+                                     66 	.area GSINIT3 (CODE)
+                                     67 	.area GSINIT4 (CODE)
+                                     68 	.area GSINIT5 (CODE)
+                                     69 	.area GSINIT  (CODE)
+                                     70 	.area GSFINAL (CODE)
+                                     71 	.area CSEG    (CODE)
+                                     72 ;--------------------------------------------------------
+                                     73 ; global & static initialisations
+                                     74 ;--------------------------------------------------------
+                                     75 	.area HOME    (CODE)
+                                     76 	.area GSINIT  (CODE)
+                                     77 	.area GSFINAL (CODE)
+                                     78 	.area GSINIT  (CODE)
+                                     79 ;--------------------------------------------------------
+                                     80 ; Home
+                                     81 ;--------------------------------------------------------
+                                     82 	.area HOME    (CODE)
+                                     83 	.area HOME    (CODE)
+                                     84 ;--------------------------------------------------------
+                                     85 ; code
+                                     86 ;--------------------------------------------------------
+                                     87 	.area CSEG    (CODE)
+                                     88 ;------------------------------------------------------------
+                                     89 ;Allocation info for local variables in function 'dummy'
+                                     90 ;------------------------------------------------------------
+                                     91 ;	_memset.c:204: static void dummy(void) __naked
+                                     92 ;	-----------------------------------------
+                                     93 ;	 function dummy
+                                     94 ;	-----------------------------------------
+      000000                         95 _dummy:
+                                     96 ;	naked function: no prologue.
+                                     97 ;	_memset.c:326: __endasm;
+                                     98 	.area	OSEG (OVR,DATA)
+      000000                         99 _memset_PARM_2::
+      000000                        100 	.ds	1
+      000001                        101 _memset_PARM_3::
+      000001                        102 	.ds	2
+                                    103 	.area	CSEG (CODE)
+      000000                        104 _memset::
+                                    105 ;	Assign buf (b holds memspace, no need to touch)
+      000000 AC 82            [24]  106 	mov	r4,dpl
+      000002 AD 83            [24]  107 	mov	r5,dph
+                                    108 ;
+                                    109 ;	Assign count
+      000004 AE*01            [24]  110 	mov	r6,_memset_PARM_3
+      000006 AF*02            [24]  111 	mov	r7,(_memset_PARM_3 + 1)
+                                    112 ;
+                                    113 ;	if (!count) return buf;
+                                    114 ;	check for count != 0 intermangled with gymnastic
+                                    115 ;	preparing djnz instructions
+      000008 BE 00 04         [24]  116 	cjne	r6,#0x00,COUNT_LSB_NOT_ZERO
+      00000B EF               [12]  117 	mov	a,r7
+      00000C 60 0C            [24]  118 	jz	MEMSET_END
+      00000E 1F               [12]  119 	dec	r7
+      00000F                        120 COUNT_LSB_NOT_ZERO:
+      00000F 0F               [12]  121 	inc	r7
+                                    122 ;
+                                    123 ;	This was 8 byte overhead for preparing
+                                    124 ;	the count argument for an integer loop with two
+                                    125 ;	djnz instructions - it might make sense to
+                                    126 ;	let SDCC automatically generate this when
+                                    127 ;	it encounters a loop like:
+                                    128 ;	for(i=0;i<j;i++){...}
+                                    129 ;	(at least for option --opt-code-speed)
+                                    130 ;
+                                    131 ;	Assign ch
+      000010 E5*00            [12]  132 	mov	a,_memset_PARM_2
+                                    133 ;	_memset.c do {
+      000012                        134 MEMSET_LOOP:
+                                    135 ;	_memset.c *p = ch;
+      000012 12r00r00         [24]  136 	lcall	__gptrput
+                                    137 ;	_memset.c p++;
+      000015 A3               [24]  138 	inc	dptr
+                                    139 ;	_memset.c } while(--count) ;
+      000016 DE FA            [24]  140 	djnz	r6,MEMSET_LOOP
+      000018 DF F8            [24]  141 	djnz	r7,MEMSET_LOOP
+                                    142 ;
+      00001A                        143 MEMSET_END:
+                                    144 ;	_memset.c return buf ;
+                                    145 ;	b was unchanged
+      00001A 8C 82            [24]  146 	mov	dpl,r4
+      00001C 8D 83            [24]  147 	mov	dph,r5
+                                    148 ;
+      00001E 22               [24]  149 	ret
+                                    150 ;	_memset.c:327: }
+                                    151 ;	naked function: no epilogue.
+                                    152 	.area CSEG    (CODE)
+                                    153 	.area CONST   (CODE)
+                                    154 	.area XINIT   (CODE)
+                                    155 	.area CABS    (ABS,CODE)

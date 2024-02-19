@@ -1,0 +1,1436 @@
+                                      1 ;--------------------------------------------------------
+                                      2 ; File Created by SDCC : free open source ISO C Compiler 
+                                      3 ; Version 4.2.14 #0 (Linux)
+                                      4 ;--------------------------------------------------------
+                                      5 	.module rtc390
+                                      6 	.optsdcc -mds390 --model-flat24
+                                      7 	
+                                      8 ;--------------------------------------------------------
+                                      9 ; CPU specific extensions
+                                     10 ;--------------------------------------------------------
+                                     11 	.DS80C390
+                                     12 	.amode	2	; 24 bit flat addressing
+                           000082    13 dpl	=	0x82
+                           000083    14 dph	=	0x83
+                           000084    15 dpl1	=	0x84
+                           000085    16 dph1	=	0x85
+                           000086    17 dps	=	0x86
+                           000093    18 dpx	=	0x93
+                           000095    19 dpx1	=	0x95
+                           00009B    20 esp	=	0x9B
+                           00009C    21 ap	=	0x9C
+                           00009C    22 acc1	=	0x9C
+                           0000D1    23 mcnt0	=	0xD1
+                           0000D2    24 mcnt1	=	0xD2
+                           0000D3    25 ma	=	0xD3
+                           0000D4    26 mb	=	0xD4
+                           0000D5    27 mc	=	0xD5
+                           00009D    28 acon	=	0x9D
+                           0000C6    29 mcon	=	0xC6
+                           0000D1    30 F1	=	0xD1	; user flag
+                                     31 ;--------------------------------------------------------
+                                     32 ; Public variables in this module
+                                     33 ;--------------------------------------------------------
+                                     34 	.globl _rtcMagic
+                                     35 	.globl _RtcRead
+                                     36 	.globl _RtcWrite
+                                     37 ;--------------------------------------------------------
+                                     38 ; special function registers
+                                     39 ;--------------------------------------------------------
+                           000080    40 _P4	=	0x0080
+                           000081    41 _SP	=	0x0081
+                           000082    42 _DPL	=	0x0082
+                           000083    43 _DPH	=	0x0083
+                           000084    44 _DPL1	=	0x0084
+                           000085    45 _DPH1	=	0x0085
+                           000086    46 _DPS	=	0x0086
+                           000087    47 _PCON	=	0x0087
+                           000088    48 _TCON	=	0x0088
+                           000089    49 _TMOD	=	0x0089
+                           00008A    50 _TL0	=	0x008a
+                           00008B    51 _TL1	=	0x008b
+                           00008C    52 _TH0	=	0x008c
+                           00008D    53 _TH1	=	0x008d
+                           00008E    54 _CKCON	=	0x008e
+                           000090    55 _P1	=	0x0090
+                           000091    56 _EXIF	=	0x0091
+                           000092    57 _P4CNT	=	0x0092
+                           000093    58 _DPX	=	0x0093
+                           000095    59 _DPX1	=	0x0095
+                           000098    60 _SCON0	=	0x0098
+                           000099    61 _SBUF0	=	0x0099
+                           00009B    62 _ESP	=	0x009b
+                           00009C    63 _AP	=	0x009c
+                           00009D    64 _ACON	=	0x009d
+                           0000A0    65 _P2	=	0x00a0
+                           0000A1    66 _P5	=	0x00a1
+                           0000A2    67 _P5CNT	=	0x00a2
+                           0000A8    68 _IE	=	0x00a8
+                           0000B0    69 _P3	=	0x00b0
+                           0000B8    70 _IP	=	0x00b8
+                           0000C0    71 _SCON1	=	0x00c0
+                           0000C1    72 _SBUF1	=	0x00c1
+                           0000C4    73 _PMR	=	0x00c4
+                           0000C6    74 _MCON	=	0x00c6
+                           0000C7    75 _TA	=	0x00c7
+                           0000C8    76 _T2CON	=	0x00c8
+                           0000C9    77 _T2MOD	=	0x00c9
+                           0000CA    78 _RCAP2L	=	0x00ca
+                           0000CA    79 _RTL2	=	0x00ca
+                           0000CB    80 _RCAP2H	=	0x00cb
+                           0000CB    81 _RTH2	=	0x00cb
+                           0000CC    82 _TL2	=	0x00cc
+                           0000CD    83 _TH2	=	0x00cd
+                           0000D0    84 _PSW	=	0x00d0
+                           0000D1    85 _MCNT0	=	0x00d1
+                           0000D2    86 _MCNT1	=	0x00d2
+                           0000D3    87 _MA	=	0x00d3
+                           0000D4    88 _MB	=	0x00d4
+                           0000D5    89 _MC	=	0x00d5
+                           0000D8    90 _WDCON	=	0x00d8
+                           0000E0    91 _ACC	=	0x00e0
+                           0000E8    92 _EIE	=	0x00e8
+                           0000EA    93 _MXAX	=	0x00ea
+                           0000F0    94 _B	=	0x00f0
+                           0000F8    95 _EIP	=	0x00f8
+                           008C8A    96 _TMR0	=	0x8c8a
+                           008D8B    97 _TMR1	=	0x8d8b
+                           00CDCC    98 _TMR2	=	0xcdcc
+                           00CBCA    99 _RCAP2	=	0xcbca
+                                    100 ;--------------------------------------------------------
+                                    101 ; special function bits
+                                    102 ;--------------------------------------------------------
+                           000088   103 _IT0	=	0x0088
+                           000089   104 _IE0	=	0x0089
+                           00008A   105 _IT1	=	0x008a
+                           00008B   106 _IE1	=	0x008b
+                           00008C   107 _TR0	=	0x008c
+                           00008D   108 _TF0	=	0x008d
+                           00008E   109 _TR1	=	0x008e
+                           00008F   110 _TF1	=	0x008f
+                           000090   111 _T2	=	0x0090
+                           000091   112 _T2EX	=	0x0091
+                           000092   113 _RXD1	=	0x0092
+                           000093   114 _TXD1	=	0x0093
+                           000094   115 _INT2	=	0x0094
+                           000095   116 _INT3	=	0x0095
+                           000096   117 _INT4	=	0x0096
+                           000097   118 _INT5	=	0x0097
+                           000098   119 _RI_0	=	0x0098
+                           000099   120 _TI_0	=	0x0099
+                           00009A   121 _RB8_0	=	0x009a
+                           00009B   122 _TB8_0	=	0x009b
+                           00009C   123 _REN_0	=	0x009c
+                           00009D   124 _SM2_0	=	0x009d
+                           00009E   125 _SM1_0	=	0x009e
+                           00009F   126 _SM0_0	=	0x009f
+                           00009F   127 _FE_0	=	0x009f
+                           0000A8   128 _EX0	=	0x00a8
+                           0000A9   129 _ET0	=	0x00a9
+                           0000AA   130 _EX1	=	0x00aa
+                           0000AB   131 _ET1	=	0x00ab
+                           0000AC   132 _ES0	=	0x00ac
+                           0000AD   133 _ET2	=	0x00ad
+                           0000AE   134 _ES1	=	0x00ae
+                           0000AF   135 _EA	=	0x00af
+                           0000B0   136 _RXD0	=	0x00b0
+                           0000B1   137 _TXD0	=	0x00b1
+                           0000B2   138 _INT0	=	0x00b2
+                           0000B3   139 _INT1	=	0x00b3
+                           0000B4   140 _T0	=	0x00b4
+                           0000B5   141 _T1	=	0x00b5
+                           0000B6   142 _WR	=	0x00b6
+                           0000B7   143 _RD	=	0x00b7
+                           0000B8   144 _PX0	=	0x00b8
+                           0000B9   145 _PT0	=	0x00b9
+                           0000BA   146 _PX1	=	0x00ba
+                           0000BB   147 _PT1	=	0x00bb
+                           0000BC   148 _PS0	=	0x00bc
+                           0000BD   149 _PT2	=	0x00bd
+                           0000BE   150 _PS1	=	0x00be
+                           0000C0   151 _RI_1	=	0x00c0
+                           0000C1   152 _TI_1	=	0x00c1
+                           0000C2   153 _RB8_1	=	0x00c2
+                           0000C3   154 _TB8_1	=	0x00c3
+                           0000C4   155 _REN_1	=	0x00c4
+                           0000C5   156 _SM2_1	=	0x00c5
+                           0000C6   157 _SM1_1	=	0x00c6
+                           0000C7   158 _SM0_1	=	0x00c7
+                           0000C7   159 _FE_1	=	0x00c7
+                           0000C8   160 _CP_RL	=	0x00c8
+                           0000C9   161 _C_T	=	0x00c9
+                           0000CA   162 _TR2	=	0x00ca
+                           0000CB   163 _EXEN2	=	0x00cb
+                           0000CC   164 _TCLK	=	0x00cc
+                           0000CD   165 _RCLK	=	0x00cd
+                           0000CE   166 _EXF2	=	0x00ce
+                           0000CF   167 _TF2	=	0x00cf
+                           0000D0   168 _P	=	0x00d0
+                           0000D1   169 _F1	=	0x00d1
+                           0000D2   170 _OV	=	0x00d2
+                           0000D3   171 _RS0	=	0x00d3
+                           0000D4   172 _RS1	=	0x00d4
+                           0000D5   173 _F0	=	0x00d5
+                           0000D6   174 _AC	=	0x00d6
+                           0000D7   175 _CY	=	0x00d7
+                           0000D8   176 _RWT	=	0x00d8
+                           0000D9   177 _EWT	=	0x00d9
+                           0000DA   178 _WDRF	=	0x00da
+                           0000DB   179 _WDIF	=	0x00db
+                           0000DC   180 _PFI	=	0x00dc
+                           0000DD   181 _EPFI	=	0x00dd
+                           0000DE   182 _POR	=	0x00de
+                           0000DF   183 _SMOD_1	=	0x00df
+                           0000E8   184 _EX2	=	0x00e8
+                           0000E9   185 _EX3	=	0x00e9
+                           0000EA   186 _EX4	=	0x00ea
+                           0000EB   187 _EX5	=	0x00eb
+                           0000EC   188 _EWDI	=	0x00ec
+                           0000ED   189 _C1IE	=	0x00ed
+                           0000EE   190 _C0IE	=	0x00ee
+                           0000EF   191 _CANBIE	=	0x00ef
+                           0000F8   192 _PX2	=	0x00f8
+                           0000F9   193 _PX3	=	0x00f9
+                           0000FA   194 _PX4	=	0x00fa
+                           0000FB   195 _PX5	=	0x00fb
+                           0000FC   196 _PWDI	=	0x00fc
+                           0000FD   197 _C1IP	=	0x00fd
+                           0000FE   198 _C0IP	=	0x00fe
+                           0000FF   199 _CANBIP	=	0x00ff
+                                    200 ;--------------------------------------------------------
+                                    201 ; overlayable register banks
+                                    202 ;--------------------------------------------------------
+                                    203 	.area REG_BANK_0	(REL,OVR,DATA)
+      000000                        204 	.ds 8
+                                    205 ;--------------------------------------------------------
+                                    206 ; internal ram data
+                                    207 ;--------------------------------------------------------
+                                    208 	.area DSEG    (DATA)
+                                    209 ;--------------------------------------------------------
+                                    210 ; overlayable items in internal ram
+                                    211 ;--------------------------------------------------------
+                                    212 ;--------------------------------------------------------
+                                    213 ; indirectly addressable internal ram data
+                                    214 ;--------------------------------------------------------
+                                    215 	.area ISEG    (DATA)
+                                    216 ;--------------------------------------------------------
+                                    217 ; absolute internal ram data
+                                    218 ;--------------------------------------------------------
+                                    219 	.area IABS    (ABS,DATA)
+                                    220 	.area IABS    (ABS,DATA)
+                                    221 ;--------------------------------------------------------
+                                    222 ; bit data
+                                    223 ;--------------------------------------------------------
+                                    224 	.area BSEG    (BIT)
+                                    225 ;--------------------------------------------------------
+                                    226 ; paged external ram data
+                                    227 ;--------------------------------------------------------
+                                    228 	.area PSEG    (PAG,XDATA)
+                                    229 ;--------------------------------------------------------
+                                    230 ; uninitialized external ram data
+                                    231 ;--------------------------------------------------------
+                                    232 	.area XSEG    (XDATA)
+                           310000   233 _rtc	=	0x310000
+      000000                        234 _RtcRead_rtcDate_65536_86:
+      000000                        235 	.ds 4
+      000004                        236 _RtcRead_rtcBytes_65536_87:
+      000004                        237 	.ds 8
+      00000C                        238 _RtcWrite_rtcBytes_65536_95:
+      00000C                        239 	.ds 8
+                                    240 ;--------------------------------------------------------
+                                    241 ; absolute external ram data
+                                    242 ;--------------------------------------------------------
+                                    243 	.area XABS    (ABS,XDATA)
+                                    244 ;--------------------------------------------------------
+                                    245 ; initialized external ram data
+                                    246 ;--------------------------------------------------------
+                                    247 	.area XISEG   (XDATA)
+                                    248 ;--------------------------------------------------------
+                                    249 ; global & static initialisations
+                                    250 ;--------------------------------------------------------
+                                    251 	.area HOME    (CODE)
+                                    252 	.area GSINIT  (CODE)
+                                    253 	.area GSFINAL (CODE)
+                                    254 	.area GSINIT  (CODE)
+                                    255 ;--------------------------------------------------------
+                                    256 ; Home
+                                    257 ;--------------------------------------------------------
+                                    258 	.area HOME    (CODE)
+                                    259 	.area HOME    (CODE)
+                                    260 ;--------------------------------------------------------
+                                    261 ; code
+                                    262 ;--------------------------------------------------------
+                                    263 	.area CSEG    (CODE)
+                                    264 ;------------------------------------------------------------
+                                    265 ;Allocation info for local variables in function 'RtcSync'
+                                    266 ;------------------------------------------------------------
+                                    267 ;dummy                     Allocated to registers 
+                                    268 ;byte                      Allocated to registers 
+                                    269 ;bitMask                   Allocated to registers r3 
+                                    270 ;------------------------------------------------------------
+                                    271 ;	rtc390.c:47: static void RtcSync(void) {
+                                    272 ;	-----------------------------------------
+                                    273 ;	 function RtcSync
+                                    274 ;	-----------------------------------------
+      000000                        275 _RtcSync:
+                           000002   276 	ar2 = 0x02
+                           000003   277 	ar3 = 0x03
+                           000004   278 	ar4 = 0x04
+                           000005   279 	ar5 = 0x05
+                           000006   280 	ar6 = 0x06
+                           000007   281 	ar7 = 0x07
+                           000000   282 	ar0 = 0x00
+                           000001   283 	ar1 = 0x01
+                                    284 ;	rtc390.c:51: dummy=rtc;
+      000000 90 31 00 00      [12]  285 	mov	dptr,#_rtc
+      000004 E0               [ 8]  286 	movx	a,@dptr
+                                    287 ;	rtc390.c:54: for (byte=0; byte<8; byte++) {
+                                    288 ;	genAssign: resultIsFar = FALSE
+      000005 7A 00            [ 8]  289 	mov	r2,#0x00
+      000007                        290 00105$:
+                                    291 ;	rtc390.c:55: for (bitMask=0x01; bitMask; bitMask<<=1) {
+                                    292 ;	genAssign: resultIsFar = TRUE
+      000007 7B 01            [ 8]  293 	mov	r3,#0x01
+      000009 EA               [ 4]  294 	mov	a,r2
+      00000A 24r00            [ 8]  295 	add	a,#_rtcMagic
+      00000C F5 84            [ 8]  296 	mov	dpl1,a
+      00000E E4               [ 4]  297 	clr	a
+      00000F 34s00            [ 8]  298 	addc	a,#(_rtcMagic >> 8)
+      000011 F5 85            [ 8]  299 	mov	dph1,a
+      000013 E4               [ 4]  300 	clr	a
+      000014 34s00            [ 8]  301 	addc	a,#(_rtcMagic >> 16)
+      000016 F5 95            [ 8]  302 	mov	dpx1,a
+      000018                        303 00103$:
+                                    304 ;	rtc390.c:56: rtc = (rtcMagic[byte]&bitMask) ? 0xff : 0x00;
+      000018 05 86            [ 8]  305 	inc	dps
+      00001A E4               [ 4]  306 	clr	a
+      00001B 93               [12]  307 	movc	a,@a+dptr
+      00001C FF               [ 4]  308 	mov	r7,a
+      00001D 75 86 00         [12]  309 	mov	dps,#0
+      000020 EB               [ 4]  310 	mov	a,r3
+      000021 5F               [ 4]  311 	anl	a,r7
+      000022 60 06            [12]  312 	jz  00109$
+      000024                        313 00128$:
+                                    314 ;	genAssign: resultIsFar = FALSE
+      000024 7F FF            [ 8]  315 	mov	r7,#0xff
+      000026 78 00            [ 8]  316 	mov	r0,#0x00
+      000028 80 04            [12]  317 	sjmp 00110$
+      00002A                        318 00109$:
+                                    319 ;	genAssign: resultIsFar = FALSE
+      00002A 7F 00            [ 8]  320 	mov	r7,#0x00
+      00002C 78 00            [ 8]  321 	mov	r0,#0x00
+      00002E                        322 00110$:
+      00002E 90 31 00 00      [12]  323 	mov	dptr,#_rtc
+      000032 EF               [ 4]  324 	mov	a,r7
+      000033 F0               [ 8]  325 	movx	@dptr,a
+                                    326 ;	rtc390.c:55: for (bitMask=0x01; bitMask; bitMask<<=1) {
+      000034 8B 07            [ 8]  327 	mov	ar7,r3
+      000036 EF               [ 4]  328 	mov	a,r7
+      000037 25 E0            [ 8]  329 	add	a,acc
+      000039 FF               [ 4]  330 	mov	r7,a
+                                    331 ;	genAssign: resultIsFar = TRUE
+      00003A 8F 03            [ 8]  332 	mov	ar3,r7
+      00003C EB               [ 4]  333 	mov	a,r3
+      00003D 70 D9            [12]  334 	jnz  00103$
+      00003F                        335 00129$:
+                                    336 ;	rtc390.c:54: for (byte=0; byte<8; byte++) {
+      00003F 0A               [ 4]  337 	inc	r2
+      000040 BA 08 00         [16]  338 	cjne	r2,#0x08,00130$
+      000043                        339 00130$:
+      000043 40 C2            [12]  340 	jc   00105$
+      000045                        341 00131$:
+      000045                        342 00107$:
+                                    343 ;	rtc390.c:59: }
+      000045 22               [16]  344 	ret
+                                    345 ;------------------------------------------------------------
+                                    346 ;Allocation info for local variables in function 'RtcRead'
+                                    347 ;------------------------------------------------------------
+                                    348 ;rtcDate                   Allocated with name '_RtcRead_rtcDate_65536_86'
+                                    349 ;rtcBytes                  Allocated with name '_RtcRead_rtcBytes_65536_87'
+                                    350 ;byte                      Allocated to registers 
+                                    351 ;bitMask                   Allocated to registers r3 
+                                    352 ;------------------------------------------------------------
+                                    353 ;	rtc390.c:61: unsigned char RtcRead(struct tm *rtcDate) {
+                                    354 ;	-----------------------------------------
+                                    355 ;	 function RtcRead
+                                    356 ;	-----------------------------------------
+      000046                        357 _RtcRead:
+      000046 75 86 01         [12]  358 	mov     dps, #1
+      000049 90s00r00r00      [12]  359 	mov     dptr, #_RtcRead_rtcDate_65536_86
+      00004D E5 82            [ 8]  360 	mov	a,dpl
+      00004F F0               [ 8]  361 	movx	@dptr,a
+      000050 A3               [12]  362 	inc	dptr
+      000051 E5 83            [ 8]  363 	mov	a,dph
+      000053 F0               [ 8]  364 	movx	@dptr,a
+      000054 A3               [12]  365 	inc	dptr
+      000055 E5 93            [ 8]  366 	mov	a,dpx
+      000057 F0               [ 8]  367 	movx	@dptr,a
+      000058 A3               [12]  368 	inc	dptr
+      000059 E5 F0            [ 8]  369 	mov	a,b
+      00005B F0               [ 8]  370 	movx	@dptr,a
+      00005C 75 86 00         [12]  371 	mov	dps,#0
+                                    372 ;	rtc390.c:65: RtcSync();
+      00005F 12s00r00r00      [16]  373 	lcall	_RtcSync
+                                    374 ;	rtc390.c:67: for (byte=0; byte<8; byte++) {
+                                    375 ;	genAssign: resultIsFar = FALSE
+      000063 7E 00            [ 8]  376 	mov	r6,#0x00
+      000065                        377 00110$:
+                                    378 ;	rtc390.c:68: rtcBytes[byte]=0;
+      000065 EE               [ 4]  379 	mov	a,r6
+      000066 24r04            [ 8]  380 	add	a,#_RtcRead_rtcBytes_65536_87
+      000068 F5 84            [ 8]  381 	mov	dpl1,a
+      00006A E4               [ 4]  382 	clr	a
+      00006B 34s00            [ 8]  383 	addc	a,#(_RtcRead_rtcBytes_65536_87 >> 8)
+      00006D F5 85            [ 8]  384 	mov	dph1,a
+      00006F E4               [ 4]  385 	clr	a
+      000070 34s00            [ 8]  386 	addc	a,#(_RtcRead_rtcBytes_65536_87 >> 16)
+      000072 F5 95            [ 8]  387 	mov	dpx1,a
+      000074 E4               [ 4]  388 	clr	a
+      000075 05 86            [ 8]  389 	inc	dps
+      000077 F0               [ 8]  390 	movx	@dptr,a
+      000078 75 86 00         [12]  391 	mov	dps,#0
+                                    392 ;	rtc390.c:69: for (bitMask=0x01; bitMask; bitMask<<=1) {
+                                    393 ;	genAssign: resultIsFar = FALSE
+      00007B 7B 01            [ 8]  394 	mov	r3,#0x01
+      00007D                        395 00108$:
+                                    396 ;	rtc390.c:70: if (rtc&1) {
+      00007D 90 31 00 00      [12]  397 	mov	dptr,#_rtc
+                                    398 ;	genAssign: resultIsFar = FALSE
+      000081 E0               [ 8]  399 	movx	a,@dptr
+      000082 F8               [ 4]  400 	mov  r0,a
+      000083 30 E0 20         [12]  401 	jnb  acc[0],00109$
+      000086                        402 00139$:
+                                    403 ;	rtc390.c:71: rtcBytes[byte]|=bitMask;
+      000086 EE               [ 4]  404 	mov	a,r6
+      000087 24r04            [ 8]  405 	add	a,#_RtcRead_rtcBytes_65536_87
+      000089 F5 84            [ 8]  406 	mov	dpl1,a
+      00008B E4               [ 4]  407 	clr	a
+      00008C 34s00            [ 8]  408 	addc	a,#(_RtcRead_rtcBytes_65536_87 >> 8)
+      00008E F5 85            [ 8]  409 	mov	dph1,a
+      000090 E4               [ 4]  410 	clr	a
+      000091 34s00            [ 8]  411 	addc	a,#(_RtcRead_rtcBytes_65536_87 >> 16)
+      000093 F5 95            [ 8]  412 	mov	dpx1,a
+      000095 05 86            [ 8]  413 	inc	dps
+      000097 E0               [ 8]  414 	movx	a,@dptr
+      000098 FA               [ 4]  415 	mov	r2,a
+      000099 75 86 00         [12]  416 	mov	dps,#0
+      00009C EB               [ 4]  417 	mov	a,r3
+      00009D 42 02            [ 8]  418 	orl	ar2,a
+      00009F EA               [ 4]  419 	mov	a,r2
+      0000A0 05 86            [ 8]  420 	inc	dps
+      0000A2 F0               [ 8]  421 	movx	@dptr,a
+      0000A3 75 86 00         [12]  422 	mov	dps,#0
+                                    423 ;	rtc390.c:85: return 0;
+                                    424 ;	rtc390.c:71: rtcBytes[byte]|=bitMask;
+      0000A6                        425 00109$:
+                                    426 ;	rtc390.c:69: for (bitMask=0x01; bitMask; bitMask<<=1) {
+      0000A6 8B 07            [ 8]  427 	mov	ar7,r3
+      0000A8 EF               [ 4]  428 	mov	a,r7
+      0000A9 25 E0            [ 8]  429 	add	a,acc
+      0000AB FF               [ 4]  430 	mov	r7,a
+                                    431 ;	genAssign: resultIsFar = FALSE
+      0000AC 8F 03            [ 8]  432 	mov	ar3,r7
+      0000AE EB               [ 4]  433 	mov	a,r3
+      0000AF 70 CC            [12]  434 	jnz  00108$
+      0000B1                        435 00140$:
+                                    436 ;	rtc390.c:67: for (byte=0; byte<8; byte++) {
+      0000B1 0E               [ 4]  437 	inc	r6
+      0000B2 BE 08 00         [16]  438 	cjne	r6,#0x08,00141$
+      0000B5                        439 00141$:
+      0000B5 40 AE            [12]  440 	jc   00110$
+      0000B7                        441 00142$:
+                                    442 ;	rtc390.c:75: rtcDate->tm_year=BCDtoINT(rtcBytes[7])+100; // year since 1900
+      0000B7 90s00r00r00      [12]  443 	mov	dptr,#_RtcRead_rtcDate_65536_86
+      0000BB E0               [ 8]  444 	movx	a,@dptr
+      0000BC 24 05            [ 8]  445 	add	a,#0x05
+      0000BE FE               [ 4]  446 	mov	r6,a
+      0000BF A3               [12]  447 	inc	dptr
+      0000C0 E0               [ 8]  448 	movx	a,@dptr
+      0000C1 34 00            [ 8]  449 	addc	a,#0x00
+      0000C3 FF               [ 4]  450 	mov	r7,a
+      0000C4 A3               [12]  451 	inc	dptr
+      0000C5 E0               [ 8]  452 	movx	a,@dptr
+      0000C6 34 00            [ 8]  453 	addc	a,#0x00
+      0000C8 F8               [ 4]  454 	mov	r0,a
+      0000C9 A3               [12]  455 	inc	dptr
+      0000CA E0               [ 8]  456 	movx	a,@dptr
+      0000CB F9               [ 4]  457 	mov	r1,a
+      0000CC 90s00r00r0B      [12]  458 	mov	dptr,#(_RtcRead_rtcBytes_65536_87 + 0x000007)
+      0000D0 E0               [ 8]  459 	movx	a,@dptr
+      0000D1 FA               [ 4]  460 	mov	r2,a
+      0000D2 8A 03            [ 8]  461 	mov	ar3,r2
+      0000D4 7C 00            [ 8]  462 	mov	r4,#0x00
+      0000D6 53 03 0F         [12]  463 	anl	ar3,#0x0f
+      0000D9 7C 00            [ 8]  464 	mov	r4,#0x00
+      0000DB EA               [ 4]  465 	mov	a,r2
+      0000DC C4               [ 4]  466 	swap	a
+      0000DD 54 0F            [ 8]  467 	anl	a,#0x0f
+      0000DF FA               [ 4]  468 	mov  r2,a
+      0000E0 90s00r00r00      [12]  469 	mov  dptr,#__mulint_PARM_2
+      0000E4 F0               [ 8]  470 	movx @dptr,a
+      0000E5 A3               [12]  471 	inc	dptr
+      0000E6 E4               [ 4]  472 	clr	a
+      0000E7 F0               [ 8]  473 	movx	@dptr,a
+      0000E8 C0 03            [ 8]  474 	push	ar3
+      0000EA C0 04            [ 8]  475 	push	ar4
+      0000EC C0 06            [ 8]  476 	push	ar6
+      0000EE C0 07            [ 8]  477 	push	ar7
+      0000F0 C0 00            [ 8]  478 	push	ar0
+      0000F2 C0 01            [ 8]  479 	push	ar1
+      0000F4 90 00 00 0A      [12]  480 	mov  dptr,#0x000a
+      0000F8 12s00r00r00      [16]  481 	lcall	__mulint
+      0000FC AA 82            [ 8]  482 	mov	r2,dpl
+      0000FE AD 83            [ 8]  483 	mov	r5,dph
+      000100 D0 01            [ 8]  484 	pop	ar1
+      000102 D0 00            [ 8]  485 	pop	ar0
+      000104 D0 07            [ 8]  486 	pop	ar7
+      000106 D0 06            [ 8]  487 	pop	ar6
+      000108 D0 04            [ 8]  488 	pop	ar4
+      00010A D0 03            [ 8]  489 	pop	ar3
+      00010C EA               [ 4]  490 	mov	a,r2
+      00010D 2B               [ 4]  491 	add	a,r3
+      00010E FB               [ 4]  492 	mov	r3,a
+      00010F ED               [ 4]  493 	mov	a,r5
+      000110 3C               [ 4]  494 	addc	a,r4
+      000111 FC               [ 4]  495 	mov	r4,a
+      000112 74 64            [ 8]  496 	mov	a,#0x64
+      000114 2B               [ 4]  497 	add	a,r3
+      000115 FB               [ 4]  498 	mov	r3,a
+      000116 E4               [ 4]  499 	clr	a
+      000117 3C               [ 4]  500 	addc	a,r4
+      000118 FC               [ 4]  501 	mov	r4,a
+      000119 8E 82            [ 8]  502 	mov	dpl,r6
+      00011B 8F 83            [ 8]  503 	mov	dph,r7
+      00011D 88 93            [ 8]  504 	mov	dpx,r0
+      00011F 89 F0            [ 8]  505 	mov	b,r1
+      000121 8B 9C            [ 8]  506 	mov	acc1, r3
+      000123 EC               [ 4]  507 	mov	a,r4
+      000124 12s00r00r00      [16]  508 	lcall	__gptrputWord
+                                    509 ;	rtc390.c:76: rtcDate->tm_mon=BCDtoINT(rtcBytes[6])-1; // jan=0
+      000128 90s00r00r00      [12]  510 	mov	dptr,#_RtcRead_rtcDate_65536_86
+      00012C E0               [ 8]  511 	movx	a,@dptr
+      00012D 24 04            [ 8]  512 	add	a,#0x04
+      00012F FA               [ 4]  513 	mov	r2,a
+      000130 A3               [12]  514 	inc	dptr
+      000131 E0               [ 8]  515 	movx	a,@dptr
+      000132 34 00            [ 8]  516 	addc	a,#0x00
+      000134 FB               [ 4]  517 	mov	r3,a
+      000135 A3               [12]  518 	inc	dptr
+      000136 E0               [ 8]  519 	movx	a,@dptr
+      000137 34 00            [ 8]  520 	addc	a,#0x00
+      000139 FC               [ 4]  521 	mov	r4,a
+      00013A A3               [12]  522 	inc	dptr
+      00013B E0               [ 8]  523 	movx	a,@dptr
+      00013C FD               [ 4]  524 	mov	r5,a
+      00013D 90s00r00r0A      [12]  525 	mov	dptr,#(_RtcRead_rtcBytes_65536_87 + 0x000006)
+      000141 E0               [ 8]  526 	movx	a,@dptr
+      000142 FE               [ 4]  527 	mov	r6,a
+      000143 8E 07            [ 8]  528 	mov	ar7,r6
+      000145 53 07 0F         [12]  529 	anl	ar7,#0x0f
+      000148 EE               [ 4]  530 	mov	a,r6
+      000149 C4               [ 4]  531 	swap	a
+      00014A 54 0F            [ 8]  532 	anl	a,#0x0f
+      00014C FE               [ 4]  533 	mov	r6,a
+      00014D C2 D5            [ 8]  534 	clr	F0
+      00014F 75 F0 0A         [12]  535 	mov	b,#0x0a
+      000152 EE               [ 4]  536 	mov	a,r6
+      000153 30 E7 04         [12]  537 	jnb	acc[7],00143$
+      000156 B2 D5            [ 8]  538 	cpl	F0
+      000158 F4               [ 4]  539 	cpl	a
+      000159 04               [ 4]  540 	inc	a
+      00015A                        541 00143$:
+      00015A A4               [20]  542 	mul	ab
+      00015B 30 D5 02         [12]  543 	jnb	F0,00144$
+      00015E F4               [ 4]  544 	cpl	a
+      00015F 04               [ 4]  545 	inc	a
+      000160                        546 00144$:
+      000160 FE               [ 4]  547 	mov  r6,a
+      000161 2F               [ 4]  548 	add	a,r7
+      000162 FF               [ 4]  549 	mov	r7,a
+      000163 1F               [ 4]  550 	dec	r7
+      000164 8A 82            [ 8]  551 	mov	dpl,r2
+      000166 8B 83            [ 8]  552 	mov	dph,r3
+      000168 8C 93            [ 8]  553 	mov	dpx,r4
+      00016A 8D F0            [ 8]  554 	mov	b,r5
+      00016C EF               [ 4]  555 	mov	a,r7
+      00016D 12s00r00r00      [16]  556 	lcall	__gptrput
+                                    557 ;	rtc390.c:77: rtcDate->tm_mday=BCDtoINT(rtcBytes[5]);
+      000171 90s00r00r00      [12]  558 	mov	dptr,#_RtcRead_rtcDate_65536_86
+      000175 E0               [ 8]  559 	movx	a,@dptr
+      000176 24 03            [ 8]  560 	add	a,#0x03
+      000178 FA               [ 4]  561 	mov	r2,a
+      000179 A3               [12]  562 	inc	dptr
+      00017A E0               [ 8]  563 	movx	a,@dptr
+      00017B 34 00            [ 8]  564 	addc	a,#0x00
+      00017D FB               [ 4]  565 	mov	r3,a
+      00017E A3               [12]  566 	inc	dptr
+      00017F E0               [ 8]  567 	movx	a,@dptr
+      000180 34 00            [ 8]  568 	addc	a,#0x00
+      000182 FC               [ 4]  569 	mov	r4,a
+      000183 A3               [12]  570 	inc	dptr
+      000184 E0               [ 8]  571 	movx	a,@dptr
+      000185 FD               [ 4]  572 	mov	r5,a
+      000186 90s00r00r09      [12]  573 	mov	dptr,#(_RtcRead_rtcBytes_65536_87 + 0x000005)
+      00018A E0               [ 8]  574 	movx	a,@dptr
+      00018B FE               [ 4]  575 	mov	r6,a
+      00018C 8E 07            [ 8]  576 	mov	ar7,r6
+      00018E 53 07 0F         [12]  577 	anl	ar7,#0x0f
+      000191 EE               [ 4]  578 	mov	a,r6
+      000192 C4               [ 4]  579 	swap	a
+      000193 54 0F            [ 8]  580 	anl	a,#0x0f
+      000195 FE               [ 4]  581 	mov	r6,a
+      000196 C2 D5            [ 8]  582 	clr	F0
+      000198 75 F0 0A         [12]  583 	mov	b,#0x0a
+      00019B EE               [ 4]  584 	mov	a,r6
+      00019C 30 E7 04         [12]  585 	jnb	acc[7],00145$
+      00019F B2 D5            [ 8]  586 	cpl	F0
+      0001A1 F4               [ 4]  587 	cpl	a
+      0001A2 04               [ 4]  588 	inc	a
+      0001A3                        589 00145$:
+      0001A3 A4               [20]  590 	mul	ab
+      0001A4 30 D5 02         [12]  591 	jnb	F0,00146$
+      0001A7 F4               [ 4]  592 	cpl	a
+      0001A8 04               [ 4]  593 	inc	a
+      0001A9                        594 00146$:
+      0001A9 FE               [ 4]  595 	mov  r6,a
+      0001AA 2F               [ 4]  596 	add	a,r7
+      0001AB FF               [ 4]  597 	mov	r7,a
+      0001AC 8A 82            [ 8]  598 	mov	dpl,r2
+      0001AE 8B 83            [ 8]  599 	mov	dph,r3
+      0001B0 8C 93            [ 8]  600 	mov	dpx,r4
+      0001B2 8D F0            [ 8]  601 	mov	b,r5
+      0001B4 EF               [ 4]  602 	mov	a,r7
+      0001B5 12s00r00r00      [16]  603 	lcall	__gptrput
+                                    604 ;	rtc390.c:78: rtcDate->tm_wday=(rtcBytes[4]&0x07)-1; // monday=0?
+      0001B9 90s00r00r00      [12]  605 	mov	dptr,#_RtcRead_rtcDate_65536_86
+      0001BD E0               [ 8]  606 	movx	a,@dptr
+      0001BE 24 07            [ 8]  607 	add	a,#0x07
+      0001C0 FA               [ 4]  608 	mov	r2,a
+      0001C1 A3               [12]  609 	inc	dptr
+      0001C2 E0               [ 8]  610 	movx	a,@dptr
+      0001C3 34 00            [ 8]  611 	addc	a,#0x00
+      0001C5 FB               [ 4]  612 	mov	r3,a
+      0001C6 A3               [12]  613 	inc	dptr
+      0001C7 E0               [ 8]  614 	movx	a,@dptr
+      0001C8 34 00            [ 8]  615 	addc	a,#0x00
+      0001CA FC               [ 4]  616 	mov	r4,a
+      0001CB A3               [12]  617 	inc	dptr
+      0001CC E0               [ 8]  618 	movx	a,@dptr
+      0001CD FD               [ 4]  619 	mov	r5,a
+      0001CE 90s00r00r08      [12]  620 	mov	dptr,#(_RtcRead_rtcBytes_65536_87 + 0x000004)
+      0001D2 E0               [ 8]  621 	movx	a,@dptr
+      0001D3 FE               [ 4]  622 	mov	r6,a
+      0001D4 53 06 07         [12]  623 	anl	ar6,#0x07
+      0001D7 1E               [ 4]  624 	dec	r6
+      0001D8 8A 82            [ 8]  625 	mov	dpl,r2
+      0001DA 8B 83            [ 8]  626 	mov	dph,r3
+      0001DC 8C 93            [ 8]  627 	mov	dpx,r4
+      0001DE 8D F0            [ 8]  628 	mov	b,r5
+      0001E0 EE               [ 4]  629 	mov	a,r6
+      0001E1 12s00r00r00      [16]  630 	lcall	__gptrput
+                                    631 ;	rtc390.c:79: rtcDate->tm_hour=BCDtoINT(rtcBytes[3]);
+      0001E5 90s00r00r00      [12]  632 	mov	dptr,#_RtcRead_rtcDate_65536_86
+      0001E9 E0               [ 8]  633 	movx	a,@dptr
+      0001EA 24 02            [ 8]  634 	add	a,#0x02
+      0001EC FA               [ 4]  635 	mov	r2,a
+      0001ED A3               [12]  636 	inc	dptr
+      0001EE E0               [ 8]  637 	movx	a,@dptr
+      0001EF 34 00            [ 8]  638 	addc	a,#0x00
+      0001F1 FB               [ 4]  639 	mov	r3,a
+      0001F2 A3               [12]  640 	inc	dptr
+      0001F3 E0               [ 8]  641 	movx	a,@dptr
+      0001F4 34 00            [ 8]  642 	addc	a,#0x00
+      0001F6 FC               [ 4]  643 	mov	r4,a
+      0001F7 A3               [12]  644 	inc	dptr
+      0001F8 E0               [ 8]  645 	movx	a,@dptr
+      0001F9 FD               [ 4]  646 	mov	r5,a
+      0001FA 90s00r00r07      [12]  647 	mov	dptr,#(_RtcRead_rtcBytes_65536_87 + 0x000003)
+      0001FE E0               [ 8]  648 	movx	a,@dptr
+      0001FF FE               [ 4]  649 	mov	r6,a
+      000200 8E 07            [ 8]  650 	mov	ar7,r6
+      000202 53 07 0F         [12]  651 	anl	ar7,#0x0f
+      000205 EE               [ 4]  652 	mov	a,r6
+      000206 C4               [ 4]  653 	swap	a
+      000207 54 0F            [ 8]  654 	anl	a,#0x0f
+      000209 FE               [ 4]  655 	mov	r6,a
+      00020A C2 D5            [ 8]  656 	clr	F0
+      00020C 75 F0 0A         [12]  657 	mov	b,#0x0a
+      00020F EE               [ 4]  658 	mov	a,r6
+      000210 30 E7 04         [12]  659 	jnb	acc[7],00147$
+      000213 B2 D5            [ 8]  660 	cpl	F0
+      000215 F4               [ 4]  661 	cpl	a
+      000216 04               [ 4]  662 	inc	a
+      000217                        663 00147$:
+      000217 A4               [20]  664 	mul	ab
+      000218 30 D5 02         [12]  665 	jnb	F0,00148$
+      00021B F4               [ 4]  666 	cpl	a
+      00021C 04               [ 4]  667 	inc	a
+      00021D                        668 00148$:
+      00021D FE               [ 4]  669 	mov  r6,a
+      00021E 2F               [ 4]  670 	add	a,r7
+      00021F FF               [ 4]  671 	mov	r7,a
+      000220 8A 82            [ 8]  672 	mov	dpl,r2
+      000222 8B 83            [ 8]  673 	mov	dph,r3
+      000224 8C 93            [ 8]  674 	mov	dpx,r4
+      000226 8D F0            [ 8]  675 	mov	b,r5
+      000228 EF               [ 4]  676 	mov	a,r7
+      000229 12s00r00r00      [16]  677 	lcall	__gptrput
+                                    678 ;	rtc390.c:80: rtcDate->tm_min=BCDtoINT(rtcBytes[2]);
+      00022D 90s00r00r00      [12]  679 	mov	dptr,#_RtcRead_rtcDate_65536_86
+      000231 E0               [ 8]  680 	movx	a,@dptr
+      000232 24 01            [ 8]  681 	add	a,#0x01
+      000234 FA               [ 4]  682 	mov	r2,a
+      000235 A3               [12]  683 	inc	dptr
+      000236 E0               [ 8]  684 	movx	a,@dptr
+      000237 34 00            [ 8]  685 	addc	a,#0x00
+      000239 FB               [ 4]  686 	mov	r3,a
+      00023A A3               [12]  687 	inc	dptr
+      00023B E0               [ 8]  688 	movx	a,@dptr
+      00023C 34 00            [ 8]  689 	addc	a,#0x00
+      00023E FC               [ 4]  690 	mov	r4,a
+      00023F A3               [12]  691 	inc	dptr
+      000240 E0               [ 8]  692 	movx	a,@dptr
+      000241 FD               [ 4]  693 	mov	r5,a
+      000242 90s00r00r06      [12]  694 	mov	dptr,#(_RtcRead_rtcBytes_65536_87 + 0x000002)
+      000246 E0               [ 8]  695 	movx	a,@dptr
+      000247 FE               [ 4]  696 	mov	r6,a
+      000248 8E 07            [ 8]  697 	mov	ar7,r6
+      00024A 53 07 0F         [12]  698 	anl	ar7,#0x0f
+      00024D EE               [ 4]  699 	mov	a,r6
+      00024E C4               [ 4]  700 	swap	a
+      00024F 54 0F            [ 8]  701 	anl	a,#0x0f
+      000251 FE               [ 4]  702 	mov	r6,a
+      000252 C2 D5            [ 8]  703 	clr	F0
+      000254 75 F0 0A         [12]  704 	mov	b,#0x0a
+      000257 EE               [ 4]  705 	mov	a,r6
+      000258 30 E7 04         [12]  706 	jnb	acc[7],00149$
+      00025B B2 D5            [ 8]  707 	cpl	F0
+      00025D F4               [ 4]  708 	cpl	a
+      00025E 04               [ 4]  709 	inc	a
+      00025F                        710 00149$:
+      00025F A4               [20]  711 	mul	ab
+      000260 30 D5 02         [12]  712 	jnb	F0,00150$
+      000263 F4               [ 4]  713 	cpl	a
+      000264 04               [ 4]  714 	inc	a
+      000265                        715 00150$:
+      000265 FE               [ 4]  716 	mov  r6,a
+      000266 2F               [ 4]  717 	add	a,r7
+      000267 FF               [ 4]  718 	mov	r7,a
+      000268 8A 82            [ 8]  719 	mov	dpl,r2
+      00026A 8B 83            [ 8]  720 	mov	dph,r3
+      00026C 8C 93            [ 8]  721 	mov	dpx,r4
+      00026E 8D F0            [ 8]  722 	mov	b,r5
+      000270 EF               [ 4]  723 	mov	a,r7
+      000271 12s00r00r00      [16]  724 	lcall	__gptrput
+                                    725 ;	rtc390.c:81: rtcDate->tm_sec=BCDtoINT(rtcBytes[1]);
+      000275 90s00r00r05      [12]  726 	mov	dptr,#(_RtcRead_rtcBytes_65536_87 + 0x000001)
+      000279 E0               [ 8]  727 	movx	a,@dptr
+      00027A FA               [ 4]  728 	mov	r2,a
+      00027B 8A 03            [ 8]  729 	mov	ar3,r2
+      00027D 53 03 0F         [12]  730 	anl	ar3,#0x0f
+      000280 EA               [ 4]  731 	mov	a,r2
+      000281 C4               [ 4]  732 	swap	a
+      000282 54 0F            [ 8]  733 	anl	a,#0x0f
+      000284 FA               [ 4]  734 	mov	r2,a
+      000285 C2 D5            [ 8]  735 	clr	F0
+      000287 75 F0 0A         [12]  736 	mov	b,#0x0a
+      00028A EA               [ 4]  737 	mov	a,r2
+      00028B 30 E7 04         [12]  738 	jnb	acc[7],00151$
+      00028E B2 D5            [ 8]  739 	cpl	F0
+      000290 F4               [ 4]  740 	cpl	a
+      000291 04               [ 4]  741 	inc	a
+      000292                        742 00151$:
+      000292 A4               [20]  743 	mul	ab
+      000293 30 D5 02         [12]  744 	jnb	F0,00152$
+      000296 F4               [ 4]  745 	cpl	a
+      000297 04               [ 4]  746 	inc	a
+      000298                        747 00152$:
+      000298 FA               [ 4]  748 	mov  r2,a
+      000299 2B               [ 4]  749 	add	a,r3
+      00029A FB               [ 4]  750 	mov	r3,a
+      00029B 90s00r00r00      [12]  751 	mov	dptr,#_RtcRead_rtcDate_65536_86
+      00029F E0               [ 8]  752 	movx	a,@dptr
+      0002A0 C0 E0            [ 8]  753 	push	acc
+      0002A2 A3               [12]  754 	inc	dptr
+      0002A3 E0               [ 8]  755 	movx	a,@dptr
+      0002A4 C0 E0            [ 8]  756 	push	acc
+      0002A6 A3               [12]  757 	inc	dptr
+      0002A7 E0               [ 8]  758 	movx	a,@dptr
+      0002A8 C0 E0            [ 8]  759 	push	acc
+      0002AA A3               [12]  760 	inc	dptr
+      0002AB E0               [ 8]  761 	movx	a,@dptr
+      0002AC F5 F0            [ 8]  762 	mov	b,a
+      0002AE D0 93            [ 8]  763 	pop	dpx
+      0002B0 D0 83            [ 8]  764 	pop	dph
+      0002B2 D0 82            [ 8]  765 	pop	dpl
+      0002B4 EB               [ 4]  766 	mov	a,r3
+      0002B5 12s00r00r00      [16]  767 	lcall	__gptrput
+                                    768 ;	rtc390.c:82: rtcDate->tm_hundredth=BCDtoINT(rtcBytes[0]);
+      0002B9 90s00r00r00      [12]  769 	mov	dptr,#_RtcRead_rtcDate_65536_86
+      0002BD E0               [ 8]  770 	movx	a,@dptr
+      0002BE 24 0B            [ 8]  771 	add	a,#0x0b
+      0002C0 FA               [ 4]  772 	mov	r2,a
+      0002C1 A3               [12]  773 	inc	dptr
+      0002C2 E0               [ 8]  774 	movx	a,@dptr
+      0002C3 34 00            [ 8]  775 	addc	a,#0x00
+      0002C5 FB               [ 4]  776 	mov	r3,a
+      0002C6 A3               [12]  777 	inc	dptr
+      0002C7 E0               [ 8]  778 	movx	a,@dptr
+      0002C8 34 00            [ 8]  779 	addc	a,#0x00
+      0002CA FC               [ 4]  780 	mov	r4,a
+      0002CB A3               [12]  781 	inc	dptr
+      0002CC E0               [ 8]  782 	movx	a,@dptr
+      0002CD FD               [ 4]  783 	mov	r5,a
+      0002CE 90s00r00r04      [12]  784 	mov	dptr,#_RtcRead_rtcBytes_65536_87
+      0002D2 E0               [ 8]  785 	movx	a,@dptr
+      0002D3 FE               [ 4]  786 	mov	r6,a
+      0002D4 8E 07            [ 8]  787 	mov	ar7,r6
+      0002D6 53 07 0F         [12]  788 	anl	ar7,#0x0f
+      0002D9 EE               [ 4]  789 	mov	a,r6
+      0002DA C4               [ 4]  790 	swap	a
+      0002DB 54 0F            [ 8]  791 	anl	a,#0x0f
+      0002DD FE               [ 4]  792 	mov	r6,a
+      0002DE C2 D5            [ 8]  793 	clr	F0
+      0002E0 75 F0 0A         [12]  794 	mov	b,#0x0a
+      0002E3 EE               [ 4]  795 	mov	a,r6
+      0002E4 30 E7 04         [12]  796 	jnb	acc[7],00153$
+      0002E7 B2 D5            [ 8]  797 	cpl	F0
+      0002E9 F4               [ 4]  798 	cpl	a
+      0002EA 04               [ 4]  799 	inc	a
+      0002EB                        800 00153$:
+      0002EB A4               [20]  801 	mul	ab
+      0002EC 30 D5 02         [12]  802 	jnb	F0,00154$
+      0002EF F4               [ 4]  803 	cpl	a
+      0002F0 04               [ 4]  804 	inc	a
+      0002F1                        805 00154$:
+      0002F1 FE               [ 4]  806 	mov  r6,a
+      0002F2 2F               [ 4]  807 	add	a,r7
+      0002F3 FF               [ 4]  808 	mov	r7,a
+      0002F4 8A 82            [ 8]  809 	mov	dpl,r2
+      0002F6 8B 83            [ 8]  810 	mov	dph,r3
+      0002F8 8C 93            [ 8]  811 	mov	dpx,r4
+      0002FA 8D F0            [ 8]  812 	mov	b,r5
+      0002FC EF               [ 4]  813 	mov	a,r7
+      0002FD 12s00r00r00      [16]  814 	lcall	__gptrput
+                                    815 ;	rtc390.c:83: if ((rtcBytes[4]&0x30) || (rtcBytes[3]&0x80)) {
+      000301 90s00r00r08      [12]  816 	mov	dptr,#(_RtcRead_rtcBytes_65536_87 + 0x000004)
+      000305 E0               [ 8]  817 	movx	a,@dptr
+      000306 FA               [ 4]  818 	mov  r2,a
+      000307 54 30            [ 8]  819 	anl	a,#0x30
+      000309 60 02            [12]  820 	jz   00156$
+      00030B                        821 00155$:
+      00030B 80 09            [12]  822 	sjmp 00105$
+      00030D                        823 00156$:
+      00030D 90s00r00r07      [12]  824 	mov	dptr,#(_RtcRead_rtcBytes_65536_87 + 0x000003)
+      000311 E0               [ 8]  825 	movx	a,@dptr
+      000312 FA               [ 4]  826 	mov  r2,a
+      000313 30 E7 04         [12]  827 	jnb  acc[7],00106$
+      000316                        828 00157$:
+      000316                        829 00105$:
+                                    830 ;	rtc390.c:85: return 0;
+      000316 75 82 00         [12]  831 	mov	dpl,#0x00
+                                    832 ;	rtc390.c:87: return 1;
+                                    833 ;	rtc390.c:88: }
+      000319 22               [16]  834 	ret
+      00031A                        835 00106$:
+      00031A 75 82 01         [12]  836 	mov     dpl,#0x01
+      00031D                        837 00112$:
+      00031D 22               [16]  838 	ret
+                                    839 ;------------------------------------------------------------
+                                    840 ;Allocation info for local variables in function 'RtcWrite'
+                                    841 ;------------------------------------------------------------
+                                    842 ;rtcDate                   Allocated to registers r2 r3 r4 r5 
+                                    843 ;rtcBytes                  Allocated with name '_RtcWrite_rtcBytes_65536_95'
+                                    844 ;byte                      Allocated to registers 
+                                    845 ;bitMask                   Allocated to registers r3 
+                                    846 ;------------------------------------------------------------
+                                    847 ;	rtc390.c:90: void RtcWrite(struct tm *rtcDate) {
+                                    848 ;	-----------------------------------------
+                                    849 ;	 function RtcWrite
+                                    850 ;	-----------------------------------------
+      00031E                        851 _RtcWrite:
+      00031E AA 82            [ 8]  852 	mov	r2,dpl
+      000320 AB 83            [ 8]  853 	mov	r3,dph
+      000322 AC 93            [ 8]  854 	mov	r4,dpx
+      000324 AD F0            [ 8]  855 	mov	r5,b
+                                    856 ;	rtc390.c:94: rtcBytes[7]=INTtoBCD(rtcDate->tm_year%100);
+      000326 74 05            [ 8]  857 	mov	a,#0x05
+      000328 2A               [ 4]  858 	add	a,r2
+      000329 FE               [ 4]  859 	mov	r6,a
+      00032A E4               [ 4]  860 	clr	a
+      00032B 3B               [ 4]  861 	addc	a,r3
+      00032C FF               [ 4]  862 	mov	r7,a
+      00032D E4               [ 4]  863 	clr	a
+      00032E 3C               [ 4]  864 	addc	a,r4
+      00032F F8               [ 4]  865 	mov	r0,a
+      000330 8D 01            [ 8]  866 	mov	ar1,r5
+      000332 8E 82            [ 8]  867 	mov	dpl,r6
+      000334 8F 83            [ 8]  868 	mov	dph,r7
+      000336 88 93            [ 8]  869 	mov	dpx,r0
+      000338 89 F0            [ 8]  870 	mov	b,r1
+      00033A 12s00r00r00      [16]  871 	lcall	__gptrgetWord
+      00033E FE               [ 4]  872 	mov	r6,a
+      00033F AF 9C            [ 8]  873 	mov	r7,acc1
+                                    874 ;	genAssign: resultIsFar = TRUE
+      000341 90s00r00r00      [12]  875 	mov	dptr,#__modsint_PARM_2
+      000345 74 64            [ 8]  876 	mov	a,#0x64
+      000347 F0               [ 8]  877 	movx	@dptr,a
+      000348 E4               [ 4]  878 	clr	a
+      000349 A3               [12]  879 	inc	dptr
+      00034A F0               [ 8]  880 	movx	@dptr,a
+      00034B C0 02            [ 8]  881 	push	ar2
+      00034D C0 03            [ 8]  882 	push	ar3
+      00034F C0 04            [ 8]  883 	push	ar4
+      000351 C0 05            [ 8]  884 	push	ar5
+      000353 8E 82            [ 8]  885 	mov	dpl,r6
+      000355 8F 83            [ 8]  886 	mov	dph,r7
+      000357 12s00r00r00      [16]  887 	lcall	__modsint
+      00035B AE 82            [ 8]  888 	mov	r6,dpl
+      00035D AF 83            [ 8]  889 	mov	r7,dph
+      00035F D0 05            [ 8]  890 	pop	ar5
+      000361 D0 04            [ 8]  891 	pop	ar4
+      000363 D0 03            [ 8]  892 	pop	ar3
+      000365 D0 02            [ 8]  893 	pop	ar2
+                                    894 ;	genAssign: resultIsFar = TRUE
+      000367 90s00r00r00      [12]  895 	mov	dptr,#__modsint_PARM_2
+      00036B 74 0A            [ 8]  896 	mov	a,#0x0a
+      00036D F0               [ 8]  897 	movx	@dptr,a
+      00036E E4               [ 4]  898 	clr	a
+      00036F A3               [12]  899 	inc	dptr
+      000370 F0               [ 8]  900 	movx	@dptr,a
+      000371 C0 02            [ 8]  901 	push	ar2
+      000373 C0 03            [ 8]  902 	push	ar3
+      000375 C0 04            [ 8]  903 	push	ar4
+      000377 C0 05            [ 8]  904 	push	ar5
+      000379 C0 06            [ 8]  905 	push	ar6
+      00037B C0 07            [ 8]  906 	push	ar7
+      00037D 8E 82            [ 8]  907 	mov	dpl,r6
+      00037F 8F 83            [ 8]  908 	mov	dph,r7
+      000381 12s00r00r00      [16]  909 	lcall	__modsint
+      000385 A8 82            [ 8]  910 	mov	r0,dpl
+      000387 A9 83            [ 8]  911 	mov	r1,dph
+      000389 D0 07            [ 8]  912 	pop	ar7
+      00038B D0 06            [ 8]  913 	pop	ar6
+      00038D D0 05            [ 8]  914 	pop	ar5
+      00038F D0 04            [ 8]  915 	pop	ar4
+      000391 D0 03            [ 8]  916 	pop	ar3
+      000393 D0 02            [ 8]  917 	pop	ar2
+                                    918 ;	genAssign: resultIsFar = TRUE
+      000395 90s00r00r00      [12]  919 	mov	dptr,#__divsint_PARM_2
+      000399 74 0A            [ 8]  920 	mov	a,#0x0a
+      00039B F0               [ 8]  921 	movx	@dptr,a
+      00039C E4               [ 4]  922 	clr	a
+      00039D A3               [12]  923 	inc	dptr
+      00039E F0               [ 8]  924 	movx	@dptr,a
+      00039F C0 02            [ 8]  925 	push	ar2
+      0003A1 C0 03            [ 8]  926 	push	ar3
+      0003A3 C0 04            [ 8]  927 	push	ar4
+      0003A5 C0 05            [ 8]  928 	push	ar5
+      0003A7 C0 00            [ 8]  929 	push	ar0
+      0003A9 8E 82            [ 8]  930 	mov	dpl,r6
+      0003AB 8F 83            [ 8]  931 	mov	dph,r7
+      0003AD 12s00r00r00      [16]  932 	lcall	__divsint
+      0003B1 AE 82            [ 8]  933 	mov	r6,dpl
+      0003B3 AF 83            [ 8]  934 	mov	r7,dph
+      0003B5 D0 00            [ 8]  935 	pop	ar0
+      0003B7 D0 05            [ 8]  936 	pop	ar5
+      0003B9 D0 04            [ 8]  937 	pop	ar4
+      0003BB D0 03            [ 8]  938 	pop	ar3
+      0003BD D0 02            [ 8]  939 	pop	ar2
+      0003BF EE               [ 4]  940 	mov	a,r6
+      0003C0 C4               [ 4]  941 	swap	a
+      0003C1 54 F0            [ 8]  942 	anl	a,#0xf0
+      0003C3 FE               [ 4]  943 	mov  r6,a
+      0003C4 28               [ 4]  944 	add	a,r0
+      0003C5 F8               [ 4]  945 	mov  r0,a
+      0003C6 90s00r00r13      [12]  946 	mov  dptr,#(_RtcWrite_rtcBytes_65536_95 + 0x000007)
+      0003CA F0               [ 8]  947 	movx @dptr,a
+                                    948 ;	rtc390.c:95: rtcBytes[6]=INTtoBCD(rtcDate->tm_mon)+1;
+      0003CB 74 04            [ 8]  949 	mov	a,#0x04
+      0003CD 2A               [ 4]  950 	add	a,r2
+      0003CE FE               [ 4]  951 	mov	r6,a
+      0003CF E4               [ 4]  952 	clr	a
+      0003D0 3B               [ 4]  953 	addc	a,r3
+      0003D1 FF               [ 4]  954 	mov	r7,a
+      0003D2 E4               [ 4]  955 	clr	a
+      0003D3 3C               [ 4]  956 	addc	a,r4
+      0003D4 F8               [ 4]  957 	mov	r0,a
+      0003D5 8D 01            [ 8]  958 	mov	ar1,r5
+      0003D7 8E 82            [ 8]  959 	mov	dpl,r6
+      0003D9 8F 83            [ 8]  960 	mov	dph,r7
+      0003DB 88 93            [ 8]  961 	mov	dpx,r0
+      0003DD 89 F0            [ 8]  962 	mov	b,r1
+      0003DF 12s00r00r00      [16]  963 	lcall	__gptrget
+      0003E3 FE               [ 4]  964 	mov	r6,a
+      0003E4 7F 00            [ 8]  965 	mov	r7,#0x00
+                                    966 ;	genAssign: resultIsFar = TRUE
+      0003E6 90s00r00r00      [12]  967 	mov	dptr,#__modsint_PARM_2
+      0003EA 74 0A            [ 8]  968 	mov	a,#0x0a
+      0003EC F0               [ 8]  969 	movx	@dptr,a
+      0003ED E4               [ 4]  970 	clr	a
+      0003EE A3               [12]  971 	inc	dptr
+      0003EF F0               [ 8]  972 	movx	@dptr,a
+      0003F0 C0 02            [ 8]  973 	push	ar2
+      0003F2 C0 03            [ 8]  974 	push	ar3
+      0003F4 C0 04            [ 8]  975 	push	ar4
+      0003F6 C0 05            [ 8]  976 	push	ar5
+      0003F8 C0 06            [ 8]  977 	push	ar6
+      0003FA C0 07            [ 8]  978 	push	ar7
+      0003FC 8E 82            [ 8]  979 	mov	dpl,r6
+      0003FE 8F 83            [ 8]  980 	mov	dph,r7
+      000400 12s00r00r00      [16]  981 	lcall	__modsint
+      000404 A8 82            [ 8]  982 	mov	r0,dpl
+      000406 A9 83            [ 8]  983 	mov	r1,dph
+      000408 D0 07            [ 8]  984 	pop	ar7
+      00040A D0 06            [ 8]  985 	pop	ar6
+      00040C D0 05            [ 8]  986 	pop	ar5
+      00040E D0 04            [ 8]  987 	pop	ar4
+      000410 D0 03            [ 8]  988 	pop	ar3
+      000412 D0 02            [ 8]  989 	pop	ar2
+                                    990 ;	genAssign: resultIsFar = TRUE
+      000414 90s00r00r00      [12]  991 	mov	dptr,#__divsint_PARM_2
+      000418 74 0A            [ 8]  992 	mov	a,#0x0a
+      00041A F0               [ 8]  993 	movx	@dptr,a
+      00041B E4               [ 4]  994 	clr	a
+      00041C A3               [12]  995 	inc	dptr
+      00041D F0               [ 8]  996 	movx	@dptr,a
+      00041E C0 02            [ 8]  997 	push	ar2
+      000420 C0 03            [ 8]  998 	push	ar3
+      000422 C0 04            [ 8]  999 	push	ar4
+      000424 C0 05            [ 8] 1000 	push	ar5
+      000426 C0 00            [ 8] 1001 	push	ar0
+      000428 8E 82            [ 8] 1002 	mov	dpl,r6
+      00042A 8F 83            [ 8] 1003 	mov	dph,r7
+      00042C 12s00r00r00      [16] 1004 	lcall	__divsint
+      000430 AE 82            [ 8] 1005 	mov	r6,dpl
+      000432 AF 83            [ 8] 1006 	mov	r7,dph
+      000434 D0 00            [ 8] 1007 	pop	ar0
+      000436 D0 05            [ 8] 1008 	pop	ar5
+      000438 D0 04            [ 8] 1009 	pop	ar4
+      00043A D0 03            [ 8] 1010 	pop	ar3
+      00043C D0 02            [ 8] 1011 	pop	ar2
+      00043E EE               [ 4] 1012 	mov	a,r6
+      00043F C4               [ 4] 1013 	swap	a
+      000440 54 F0            [ 8] 1014 	anl	a,#0xf0
+      000442 FE               [ 4] 1015 	mov  r6,a
+      000443 28               [ 4] 1016 	add	a,r0
+      000444 04               [ 4] 1017 	inc  a
+      000445 F8               [ 4] 1018 	mov  r0,a
+      000446 90s00r00r12      [12] 1019 	mov	dptr,#(_RtcWrite_rtcBytes_65536_95 + 0x000006)
+      00044A E8               [ 4] 1020 	mov	a,r0
+      00044B F0               [ 8] 1021 	movx	@dptr,a
+                                   1022 ;	rtc390.c:96: rtcBytes[5]=INTtoBCD(rtcDate->tm_mday);
+      00044C 74 03            [ 8] 1023 	mov	a,#0x03
+      00044E 2A               [ 4] 1024 	add	a,r2
+      00044F FE               [ 4] 1025 	mov	r6,a
+      000450 E4               [ 4] 1026 	clr	a
+      000451 3B               [ 4] 1027 	addc	a,r3
+      000452 FF               [ 4] 1028 	mov	r7,a
+      000453 E4               [ 4] 1029 	clr	a
+      000454 3C               [ 4] 1030 	addc	a,r4
+      000455 F8               [ 4] 1031 	mov	r0,a
+      000456 8D 01            [ 8] 1032 	mov	ar1,r5
+      000458 8E 82            [ 8] 1033 	mov	dpl,r6
+      00045A 8F 83            [ 8] 1034 	mov	dph,r7
+      00045C 88 93            [ 8] 1035 	mov	dpx,r0
+      00045E 89 F0            [ 8] 1036 	mov	b,r1
+      000460 12s00r00r00      [16] 1037 	lcall	__gptrget
+      000464 FE               [ 4] 1038 	mov	r6,a
+      000465 7F 00            [ 8] 1039 	mov	r7,#0x00
+                                   1040 ;	genAssign: resultIsFar = TRUE
+      000467 90s00r00r00      [12] 1041 	mov	dptr,#__modsint_PARM_2
+      00046B 74 0A            [ 8] 1042 	mov	a,#0x0a
+      00046D F0               [ 8] 1043 	movx	@dptr,a
+      00046E E4               [ 4] 1044 	clr	a
+      00046F A3               [12] 1045 	inc	dptr
+      000470 F0               [ 8] 1046 	movx	@dptr,a
+      000471 C0 02            [ 8] 1047 	push	ar2
+      000473 C0 03            [ 8] 1048 	push	ar3
+      000475 C0 04            [ 8] 1049 	push	ar4
+      000477 C0 05            [ 8] 1050 	push	ar5
+      000479 C0 06            [ 8] 1051 	push	ar6
+      00047B C0 07            [ 8] 1052 	push	ar7
+      00047D 8E 82            [ 8] 1053 	mov	dpl,r6
+      00047F 8F 83            [ 8] 1054 	mov	dph,r7
+      000481 12s00r00r00      [16] 1055 	lcall	__modsint
+      000485 A8 82            [ 8] 1056 	mov	r0,dpl
+      000487 A9 83            [ 8] 1057 	mov	r1,dph
+      000489 D0 07            [ 8] 1058 	pop	ar7
+      00048B D0 06            [ 8] 1059 	pop	ar6
+      00048D D0 05            [ 8] 1060 	pop	ar5
+      00048F D0 04            [ 8] 1061 	pop	ar4
+      000491 D0 03            [ 8] 1062 	pop	ar3
+      000493 D0 02            [ 8] 1063 	pop	ar2
+                                   1064 ;	genAssign: resultIsFar = TRUE
+      000495 90s00r00r00      [12] 1065 	mov	dptr,#__divsint_PARM_2
+      000499 74 0A            [ 8] 1066 	mov	a,#0x0a
+      00049B F0               [ 8] 1067 	movx	@dptr,a
+      00049C E4               [ 4] 1068 	clr	a
+      00049D A3               [12] 1069 	inc	dptr
+      00049E F0               [ 8] 1070 	movx	@dptr,a
+      00049F C0 02            [ 8] 1071 	push	ar2
+      0004A1 C0 03            [ 8] 1072 	push	ar3
+      0004A3 C0 04            [ 8] 1073 	push	ar4
+      0004A5 C0 05            [ 8] 1074 	push	ar5
+      0004A7 C0 00            [ 8] 1075 	push	ar0
+      0004A9 8E 82            [ 8] 1076 	mov	dpl,r6
+      0004AB 8F 83            [ 8] 1077 	mov	dph,r7
+      0004AD 12s00r00r00      [16] 1078 	lcall	__divsint
+      0004B1 AE 82            [ 8] 1079 	mov	r6,dpl
+      0004B3 AF 83            [ 8] 1080 	mov	r7,dph
+      0004B5 D0 00            [ 8] 1081 	pop	ar0
+      0004B7 D0 05            [ 8] 1082 	pop	ar5
+      0004B9 D0 04            [ 8] 1083 	pop	ar4
+      0004BB D0 03            [ 8] 1084 	pop	ar3
+      0004BD D0 02            [ 8] 1085 	pop	ar2
+      0004BF EE               [ 4] 1086 	mov	a,r6
+      0004C0 C4               [ 4] 1087 	swap	a
+      0004C1 54 F0            [ 8] 1088 	anl	a,#0xf0
+      0004C3 FE               [ 4] 1089 	mov  r6,a
+      0004C4 28               [ 4] 1090 	add	a,r0
+      0004C5 F8               [ 4] 1091 	mov  r0,a
+      0004C6 90s00r00r11      [12] 1092 	mov  dptr,#(_RtcWrite_rtcBytes_65536_95 + 0x000005)
+      0004CA F0               [ 8] 1093 	movx @dptr,a
+                                   1094 ;	rtc390.c:97: rtcBytes[4]=(INTtoBCD(rtcDate->tm_wday)+1)&0x07; //set 24h  mode
+      0004CB 74 07            [ 8] 1095 	mov	a,#0x07
+      0004CD 2A               [ 4] 1096 	add	a,r2
+      0004CE FE               [ 4] 1097 	mov	r6,a
+      0004CF E4               [ 4] 1098 	clr	a
+      0004D0 3B               [ 4] 1099 	addc	a,r3
+      0004D1 FF               [ 4] 1100 	mov	r7,a
+      0004D2 E4               [ 4] 1101 	clr	a
+      0004D3 3C               [ 4] 1102 	addc	a,r4
+      0004D4 F8               [ 4] 1103 	mov	r0,a
+      0004D5 8D 01            [ 8] 1104 	mov	ar1,r5
+      0004D7 8E 82            [ 8] 1105 	mov	dpl,r6
+      0004D9 8F 83            [ 8] 1106 	mov	dph,r7
+      0004DB 88 93            [ 8] 1107 	mov	dpx,r0
+      0004DD 89 F0            [ 8] 1108 	mov	b,r1
+      0004DF 12s00r00r00      [16] 1109 	lcall	__gptrget
+      0004E3 FE               [ 4] 1110 	mov	r6,a
+      0004E4 7F 00            [ 8] 1111 	mov	r7,#0x00
+                                   1112 ;	genAssign: resultIsFar = TRUE
+      0004E6 90s00r00r00      [12] 1113 	mov	dptr,#__modsint_PARM_2
+      0004EA 74 0A            [ 8] 1114 	mov	a,#0x0a
+      0004EC F0               [ 8] 1115 	movx	@dptr,a
+      0004ED E4               [ 4] 1116 	clr	a
+      0004EE A3               [12] 1117 	inc	dptr
+      0004EF F0               [ 8] 1118 	movx	@dptr,a
+      0004F0 C0 02            [ 8] 1119 	push	ar2
+      0004F2 C0 03            [ 8] 1120 	push	ar3
+      0004F4 C0 04            [ 8] 1121 	push	ar4
+      0004F6 C0 05            [ 8] 1122 	push	ar5
+      0004F8 C0 06            [ 8] 1123 	push	ar6
+      0004FA C0 07            [ 8] 1124 	push	ar7
+      0004FC 8E 82            [ 8] 1125 	mov	dpl,r6
+      0004FE 8F 83            [ 8] 1126 	mov	dph,r7
+      000500 12s00r00r00      [16] 1127 	lcall	__modsint
+      000504 A8 82            [ 8] 1128 	mov	r0,dpl
+      000506 A9 83            [ 8] 1129 	mov	r1,dph
+      000508 D0 07            [ 8] 1130 	pop	ar7
+      00050A D0 06            [ 8] 1131 	pop	ar6
+      00050C D0 05            [ 8] 1132 	pop	ar5
+      00050E D0 04            [ 8] 1133 	pop	ar4
+      000510 D0 03            [ 8] 1134 	pop	ar3
+      000512 D0 02            [ 8] 1135 	pop	ar2
+                                   1136 ;	genAssign: resultIsFar = TRUE
+      000514 90s00r00r00      [12] 1137 	mov	dptr,#__divsint_PARM_2
+      000518 74 0A            [ 8] 1138 	mov	a,#0x0a
+      00051A F0               [ 8] 1139 	movx	@dptr,a
+      00051B E4               [ 4] 1140 	clr	a
+      00051C A3               [12] 1141 	inc	dptr
+      00051D F0               [ 8] 1142 	movx	@dptr,a
+      00051E C0 02            [ 8] 1143 	push	ar2
+      000520 C0 03            [ 8] 1144 	push	ar3
+      000522 C0 04            [ 8] 1145 	push	ar4
+      000524 C0 05            [ 8] 1146 	push	ar5
+      000526 C0 00            [ 8] 1147 	push	ar0
+      000528 8E 82            [ 8] 1148 	mov	dpl,r6
+      00052A 8F 83            [ 8] 1149 	mov	dph,r7
+      00052C 12s00r00r00      [16] 1150 	lcall	__divsint
+      000530 AE 82            [ 8] 1151 	mov	r6,dpl
+      000532 AF 83            [ 8] 1152 	mov	r7,dph
+      000534 D0 00            [ 8] 1153 	pop	ar0
+      000536 D0 05            [ 8] 1154 	pop	ar5
+      000538 D0 04            [ 8] 1155 	pop	ar4
+      00053A D0 03            [ 8] 1156 	pop	ar3
+      00053C D0 02            [ 8] 1157 	pop	ar2
+      00053E EE               [ 4] 1158 	mov	a,r6
+      00053F C4               [ 4] 1159 	swap	a
+      000540 54 F0            [ 8] 1160 	anl	a,#0xf0
+      000542 FE               [ 4] 1161 	mov  r6,a
+      000543 28               [ 4] 1162 	add	a,r0
+      000544 04               [ 4] 1163 	inc  a
+      000545 F8               [ 4] 1164 	mov  r0,a
+      000546 53 00 07         [12] 1165 	anl	ar0,#0x07
+      000549 90s00r00r10      [12] 1166 	mov	dptr,#(_RtcWrite_rtcBytes_65536_95 + 0x000004)
+      00054D E8               [ 4] 1167 	mov	a,r0
+      00054E F0               [ 8] 1168 	movx	@dptr,a
+                                   1169 ;	rtc390.c:98: rtcBytes[3]=INTtoBCD(rtcDate->tm_hour)&0x3f; // oscilator on, reset on
+      00054F 74 02            [ 8] 1170 	mov	a,#0x02
+      000551 2A               [ 4] 1171 	add	a,r2
+      000552 FE               [ 4] 1172 	mov	r6,a
+      000553 E4               [ 4] 1173 	clr	a
+      000554 3B               [ 4] 1174 	addc	a,r3
+      000555 FF               [ 4] 1175 	mov	r7,a
+      000556 E4               [ 4] 1176 	clr	a
+      000557 3C               [ 4] 1177 	addc	a,r4
+      000558 F8               [ 4] 1178 	mov	r0,a
+      000559 8D 01            [ 8] 1179 	mov	ar1,r5
+      00055B 8E 82            [ 8] 1180 	mov	dpl,r6
+      00055D 8F 83            [ 8] 1181 	mov	dph,r7
+      00055F 88 93            [ 8] 1182 	mov	dpx,r0
+      000561 89 F0            [ 8] 1183 	mov	b,r1
+      000563 12s00r00r00      [16] 1184 	lcall	__gptrget
+      000567 FE               [ 4] 1185 	mov	r6,a
+      000568 7F 00            [ 8] 1186 	mov	r7,#0x00
+                                   1187 ;	genAssign: resultIsFar = TRUE
+      00056A 90s00r00r00      [12] 1188 	mov	dptr,#__modsint_PARM_2
+      00056E 74 0A            [ 8] 1189 	mov	a,#0x0a
+      000570 F0               [ 8] 1190 	movx	@dptr,a
+      000571 E4               [ 4] 1191 	clr	a
+      000572 A3               [12] 1192 	inc	dptr
+      000573 F0               [ 8] 1193 	movx	@dptr,a
+      000574 C0 02            [ 8] 1194 	push	ar2
+      000576 C0 03            [ 8] 1195 	push	ar3
+      000578 C0 04            [ 8] 1196 	push	ar4
+      00057A C0 05            [ 8] 1197 	push	ar5
+      00057C C0 06            [ 8] 1198 	push	ar6
+      00057E C0 07            [ 8] 1199 	push	ar7
+      000580 8E 82            [ 8] 1200 	mov	dpl,r6
+      000582 8F 83            [ 8] 1201 	mov	dph,r7
+      000584 12s00r00r00      [16] 1202 	lcall	__modsint
+      000588 A8 82            [ 8] 1203 	mov	r0,dpl
+      00058A A9 83            [ 8] 1204 	mov	r1,dph
+      00058C D0 07            [ 8] 1205 	pop	ar7
+      00058E D0 06            [ 8] 1206 	pop	ar6
+      000590 D0 05            [ 8] 1207 	pop	ar5
+      000592 D0 04            [ 8] 1208 	pop	ar4
+      000594 D0 03            [ 8] 1209 	pop	ar3
+      000596 D0 02            [ 8] 1210 	pop	ar2
+                                   1211 ;	genAssign: resultIsFar = TRUE
+      000598 90s00r00r00      [12] 1212 	mov	dptr,#__divsint_PARM_2
+      00059C 74 0A            [ 8] 1213 	mov	a,#0x0a
+      00059E F0               [ 8] 1214 	movx	@dptr,a
+      00059F E4               [ 4] 1215 	clr	a
+      0005A0 A3               [12] 1216 	inc	dptr
+      0005A1 F0               [ 8] 1217 	movx	@dptr,a
+      0005A2 C0 02            [ 8] 1218 	push	ar2
+      0005A4 C0 03            [ 8] 1219 	push	ar3
+      0005A6 C0 04            [ 8] 1220 	push	ar4
+      0005A8 C0 05            [ 8] 1221 	push	ar5
+      0005AA C0 00            [ 8] 1222 	push	ar0
+      0005AC 8E 82            [ 8] 1223 	mov	dpl,r6
+      0005AE 8F 83            [ 8] 1224 	mov	dph,r7
+      0005B0 12s00r00r00      [16] 1225 	lcall	__divsint
+      0005B4 AE 82            [ 8] 1226 	mov	r6,dpl
+      0005B6 AF 83            [ 8] 1227 	mov	r7,dph
+      0005B8 D0 00            [ 8] 1228 	pop	ar0
+      0005BA D0 05            [ 8] 1229 	pop	ar5
+      0005BC D0 04            [ 8] 1230 	pop	ar4
+      0005BE D0 03            [ 8] 1231 	pop	ar3
+      0005C0 D0 02            [ 8] 1232 	pop	ar2
+      0005C2 EE               [ 4] 1233 	mov	a,r6
+      0005C3 C4               [ 4] 1234 	swap	a
+      0005C4 54 F0            [ 8] 1235 	anl	a,#0xf0
+      0005C6 FE               [ 4] 1236 	mov  r6,a
+      0005C7 28               [ 4] 1237 	add	a,r0
+      0005C8 F8               [ 4] 1238 	mov	r0,a
+      0005C9 53 00 3F         [12] 1239 	anl	ar0,#0x3f
+      0005CC 90s00r00r0F      [12] 1240 	mov	dptr,#(_RtcWrite_rtcBytes_65536_95 + 0x000003)
+      0005D0 E8               [ 4] 1241 	mov	a,r0
+      0005D1 F0               [ 8] 1242 	movx	@dptr,a
+                                   1243 ;	rtc390.c:99: rtcBytes[2]=INTtoBCD(rtcDate->tm_min);
+      0005D2 74 01            [ 8] 1244 	mov	a,#0x01
+      0005D4 2A               [ 4] 1245 	add	a,r2
+      0005D5 FE               [ 4] 1246 	mov	r6,a
+      0005D6 E4               [ 4] 1247 	clr	a
+      0005D7 3B               [ 4] 1248 	addc	a,r3
+      0005D8 FF               [ 4] 1249 	mov	r7,a
+      0005D9 E4               [ 4] 1250 	clr	a
+      0005DA 3C               [ 4] 1251 	addc	a,r4
+      0005DB F8               [ 4] 1252 	mov	r0,a
+      0005DC 8D 01            [ 8] 1253 	mov	ar1,r5
+      0005DE 8E 82            [ 8] 1254 	mov	dpl,r6
+      0005E0 8F 83            [ 8] 1255 	mov	dph,r7
+      0005E2 88 93            [ 8] 1256 	mov	dpx,r0
+      0005E4 89 F0            [ 8] 1257 	mov	b,r1
+      0005E6 12s00r00r00      [16] 1258 	lcall	__gptrget
+      0005EA FE               [ 4] 1259 	mov	r6,a
+      0005EB 7F 00            [ 8] 1260 	mov	r7,#0x00
+                                   1261 ;	genAssign: resultIsFar = TRUE
+      0005ED 90s00r00r00      [12] 1262 	mov	dptr,#__modsint_PARM_2
+      0005F1 74 0A            [ 8] 1263 	mov	a,#0x0a
+      0005F3 F0               [ 8] 1264 	movx	@dptr,a
+      0005F4 E4               [ 4] 1265 	clr	a
+      0005F5 A3               [12] 1266 	inc	dptr
+      0005F6 F0               [ 8] 1267 	movx	@dptr,a
+      0005F7 C0 02            [ 8] 1268 	push	ar2
+      0005F9 C0 03            [ 8] 1269 	push	ar3
+      0005FB C0 04            [ 8] 1270 	push	ar4
+      0005FD C0 05            [ 8] 1271 	push	ar5
+      0005FF C0 06            [ 8] 1272 	push	ar6
+      000601 C0 07            [ 8] 1273 	push	ar7
+      000603 8E 82            [ 8] 1274 	mov	dpl,r6
+      000605 8F 83            [ 8] 1275 	mov	dph,r7
+      000607 12s00r00r00      [16] 1276 	lcall	__modsint
+      00060B A8 82            [ 8] 1277 	mov	r0,dpl
+      00060D A9 83            [ 8] 1278 	mov	r1,dph
+      00060F D0 07            [ 8] 1279 	pop	ar7
+      000611 D0 06            [ 8] 1280 	pop	ar6
+      000613 D0 05            [ 8] 1281 	pop	ar5
+      000615 D0 04            [ 8] 1282 	pop	ar4
+      000617 D0 03            [ 8] 1283 	pop	ar3
+      000619 D0 02            [ 8] 1284 	pop	ar2
+                                   1285 ;	genAssign: resultIsFar = TRUE
+      00061B 90s00r00r00      [12] 1286 	mov	dptr,#__divsint_PARM_2
+      00061F 74 0A            [ 8] 1287 	mov	a,#0x0a
+      000621 F0               [ 8] 1288 	movx	@dptr,a
+      000622 E4               [ 4] 1289 	clr	a
+      000623 A3               [12] 1290 	inc	dptr
+      000624 F0               [ 8] 1291 	movx	@dptr,a
+      000625 C0 02            [ 8] 1292 	push	ar2
+      000627 C0 03            [ 8] 1293 	push	ar3
+      000629 C0 04            [ 8] 1294 	push	ar4
+      00062B C0 05            [ 8] 1295 	push	ar5
+      00062D C0 00            [ 8] 1296 	push	ar0
+      00062F 8E 82            [ 8] 1297 	mov	dpl,r6
+      000631 8F 83            [ 8] 1298 	mov	dph,r7
+      000633 12s00r00r00      [16] 1299 	lcall	__divsint
+      000637 AE 82            [ 8] 1300 	mov	r6,dpl
+      000639 AF 83            [ 8] 1301 	mov	r7,dph
+      00063B D0 00            [ 8] 1302 	pop	ar0
+      00063D D0 05            [ 8] 1303 	pop	ar5
+      00063F D0 04            [ 8] 1304 	pop	ar4
+      000641 D0 03            [ 8] 1305 	pop	ar3
+      000643 D0 02            [ 8] 1306 	pop	ar2
+      000645 EE               [ 4] 1307 	mov	a,r6
+      000646 C4               [ 4] 1308 	swap	a
+      000647 54 F0            [ 8] 1309 	anl	a,#0xf0
+      000649 FE               [ 4] 1310 	mov  r6,a
+      00064A 28               [ 4] 1311 	add	a,r0
+      00064B F8               [ 4] 1312 	mov  r0,a
+      00064C 90s00r00r0E      [12] 1313 	mov  dptr,#(_RtcWrite_rtcBytes_65536_95 + 0x000002)
+      000650 F0               [ 8] 1314 	movx @dptr,a
+                                   1315 ;	rtc390.c:100: rtcBytes[1]=INTtoBCD(rtcDate->tm_sec);
+      000651 8A 82            [ 8] 1316 	mov	dpl,r2
+      000653 8B 83            [ 8] 1317 	mov	dph,r3
+      000655 8C 93            [ 8] 1318 	mov	dpx,r4
+      000657 8D F0            [ 8] 1319 	mov	b,r5
+      000659 12s00r00r00      [16] 1320 	lcall	__gptrget
+      00065D FA               [ 4] 1321 	mov	r2,a
+      00065E 7B 00            [ 8] 1322 	mov	r3,#0x00
+                                   1323 ;	genAssign: resultIsFar = TRUE
+      000660 90s00r00r00      [12] 1324 	mov	dptr,#__modsint_PARM_2
+      000664 74 0A            [ 8] 1325 	mov	a,#0x0a
+      000666 F0               [ 8] 1326 	movx	@dptr,a
+      000667 E4               [ 4] 1327 	clr	a
+      000668 A3               [12] 1328 	inc	dptr
+      000669 F0               [ 8] 1329 	movx	@dptr,a
+      00066A C0 02            [ 8] 1330 	push	ar2
+      00066C C0 03            [ 8] 1331 	push	ar3
+      00066E 8A 82            [ 8] 1332 	mov	dpl,r2
+      000670 8B 83            [ 8] 1333 	mov	dph,r3
+      000672 12s00r00r00      [16] 1334 	lcall	__modsint
+      000676 AC 82            [ 8] 1335 	mov	r4,dpl
+      000678 AD 83            [ 8] 1336 	mov	r5,dph
+      00067A D0 03            [ 8] 1337 	pop	ar3
+      00067C D0 02            [ 8] 1338 	pop	ar2
+                                   1339 ;	genAssign: resultIsFar = TRUE
+      00067E 90s00r00r00      [12] 1340 	mov	dptr,#__divsint_PARM_2
+      000682 74 0A            [ 8] 1341 	mov	a,#0x0a
+      000684 F0               [ 8] 1342 	movx	@dptr,a
+      000685 E4               [ 4] 1343 	clr	a
+      000686 A3               [12] 1344 	inc	dptr
+      000687 F0               [ 8] 1345 	movx	@dptr,a
+      000688 C0 04            [ 8] 1346 	push	ar4
+      00068A 8A 82            [ 8] 1347 	mov	dpl,r2
+      00068C 8B 83            [ 8] 1348 	mov	dph,r3
+      00068E 12s00r00r00      [16] 1349 	lcall	__divsint
+      000692 AA 82            [ 8] 1350 	mov	r2,dpl
+      000694 AB 83            [ 8] 1351 	mov	r3,dph
+      000696 D0 04            [ 8] 1352 	pop	ar4
+      000698 EA               [ 4] 1353 	mov	a,r2
+      000699 C4               [ 4] 1354 	swap	a
+      00069A 54 F0            [ 8] 1355 	anl	a,#0xf0
+      00069C FA               [ 4] 1356 	mov  r2,a
+      00069D 2C               [ 4] 1357 	add	a,r4
+      00069E FC               [ 4] 1358 	mov  r4,a
+      00069F 90s00r00r0D      [12] 1359 	mov  dptr,#(_RtcWrite_rtcBytes_65536_95 + 0x000001)
+      0006A3 F0               [ 8] 1360 	movx @dptr,a
+                                   1361 ;	rtc390.c:102: rtcBytes[0]=0;
+      0006A4 90s00r00r0C      [12] 1362 	mov	dptr,#_RtcWrite_rtcBytes_65536_95
+      0006A8 E4               [ 4] 1363 	clr	a
+      0006A9 F0               [ 8] 1364 	movx	@dptr,a
+                                   1365 ;	rtc390.c:104: RtcSync();
+      0006AA 12s00r00r00      [16] 1366 	lcall	_RtcSync
+                                   1367 ;	rtc390.c:106: for (byte=0; byte<8; byte++) {
+                                   1368 ;	genAssign: resultIsFar = FALSE
+      0006AE 7A 00            [ 8] 1369 	mov	r2,#0x00
+      0006B0                       1370 00105$:
+                                   1371 ;	rtc390.c:107: for (bitMask=0x01; bitMask; bitMask<<=1) {
+                                   1372 ;	genAssign: resultIsFar = TRUE
+      0006B0 7B 01            [ 8] 1373 	mov	r3,#0x01
+      0006B2 EA               [ 4] 1374 	mov	a,r2
+      0006B3 24r0C            [ 8] 1375 	add	a,#_RtcWrite_rtcBytes_65536_95
+      0006B5 F5 84            [ 8] 1376 	mov	dpl1,a
+      0006B7 E4               [ 4] 1377 	clr	a
+      0006B8 34s00            [ 8] 1378 	addc	a,#(_RtcWrite_rtcBytes_65536_95 >> 8)
+      0006BA F5 85            [ 8] 1379 	mov	dph1,a
+      0006BC E4               [ 4] 1380 	clr	a
+      0006BD 34s00            [ 8] 1381 	addc	a,#(_RtcWrite_rtcBytes_65536_95 >> 16)
+      0006BF F5 95            [ 8] 1382 	mov	dpx1,a
+      0006C1                       1383 00103$:
+                                   1384 ;	rtc390.c:108: rtc = (rtcBytes[byte]&bitMask) ? 0xff : 0x00;
+      0006C1 05 86            [ 8] 1385 	inc	dps
+      0006C3 E0               [ 8] 1386 	movx	a,@dptr
+      0006C4 FF               [ 4] 1387 	mov	r7,a
+      0006C5 75 86 00         [12] 1388 	mov	dps,#0
+      0006C8 EB               [ 4] 1389 	mov	a,r3
+      0006C9 5F               [ 4] 1390 	anl	a,r7
+      0006CA 60 06            [12] 1391 	jz  00109$
+      0006CC                       1392 00128$:
+                                   1393 ;	genAssign: resultIsFar = FALSE
+      0006CC 7F FF            [ 8] 1394 	mov	r7,#0xff
+      0006CE 78 00            [ 8] 1395 	mov	r0,#0x00
+      0006D0 80 04            [12] 1396 	sjmp 00110$
+      0006D2                       1397 00109$:
+                                   1398 ;	genAssign: resultIsFar = FALSE
+      0006D2 7F 00            [ 8] 1399 	mov	r7,#0x00
+      0006D4 78 00            [ 8] 1400 	mov	r0,#0x00
+      0006D6                       1401 00110$:
+      0006D6 90 31 00 00      [12] 1402 	mov	dptr,#_rtc
+      0006DA EF               [ 4] 1403 	mov	a,r7
+      0006DB F0               [ 8] 1404 	movx	@dptr,a
+                                   1405 ;	rtc390.c:107: for (bitMask=0x01; bitMask; bitMask<<=1) {
+      0006DC 8B 07            [ 8] 1406 	mov	ar7,r3
+      0006DE EF               [ 4] 1407 	mov	a,r7
+      0006DF 25 E0            [ 8] 1408 	add	a,acc
+      0006E1 FF               [ 4] 1409 	mov	r7,a
+                                   1410 ;	genAssign: resultIsFar = TRUE
+      0006E2 8F 03            [ 8] 1411 	mov	ar3,r7
+      0006E4 EB               [ 4] 1412 	mov	a,r3
+      0006E5 70 DA            [12] 1413 	jnz  00103$
+      0006E7                       1414 00129$:
+                                   1415 ;	rtc390.c:106: for (byte=0; byte<8; byte++) {
+      0006E7 0A               [ 4] 1416 	inc	r2
+      0006E8 BA 08 00         [16] 1417 	cjne	r2,#0x08,00130$
+      0006EB                       1418 00130$:
+      0006EB 40 C3            [12] 1419 	jc   00105$
+      0006ED                       1420 00131$:
+      0006ED                       1421 00107$:
+                                   1422 ;	rtc390.c:111: }
+      0006ED 22               [16] 1423 	ret
+                                   1424 	.area CSEG    (CODE)
+                                   1425 	.area CONST   (CODE)
+      000000                       1426 _rtcMagic:
+      000000 C5                    1427 	.db #0xc5	; 197
+      000001 3A                    1428 	.db #0x3a	; 58
+      000002 A3                    1429 	.db #0xa3	; 163
+      000003 5C                    1430 	.db #0x5c	; 92
+      000004 C5                    1431 	.db #0xc5	; 197
+      000005 3A                    1432 	.db #0x3a	; 58
+      000006 A3                    1433 	.db #0xa3	; 163
+      000007 5C                    1434 	.db #0x5c	; 92
+                                   1435 	.area XINIT   (CODE)
+                                   1436 	.area CABS    (ABS,CODE)

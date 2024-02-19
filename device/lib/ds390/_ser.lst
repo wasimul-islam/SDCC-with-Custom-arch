@@ -1,0 +1,638 @@
+                                      1 ;--------------------------------------------------------
+                                      2 ; File Created by SDCC : free open source ISO C Compiler 
+                                      3 ; Version 4.2.14 #0 (Linux)
+                                      4 ;--------------------------------------------------------
+                                      5 	.module _ser
+                                      6 	.optsdcc -mds390 --model-flat24
+                                      7 	
+                                      8 ;--------------------------------------------------------
+                                      9 ; CPU specific extensions
+                                     10 ;--------------------------------------------------------
+                                     11 	.DS80C390
+                                     12 	.amode	2	; 24 bit flat addressing
+                           000082    13 dpl	=	0x82
+                           000083    14 dph	=	0x83
+                           000084    15 dpl1	=	0x84
+                           000085    16 dph1	=	0x85
+                           000086    17 dps	=	0x86
+                           000093    18 dpx	=	0x93
+                           000095    19 dpx1	=	0x95
+                           00009B    20 esp	=	0x9B
+                           00009C    21 ap	=	0x9C
+                           00009C    22 acc1	=	0x9C
+                           0000D1    23 mcnt0	=	0xD1
+                           0000D2    24 mcnt1	=	0xD2
+                           0000D3    25 ma	=	0xD3
+                           0000D4    26 mb	=	0xD4
+                           0000D5    27 mc	=	0xD5
+                           00009D    28 acon	=	0x9D
+                           0000C6    29 mcon	=	0xC6
+                           0000D1    30 F1	=	0xD1	; user flag
+                                     31 ;--------------------------------------------------------
+                                     32 ; Public variables in this module
+                                     33 ;--------------------------------------------------------
+                                     34 	.globl _ser_rxBuffer
+                                     35 	.globl _ser_txBuffer
+                                     36 	.globl _ser_rxIndexOut
+                                     37 	.globl _ser_rxIndexIn
+                                     38 	.globl _ser_txIndexOut
+                                     39 	.globl _ser_txIndexIn
+                                     40 	.globl _ser_init
+                                     41 	.globl _ser_interrupt_handler
+                                     42 	.globl _ser_putc
+                                     43 	.globl _ser_getc
+                                     44 	.globl _ser_printString
+                                     45 	.globl _ser_charAvail
+                                     46 ;--------------------------------------------------------
+                                     47 ; special function registers
+                                     48 ;--------------------------------------------------------
+                           000080    49 _P0	=	0x0080
+                           000081    50 _SP	=	0x0081
+                           000082    51 _DPL	=	0x0082
+                           000083    52 _DPH	=	0x0083
+                           000087    53 _PCON	=	0x0087
+                           000088    54 _TCON	=	0x0088
+                           000089    55 _TMOD	=	0x0089
+                           00008A    56 _TL0	=	0x008a
+                           00008B    57 _TL1	=	0x008b
+                           00008C    58 _TH0	=	0x008c
+                           00008D    59 _TH1	=	0x008d
+                           000090    60 _P1	=	0x0090
+                           000098    61 _SCON	=	0x0098
+                           000099    62 _SBUF	=	0x0099
+                           0000A0    63 _P2	=	0x00a0
+                           0000A8    64 _IE	=	0x00a8
+                           0000B0    65 _P3	=	0x00b0
+                           0000B8    66 _IP	=	0x00b8
+                           0000D0    67 _PSW	=	0x00d0
+                           0000E0    68 _ACC	=	0x00e0
+                           0000F0    69 _B	=	0x00f0
+                           0000C8    70 _T2CON	=	0x00c8
+                           0000CA    71 _RCAP2L	=	0x00ca
+                           0000CB    72 _RCAP2H	=	0x00cb
+                           0000CC    73 _TL2	=	0x00cc
+                           0000CD    74 _TH2	=	0x00cd
+                                     75 ;--------------------------------------------------------
+                                     76 ; special function bits
+                                     77 ;--------------------------------------------------------
+                           000080    78 _P0_0	=	0x0080
+                           000081    79 _P0_1	=	0x0081
+                           000082    80 _P0_2	=	0x0082
+                           000083    81 _P0_3	=	0x0083
+                           000084    82 _P0_4	=	0x0084
+                           000085    83 _P0_5	=	0x0085
+                           000086    84 _P0_6	=	0x0086
+                           000087    85 _P0_7	=	0x0087
+                           000088    86 _IT0	=	0x0088
+                           000089    87 _IE0	=	0x0089
+                           00008A    88 _IT1	=	0x008a
+                           00008B    89 _IE1	=	0x008b
+                           00008C    90 _TR0	=	0x008c
+                           00008D    91 _TF0	=	0x008d
+                           00008E    92 _TR1	=	0x008e
+                           00008F    93 _TF1	=	0x008f
+                           000090    94 _P1_0	=	0x0090
+                           000091    95 _P1_1	=	0x0091
+                           000092    96 _P1_2	=	0x0092
+                           000093    97 _P1_3	=	0x0093
+                           000094    98 _P1_4	=	0x0094
+                           000095    99 _P1_5	=	0x0095
+                           000096   100 _P1_6	=	0x0096
+                           000097   101 _P1_7	=	0x0097
+                           000098   102 _RI	=	0x0098
+                           000099   103 _TI	=	0x0099
+                           00009A   104 _RB8	=	0x009a
+                           00009B   105 _TB8	=	0x009b
+                           00009C   106 _REN	=	0x009c
+                           00009D   107 _SM2	=	0x009d
+                           00009E   108 _SM1	=	0x009e
+                           00009F   109 _SM0	=	0x009f
+                           0000A0   110 _P2_0	=	0x00a0
+                           0000A1   111 _P2_1	=	0x00a1
+                           0000A2   112 _P2_2	=	0x00a2
+                           0000A3   113 _P2_3	=	0x00a3
+                           0000A4   114 _P2_4	=	0x00a4
+                           0000A5   115 _P2_5	=	0x00a5
+                           0000A6   116 _P2_6	=	0x00a6
+                           0000A7   117 _P2_7	=	0x00a7
+                           0000A8   118 _EX0	=	0x00a8
+                           0000A9   119 _ET0	=	0x00a9
+                           0000AA   120 _EX1	=	0x00aa
+                           0000AB   121 _ET1	=	0x00ab
+                           0000AC   122 _ES	=	0x00ac
+                           0000AF   123 _EA	=	0x00af
+                           0000B0   124 _P3_0	=	0x00b0
+                           0000B1   125 _P3_1	=	0x00b1
+                           0000B2   126 _P3_2	=	0x00b2
+                           0000B3   127 _P3_3	=	0x00b3
+                           0000B4   128 _P3_4	=	0x00b4
+                           0000B5   129 _P3_5	=	0x00b5
+                           0000B6   130 _P3_6	=	0x00b6
+                           0000B7   131 _P3_7	=	0x00b7
+                           0000B0   132 _RXD	=	0x00b0
+                           0000B1   133 _TXD	=	0x00b1
+                           0000B2   134 _INT0	=	0x00b2
+                           0000B3   135 _INT1	=	0x00b3
+                           0000B4   136 _T0	=	0x00b4
+                           0000B5   137 _T1	=	0x00b5
+                           0000B6   138 _WR	=	0x00b6
+                           0000B7   139 _RD	=	0x00b7
+                           0000B8   140 _PX0	=	0x00b8
+                           0000B9   141 _PT0	=	0x00b9
+                           0000BA   142 _PX1	=	0x00ba
+                           0000BB   143 _PT1	=	0x00bb
+                           0000BC   144 _PS	=	0x00bc
+                           0000D0   145 _P	=	0x00d0
+                           0000D1   146 _F1	=	0x00d1
+                           0000D2   147 _OV	=	0x00d2
+                           0000D3   148 _RS0	=	0x00d3
+                           0000D4   149 _RS1	=	0x00d4
+                           0000D5   150 _F0	=	0x00d5
+                           0000D6   151 _AC	=	0x00d6
+                           0000D7   152 _CY	=	0x00d7
+                           0000AD   153 _ET2	=	0x00ad
+                           0000BD   154 _PT2	=	0x00bd
+                           0000C8   155 _T2CON_0	=	0x00c8
+                           0000C9   156 _T2CON_1	=	0x00c9
+                           0000CA   157 _T2CON_2	=	0x00ca
+                           0000CB   158 _T2CON_3	=	0x00cb
+                           0000CC   159 _T2CON_4	=	0x00cc
+                           0000CD   160 _T2CON_5	=	0x00cd
+                           0000CE   161 _T2CON_6	=	0x00ce
+                           0000CF   162 _T2CON_7	=	0x00cf
+                           0000C8   163 _CP_RL2	=	0x00c8
+                           0000C9   164 _C_T2	=	0x00c9
+                           0000CA   165 _TR2	=	0x00ca
+                           0000CB   166 _EXEN2	=	0x00cb
+                           0000CC   167 _TCLK	=	0x00cc
+                           0000CD   168 _RCLK	=	0x00cd
+                           0000CE   169 _EXF2	=	0x00ce
+                           0000CF   170 _TF2	=	0x00cf
+                                    171 ;--------------------------------------------------------
+                                    172 ; overlayable register banks
+                                    173 ;--------------------------------------------------------
+                                    174 	.area REG_BANK_0	(REL,OVR,DATA)
+      000000                        175 	.ds 8
+                                    176 	.area REG_BANK_1	(REL,OVR,DATA)
+      000000                        177 	.ds 8
+                                    178 ;--------------------------------------------------------
+                                    179 ; internal ram data
+                                    180 ;--------------------------------------------------------
+                                    181 	.area DSEG    (DATA)
+                                    182 ;--------------------------------------------------------
+                                    183 ; overlayable items in internal ram
+                                    184 ;--------------------------------------------------------
+                                    185 ;--------------------------------------------------------
+                                    186 ; indirectly addressable internal ram data
+                                    187 ;--------------------------------------------------------
+                                    188 	.area ISEG    (DATA)
+                                    189 ;--------------------------------------------------------
+                                    190 ; absolute internal ram data
+                                    191 ;--------------------------------------------------------
+                                    192 	.area IABS    (ABS,DATA)
+                                    193 	.area IABS    (ABS,DATA)
+                                    194 ;--------------------------------------------------------
+                                    195 ; bit data
+                                    196 ;--------------------------------------------------------
+                                    197 	.area BSEG    (BIT)
+      000000                        198 _ser_txBusy:
+      000000                        199 	.ds 1
+                                    200 ;--------------------------------------------------------
+                                    201 ; paged external ram data
+                                    202 ;--------------------------------------------------------
+                                    203 	.area PSEG    (PAG,XDATA)
+                                    204 ;--------------------------------------------------------
+                                    205 ; uninitialized external ram data
+                                    206 ;--------------------------------------------------------
+                                    207 	.area XSEG    (XDATA)
+      000000                        208 _ser_txIndexIn::
+      000000                        209 	.ds 1
+      000001                        210 _ser_txIndexOut::
+      000001                        211 	.ds 1
+      000002                        212 _ser_rxIndexIn::
+      000002                        213 	.ds 1
+      000003                        214 _ser_rxIndexOut::
+      000003                        215 	.ds 1
+      000004                        216 _ser_txBuffer::
+      000004                        217 	.ds 256
+      000104                        218 _ser_rxBuffer::
+      000104                        219 	.ds 256
+                                    220 ;--------------------------------------------------------
+                                    221 ; absolute external ram data
+                                    222 ;--------------------------------------------------------
+                                    223 	.area XABS    (ABS,XDATA)
+                                    224 ;--------------------------------------------------------
+                                    225 ; initialized external ram data
+                                    226 ;--------------------------------------------------------
+                                    227 	.area XISEG   (XDATA)
+                                    228 ;--------------------------------------------------------
+                                    229 ; global & static initialisations
+                                    230 ;--------------------------------------------------------
+                                    231 	.area HOME    (CODE)
+                                    232 	.area GSINIT  (CODE)
+                                    233 	.area GSFINAL (CODE)
+                                    234 	.area GSINIT  (CODE)
+                                    235 ;--------------------------------------------------------
+                                    236 ; Home
+                                    237 ;--------------------------------------------------------
+                                    238 	.area HOME    (CODE)
+                                    239 	.area HOME    (CODE)
+                                    240 ;--------------------------------------------------------
+                                    241 ; code
+                                    242 ;--------------------------------------------------------
+                                    243 	.area CSEG    (CODE)
+                                    244 ;------------------------------------------------------------
+                                    245 ;Allocation info for local variables in function 'ser_init'
+                                    246 ;------------------------------------------------------------
+                                    247 ;	_ser.c:76: ser_init(void)
+                                    248 ;	-----------------------------------------
+                                    249 ;	 function ser_init
+                                    250 ;	-----------------------------------------
+      000000                        251 _ser_init:
+                           000002   252 	ar2 = 0x02
+                           000003   253 	ar3 = 0x03
+                           000004   254 	ar4 = 0x04
+                           000005   255 	ar5 = 0x05
+                           000006   256 	ar6 = 0x06
+                           000007   257 	ar7 = 0x07
+                           000000   258 	ar0 = 0x00
+                           000001   259 	ar1 = 0x01
+                                    260 ;	_ser.c:78: ES = 0;
+                                    261 ;	genAssign: resultIsFar = FALSE
+      000000 C2 AC            [ 8]  262 	clr	_ES
+                                    263 ;	_ser.c:80: ser_txBusy     = 0;
+                                    264 ;	genAssign: resultIsFar = FALSE
+      000002 C2*00            [ 8]  265 	clr	_ser_txBusy
+                                    266 ;	_ser.c:82: ser_txIndexIn  = 0;
+                                    267 ;	genAssign: resultIsFar = TRUE
+      000004 90s00r00r00      [12]  268 	mov	dptr,#_ser_txIndexIn
+                                    269 ;	_ser.c:83: ser_txIndexOut = 0;
+                                    270 ;	genAssign: resultIsFar = TRUE
+                                    271 ;	_ser.c:84: ser_rxIndexIn  = 0;
+                                    272 ;	genAssign: resultIsFar = TRUE
+                                    273 ;	_ser.c:85: ser_rxIndexOut = 0;
+                                    274 ;	genAssign: resultIsFar = TRUE
+      000008 E4               [ 4]  275 	clr   a
+      000009 F0               [ 8]  276 	movx  @dptr,a
+      00000A 90s00r00r01      [12]  277 	mov   dptr,#_ser_txIndexOut
+      00000E F0               [ 8]  278 	movx  @dptr,a
+      00000F 90s00r00r02      [12]  279 	mov   dptr,#_ser_rxIndexIn
+      000013 F0               [ 8]  280 	movx  @dptr,a
+      000014 90s00r00r03      [12]  281 	mov   dptr,#_ser_rxIndexOut
+      000018 F0               [ 8]  282 	movx  @dptr,a
+                                    283 ;	_ser.c:87: T2CON = 0x30;
+                                    284 ;	genAssign: resultIsFar = FALSE
+      000019 75 C8 30         [12]  285 	mov	_T2CON,#0x30
+                                    286 ;	_ser.c:90: RCAP2H = 0xFF;
+                                    287 ;	genAssign: resultIsFar = FALSE
+      00001C 75 CB FF         [12]  288 	mov	_RCAP2H,#0xff
+                                    289 ;	_ser.c:91: RCAP2L = 0xDD;
+                                    290 ;	genAssign: resultIsFar = FALSE
+      00001F 75 CA DD         [12]  291 	mov	_RCAP2L,#0xdd
+                                    292 ;	_ser.c:94: T2CON = 0x34;
+                                    293 ;	genAssign: resultIsFar = FALSE
+      000022 75 C8 34         [12]  294 	mov	_T2CON,#0x34
+                                    295 ;	_ser.c:96: SCON = 0x50;
+                                    296 ;	genAssign: resultIsFar = FALSE
+      000025 75 98 50         [12]  297 	mov	_SCON,#0x50
+                                    298 ;	_ser.c:98: if (TI) {
+                                    299 ;	_ser.c:99: TI = 0;
+                                    300 ;	genAssign: resultIsFar = FALSE
+      000028 10 99 02         [12]  301 	jbc     _TI,00115$
+      00002B 80 00            [12]  302 	sjmp    00102$
+      00002D                        303 00115$:
+      00002D                        304 00102$:
+                                    305 ;	_ser.c:101: if (RI) {
+                                    306 ;	_ser.c:102: RI = 0;
+                                    307 ;	genAssign: resultIsFar = FALSE
+      00002D 10 98 02         [12]  308 	jbc     _RI,00116$
+      000030 80 00            [12]  309 	sjmp    00104$
+      000032                        310 00116$:
+      000032                        311 00104$:
+                                    312 ;	_ser.c:105: ES=1;  
+                                    313 ;	genAssign: resultIsFar = FALSE
+      000032 D2 AC            [ 8]  314 	setb	_ES
+      000034                        315 00105$:
+                                    316 ;	_ser.c:106: }
+      000034 22               [16]  317 	ret
+                                    318 ;------------------------------------------------------------
+                                    319 ;Allocation info for local variables in function 'ser_interrupt_handler'
+                                    320 ;------------------------------------------------------------
+                                    321 ;	_ser.c:109: ser_interrupt_handler(void) __interrupt (4) __using (1)
+                                    322 ;	-----------------------------------------
+                                    323 ;	 function ser_interrupt_handler
+                                    324 ;	-----------------------------------------
+      000035                        325 _ser_interrupt_handler:
+                           00000A   326 	ar2 = 0x0a
+                           00000B   327 	ar3 = 0x0b
+                           00000C   328 	ar4 = 0x0c
+                           00000D   329 	ar5 = 0x0d
+                           00000E   330 	ar6 = 0x0e
+                           00000F   331 	ar7 = 0x0f
+                           000008   332 	ar0 = 0x08
+                           000009   333 	ar1 = 0x09
+      000035 C0 E0            [ 8]  334 	push	acc
+      000037 C0 F0            [ 8]  335 	push	b
+      000039 C0 82            [ 8]  336 	push	dpl
+      00003B C0 83            [ 8]  337 	push	dph
+      00003D C0 93            [ 8]  338 	push	dpx
+      00003F C0 86            [ 8]  339 	push	dps
+      000041 75 86 00         [12]  340 	mov	dps,#0
+      000044 C0 84            [ 8]  341 	push	dpl1
+      000046 C0 85            [ 8]  342 	push	dph1
+      000048 C0 95            [ 8]  343 	push	dpx1
+      00004A C0 9C            [ 8]  344 	push	acc1
+      00004C C0 D0            [ 8]  345 	push	psw
+      00004E 75 D0 08         [12]  346 	mov	psw,#0x08
+                                    347 ;	_ser.c:111: ES=0;
+                                    348 ;	genAssign: resultIsFar = FALSE
+      000051 C2 AC            [ 8]  349 	clr	_ES
+                                    350 ;	_ser.c:113: if (RI) {
+                                    351 ;	_ser.c:114: RI = 0;
+                                    352 ;	genAssign: resultIsFar = FALSE
+      000053 10 98 02         [12]  353 	jbc     _RI,00122$
+      000056 80 25            [12]  354 	sjmp    00102$
+      000058                        355 00122$:
+                                    356 ;	_ser.c:115: ser_rxBuffer[ser_rxIndexIn++] = SBUF;
+      000058 90s00r00r02      [12]  357 	mov	dptr,#_ser_rxIndexIn
+                                    358 ;	genAssign: resultIsFar = FALSE
+      00005C E0               [ 8]  359 	movx	a,@dptr
+      00005D FA               [ 4]  360 	mov	r2,a
+      00005E 90s00r00r02      [12]  361 	mov	dptr,#_ser_rxIndexIn
+      000062 74 01            [ 8]  362 	mov	a,#0x01
+      000064 2A               [ 4]  363 	add	a,r2
+      000065 F0               [ 8]  364 	movx	@dptr,a
+      000066 EA               [ 4]  365 	mov	a,r2
+      000067 24r04            [ 8]  366 	add	a,#_ser_rxBuffer
+      000069 F5 84            [ 8]  367 	mov	dpl1,a
+      00006B E4               [ 4]  368 	clr	a
+      00006C 34s01            [ 8]  369 	addc	a,#(_ser_rxBuffer >> 8)
+      00006E F5 85            [ 8]  370 	mov	dph1,a
+      000070 E4               [ 4]  371 	clr	a
+      000071 34s00            [ 8]  372 	addc	a,#(_ser_rxBuffer >> 16)
+      000073 F5 95            [ 8]  373 	mov	dpx1,a
+      000075 E5 99            [ 8]  374 	mov	a,_SBUF
+      000077 05 86            [ 8]  375 	inc	dps
+      000079 F0               [ 8]  376 	movx	@dptr,a
+      00007A 75 86 00         [12]  377 	mov	dps,#0
+      00007D                        378 00102$:
+                                    379 ;	_ser.c:118: if (TI) {
+                                    380 ;	_ser.c:119: TI = 0;
+                                    381 ;	genAssign: resultIsFar = FALSE
+      00007D 10 99 02         [12]  382 	jbc     _TI,00123$
+      000080 80 3E            [12]  383 	sjmp    00107$
+      000082                        384 00123$:
+                                    385 ;	_ser.c:120: if (ser_txIndexIn == ser_txIndexOut) {
+      000082 90s00r00r01      [12]  386 	mov	dptr,#_ser_txIndexOut
+      000086 75 86 01         [12]  387 	mov     dps, #1
+      000089 90s00r00r00      [12]  388 	mov     dptr, #_ser_txIndexIn
+      00008D E0               [ 8]  389 	movx	a,@dptr
+      00008E 75 86 00         [12]  390 	mov	dps,#0
+      000091 F5 F0            [ 8]  391 	mov	b,a
+      000093 E0               [ 8]  392 	movx	a,@dptr
+      000094 B5 F0 04         [16]  393 	cjne a,b,00104$
+      000097                        394 00125$:
+                                    395 ;	_ser.c:121: ser_txBusy = 0;
+                                    396 ;	genAssign: resultIsFar = FALSE
+      000097 C2*00            [ 8]  397 	clr	_ser_txBusy
+      000099 80 25            [12]  398 	sjmp 00107$
+      00009B                        399 00104$:
+                                    400 ;	_ser.c:124: SBUF = ser_txBuffer[ser_txIndexOut++];
+      00009B 90s00r00r01      [12]  401 	mov	dptr,#_ser_txIndexOut
+                                    402 ;	genAssign: resultIsFar = FALSE
+      00009F E0               [ 8]  403 	movx	a,@dptr
+      0000A0 FA               [ 4]  404 	mov	r2,a
+      0000A1 90s00r00r01      [12]  405 	mov	dptr,#_ser_txIndexOut
+      0000A5 74 01            [ 8]  406 	mov	a,#0x01
+      0000A7 2A               [ 4]  407 	add	a,r2
+      0000A8 F0               [ 8]  408 	movx	@dptr,a
+      0000A9 EA               [ 4]  409 	mov	a,r2
+      0000AA 24r04            [ 8]  410 	add	a,#_ser_txBuffer
+      0000AC F5 84            [ 8]  411 	mov	dpl1,a
+      0000AE E4               [ 4]  412 	clr	a
+      0000AF 34s00            [ 8]  413 	addc	a,#(_ser_txBuffer >> 8)
+      0000B1 F5 85            [ 8]  414 	mov	dph1,a
+      0000B3 E4               [ 4]  415 	clr	a
+      0000B4 34s00            [ 8]  416 	addc	a,#(_ser_txBuffer >> 16)
+      0000B6 F5 95            [ 8]  417 	mov	dpx1,a
+      0000B8 05 86            [ 8]  418 	inc	dps
+      0000BA E0               [ 8]  419 	movx	a,@dptr
+      0000BB F5 99            [ 8]  420 	mov	_SBUF,a
+      0000BD 75 86 00         [12]  421 	mov	dps,#0
+      0000C0                        422 00107$:
+                                    423 ;	_ser.c:128: ES=1;
+                                    424 ;	genAssign: resultIsFar = FALSE
+      0000C0 D2 AC            [ 8]  425 	setb	_ES
+      0000C2                        426 00108$:
+                                    427 ;	_ser.c:129: }
+      0000C2 D0 D0            [ 8]  428 	pop	psw
+      0000C4 D0 9C            [ 8]  429 	pop	acc1
+      0000C6 D0 95            [ 8]  430 	pop	dpx1
+      0000C8 D0 85            [ 8]  431 	pop	dph1
+      0000CA D0 84            [ 8]  432 	pop	dpl1
+      0000CC D0 86            [ 8]  433 	pop	dps
+      0000CE D0 93            [ 8]  434 	pop	dpx
+      0000D0 D0 83            [ 8]  435 	pop	dph
+      0000D2 D0 82            [ 8]  436 	pop	dpl
+      0000D4 D0 F0            [ 8]  437 	pop	b
+      0000D6 D0 E0            [ 8]  438 	pop	acc
+      0000D8 32               [16]  439 	reti
+                                    440 ;------------------------------------------------------------
+                                    441 ;Allocation info for local variables in function 'ser_putc'
+                                    442 ;------------------------------------------------------------
+                                    443 ;c                         Allocated to registers r2 
+                                    444 ;------------------------------------------------------------
+                                    445 ;	_ser.c:132: ser_putc(unsigned char c)
+                                    446 ;	-----------------------------------------
+                                    447 ;	 function ser_putc
+                                    448 ;	-----------------------------------------
+      0000D9                        449 _ser_putc:
+                           000002   450 	ar2 = 0x02
+                           000003   451 	ar3 = 0x03
+                           000004   452 	ar4 = 0x04
+                           000005   453 	ar5 = 0x05
+                           000006   454 	ar6 = 0x06
+                           000007   455 	ar7 = 0x07
+                           000000   456 	ar0 = 0x00
+                           000001   457 	ar1 = 0x01
+      0000D9 AA 82            [ 8]  458 	mov	r2,dpl
+                                    459 ;	_ser.c:134: ES=0;
+                                    460 ;	genAssign: resultIsFar = FALSE
+      0000DB C2 AC            [ 8]  461 	clr	_ES
+                                    462 ;	_ser.c:136: if (ser_txBusy) {
+      0000DD 30*00 26         [12]  463 	jnb  _ser_txBusy,00102$
+      0000E0                        464 00110$:
+                                    465 ;	_ser.c:137: ser_txBuffer[ser_txIndexIn++] = c;
+      0000E0 90s00r00r00      [12]  466 	mov	dptr,#_ser_txIndexIn
+                                    467 ;	genAssign: resultIsFar = FALSE
+      0000E4 E0               [ 8]  468 	movx	a,@dptr
+      0000E5 FB               [ 4]  469 	mov	r3,a
+      0000E6 90s00r00r00      [12]  470 	mov	dptr,#_ser_txIndexIn
+      0000EA 74 01            [ 8]  471 	mov	a,#0x01
+      0000EC 2B               [ 4]  472 	add	a,r3
+      0000ED F0               [ 8]  473 	movx	@dptr,a
+      0000EE EB               [ 4]  474 	mov	a,r3
+      0000EF 24r04            [ 8]  475 	add	a,#_ser_txBuffer
+      0000F1 F5 84            [ 8]  476 	mov	dpl1,a
+      0000F3 E4               [ 4]  477 	clr	a
+      0000F4 34s00            [ 8]  478 	addc	a,#(_ser_txBuffer >> 8)
+      0000F6 F5 85            [ 8]  479 	mov	dph1,a
+      0000F8 E4               [ 4]  480 	clr	a
+      0000F9 34s00            [ 8]  481 	addc	a,#(_ser_txBuffer >> 16)
+      0000FB F5 95            [ 8]  482 	mov	dpx1,a
+      0000FD EA               [ 4]  483 	mov	a,r2
+      0000FE 05 86            [ 8]  484 	inc	dps
+      000100 F0               [ 8]  485 	movx	@dptr,a
+      000101 75 86 00         [12]  486 	mov	dps,#0
+      000104 80 04            [12]  487 	sjmp 00103$
+      000106                        488 00102$:
+                                    489 ;	_ser.c:140: ser_txBusy = 1;
+                                    490 ;	genAssign: resultIsFar = FALSE
+      000106 D2*00            [ 8]  491 	setb	_ser_txBusy
+                                    492 ;	_ser.c:141: SBUF = c;
+                                    493 ;	genAssign: resultIsFar = FALSE
+      000108 8A 99            [ 8]  494 	mov	_SBUF,r2
+      00010A                        495 00103$:
+                                    496 ;	_ser.c:144: ES=1;
+                                    497 ;	genAssign: resultIsFar = FALSE
+      00010A D2 AC            [ 8]  498 	setb	_ES
+      00010C                        499 00104$:
+                                    500 ;	_ser.c:145: }
+      00010C 22               [16]  501 	ret
+                                    502 ;------------------------------------------------------------
+                                    503 ;Allocation info for local variables in function 'ser_getc'
+                                    504 ;------------------------------------------------------------
+                                    505 ;tmp                       Allocated to registers r2 
+                                    506 ;------------------------------------------------------------
+                                    507 ;	_ser.c:148: ser_getc(void)
+                                    508 ;	-----------------------------------------
+                                    509 ;	 function ser_getc
+                                    510 ;	-----------------------------------------
+      00010D                        511 _ser_getc:
+                                    512 ;	_ser.c:153: if (ser_rxIndexIn != ser_rxIndexOut) {
+      00010D 90s00r00r03      [12]  513 	mov	dptr,#_ser_rxIndexOut
+      000111 75 86 01         [12]  514 	mov     dps, #1
+      000114 90s00r00r02      [12]  515 	mov     dptr, #_ser_rxIndexIn
+      000118 E0               [ 8]  516 	movx	a,@dptr
+      000119 75 86 00         [12]  517 	mov	dps,#0
+      00011C F5 F0            [ 8]  518 	mov	b,a
+      00011E E0               [ 8]  519 	movx	a,@dptr
+      00011F B5 F0 02         [16]  520 	cjne	a,b,00110$
+      000122 80 26            [12]  521 	sjmp 00102$
+      000124                        522 00110$:
+                                    523 ;	_ser.c:154: tmp = ser_rxBuffer[ser_rxIndexOut++];
+      000124 90s00r00r03      [12]  524 	mov	dptr,#_ser_rxIndexOut
+                                    525 ;	genAssign: resultIsFar = FALSE
+      000128 E0               [ 8]  526 	movx	a,@dptr
+      000129 FA               [ 4]  527 	mov	r2,a
+      00012A 90s00r00r03      [12]  528 	mov	dptr,#_ser_rxIndexOut
+      00012E 74 01            [ 8]  529 	mov	a,#0x01
+      000130 2A               [ 4]  530 	add	a,r2
+      000131 F0               [ 8]  531 	movx	@dptr,a
+      000132 EA               [ 4]  532 	mov	a,r2
+      000133 24r04            [ 8]  533 	add	a,#_ser_rxBuffer
+      000135 F5 84            [ 8]  534 	mov	dpl1,a
+      000137 E4               [ 4]  535 	clr	a
+      000138 34s01            [ 8]  536 	addc	a,#(_ser_rxBuffer >> 8)
+      00013A F5 85            [ 8]  537 	mov	dph1,a
+      00013C E4               [ 4]  538 	clr	a
+      00013D 34s00            [ 8]  539 	addc	a,#(_ser_rxBuffer >> 16)
+      00013F F5 95            [ 8]  540 	mov	dpx1,a
+      000141 05 86            [ 8]  541 	inc	dps
+      000143 E0               [ 8]  542 	movx	a,@dptr
+      000144 FA               [ 4]  543 	mov	r2,a
+      000145 75 86 00         [12]  544 	mov	dps,#0
+                                    545 ;	genAssign: resultIsFar = TRUE
+      000148 80 02            [12]  546 	sjmp 00103$
+      00014A                        547 00102$:
+                                    548 ;	_ser.c:157: tmp = 0;
+                                    549 ;	genAssign: resultIsFar = TRUE
+      00014A 7A 00            [ 8]  550 	mov	r2,#0x00
+      00014C                        551 00103$:
+                                    552 ;	_ser.c:161: return(tmp);
+      00014C 8A 82            [ 8]  553 	mov	dpl,r2
+      00014E                        554 00104$:
+                                    555 ;	_ser.c:162: }
+      00014E 22               [16]  556 	ret
+                                    557 ;------------------------------------------------------------
+                                    558 ;Allocation info for local variables in function 'ser_printString'
+                                    559 ;------------------------------------------------------------
+                                    560 ;String                    Allocated to registers 
+                                    561 ;------------------------------------------------------------
+                                    562 ;	_ser.c:165: ser_printString(char *String)
+                                    563 ;	-----------------------------------------
+                                    564 ;	 function ser_printString
+                                    565 ;	-----------------------------------------
+      00014F                        566 _ser_printString:
+      00014F AA 82            [ 8]  567 	mov	r2,dpl
+      000151 AB 83            [ 8]  568 	mov	r3,dph
+      000153 AC 93            [ 8]  569 	mov	r4,dpx
+      000155 AD F0            [ 8]  570 	mov	r5,b
+                                    571 ;	_ser.c:167: while (*String) {
+      000157                        572 00101$:
+      000157 8A 82            [ 8]  573 	mov	dpl,r2
+      000159 8B 83            [ 8]  574 	mov	dph,r3
+      00015B 8C 93            [ 8]  575 	mov	dpx,r4
+      00015D 8D F0            [ 8]  576 	mov	b,r5
+      00015F 12s00r00r00      [16]  577 	lcall	__gptrget
+      000163 FE               [ 4]  578 	mov  r6,a
+      000164 60 21            [12]  579 	jz  00104$
+      000166                        580 00115$:
+                                    581 ;	_ser.c:168: ser_putc(*String++);
+      000166 0A               [ 4]  582 	inc	r2
+      000167 BA 00 05         [16]  583 	cjne	r2,#0x00,00116$
+      00016A 0B               [ 4]  584 	inc	r3
+      00016B BB 00 01         [16]  585 	cjne	r3,#0x00,00116$
+      00016E 0C               [ 4]  586 	inc	r4
+      00016F                        587 00116$:
+      00016F C0 02            [ 8]  588 	push	ar2
+      000171 C0 03            [ 8]  589 	push	ar3
+      000173 C0 04            [ 8]  590 	push	ar4
+      000175 C0 05            [ 8]  591 	push	ar5
+      000177 8E 82            [ 8]  592 	mov	dpl,r6
+      000179 12s00r00rD9      [16]  593 	lcall	_ser_putc
+      00017D D0 05            [ 8]  594 	pop	ar5
+      00017F D0 04            [ 8]  595 	pop	ar4
+      000181 D0 03            [ 8]  596 	pop	ar3
+      000183 D0 02            [ 8]  597 	pop	ar2
+      000185 80 D0            [12]  598 	sjmp 00101$
+      000187                        599 00104$:
+                                    600 ;	_ser.c:170: }
+      000187 22               [16]  601 	ret
+                                    602 ;------------------------------------------------------------
+                                    603 ;Allocation info for local variables in function 'ser_charAvail'
+                                    604 ;------------------------------------------------------------
+                                    605 ;ret                       Allocated to registers r2 
+                                    606 ;------------------------------------------------------------
+                                    607 ;	_ser.c:173: ser_charAvail(void)
+                                    608 ;	-----------------------------------------
+                                    609 ;	 function ser_charAvail
+                                    610 ;	-----------------------------------------
+      000188                        611 _ser_charAvail:
+                                    612 ;	_ser.c:175: char ret = 0;
+                                    613 ;	genAssign: resultIsFar = TRUE
+      000188 7A 00            [ 8]  614 	mov	r2,#0x00
+                                    615 ;	_ser.c:177: if (ser_rxIndexIn != ser_rxIndexOut) {
+      00018A 90s00r00r03      [12]  616 	mov	dptr,#_ser_rxIndexOut
+      00018E 75 86 01         [12]  617 	mov     dps, #1
+      000191 90s00r00r02      [12]  618 	mov     dptr, #_ser_rxIndexIn
+      000195 E0               [ 8]  619 	movx	a,@dptr
+      000196 75 86 00         [12]  620 	mov	dps,#0
+      000199 F5 F0            [ 8]  621 	mov	b,a
+      00019B E0               [ 8]  622 	movx	a,@dptr
+      00019C B5 F0 02         [16]  623 	cjne	a,b,00109$
+      00019F 80 02            [12]  624 	sjmp 00102$
+      0001A1                        625 00109$:
+                                    626 ;	_ser.c:178: ret = 1;
+                                    627 ;	genAssign: resultIsFar = TRUE
+      0001A1 7A 01            [ 8]  628 	mov	r2,#0x01
+      0001A3                        629 00102$:
+                                    630 ;	_ser.c:181: return(ret);
+      0001A3 8A 82            [ 8]  631 	mov	dpl,r2
+      0001A5                        632 00103$:
+                                    633 ;	_ser.c:182: }
+      0001A5 22               [16]  634 	ret
+                                    635 	.area CSEG    (CODE)
+                                    636 	.area CONST   (CODE)
+                                    637 	.area XINIT   (CODE)
+                                    638 	.area CABS    (ABS,CODE)

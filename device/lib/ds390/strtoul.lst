@@ -1,0 +1,1189 @@
+                                      1 ;--------------------------------------------------------
+                                      2 ; File Created by SDCC : free open source ISO C Compiler 
+                                      3 ; Version 4.2.14 #0 (Linux)
+                                      4 ;--------------------------------------------------------
+                                      5 	.module strtoul
+                                      6 	.optsdcc -mds390 --model-flat24
+                                      7 	
+                                      8 ;--------------------------------------------------------
+                                      9 ; CPU specific extensions
+                                     10 ;--------------------------------------------------------
+                                     11 	.DS80C390
+                                     12 	.amode	2	; 24 bit flat addressing
+                           000082    13 dpl	=	0x82
+                           000083    14 dph	=	0x83
+                           000084    15 dpl1	=	0x84
+                           000085    16 dph1	=	0x85
+                           000086    17 dps	=	0x86
+                           000093    18 dpx	=	0x93
+                           000095    19 dpx1	=	0x95
+                           00009B    20 esp	=	0x9B
+                           00009C    21 ap	=	0x9C
+                           00009C    22 acc1	=	0x9C
+                           0000D1    23 mcnt0	=	0xD1
+                           0000D2    24 mcnt1	=	0xD2
+                           0000D3    25 ma	=	0xD3
+                           0000D4    26 mb	=	0xD4
+                           0000D5    27 mc	=	0xD5
+                           00009D    28 acon	=	0x9D
+                           0000C6    29 mcon	=	0xC6
+                           0000D1    30 F1	=	0xD1	; user flag
+                                     31 ;--------------------------------------------------------
+                                     32 ; Public variables in this module
+                                     33 ;--------------------------------------------------------
+                                     34 	.globl _strncmp
+                                     35 	.globl _strtoul_PARM_3
+                                     36 	.globl _strtoul_PARM_2
+                                     37 	.globl _strtoul
+                                     38 ;--------------------------------------------------------
+                                     39 ; special function registers
+                                     40 ;--------------------------------------------------------
+                                     41 ;--------------------------------------------------------
+                                     42 ; special function bits
+                                     43 ;--------------------------------------------------------
+                                     44 ;--------------------------------------------------------
+                                     45 ; overlayable register banks
+                                     46 ;--------------------------------------------------------
+                                     47 	.area REG_BANK_0	(REL,OVR,DATA)
+      000000                         48 	.ds 8
+                                     49 ;--------------------------------------------------------
+                                     50 ; internal ram data
+                                     51 ;--------------------------------------------------------
+                                     52 	.area DSEG    (DATA)
+                                     53 ;--------------------------------------------------------
+                                     54 ; overlayable items in internal ram
+                                     55 ;--------------------------------------------------------
+                                     56 ;--------------------------------------------------------
+                                     57 ; indirectly addressable internal ram data
+                                     58 ;--------------------------------------------------------
+                                     59 	.area ISEG    (DATA)
+                                     60 ;--------------------------------------------------------
+                                     61 ; absolute internal ram data
+                                     62 ;--------------------------------------------------------
+                                     63 	.area IABS    (ABS,DATA)
+                                     64 	.area IABS    (ABS,DATA)
+                                     65 ;--------------------------------------------------------
+                                     66 ; bit data
+                                     67 ;--------------------------------------------------------
+                                     68 	.area BSEG    (BIT)
+      000000                         69 _strtoul_sloc2_1_0:
+      000000                         70 	.ds 1
+                                     71 ;--------------------------------------------------------
+                                     72 ; paged external ram data
+                                     73 ;--------------------------------------------------------
+                                     74 	.area PSEG    (PAG,XDATA)
+                                     75 ;--------------------------------------------------------
+                                     76 ; uninitialized external ram data
+                                     77 ;--------------------------------------------------------
+                                     78 	.area XSEG    (XDATA)
+      000000                         79 __isdigit_PARM_2:
+      000000                         80 	.ds 1
+      000001                         81 _strtoul_PARM_2:
+      000001                         82 	.ds 4
+      000005                         83 _strtoul_PARM_3:
+      000005                         84 	.ds 2
+      000007                         85 _strtoul_nptr_65536_137:
+      000007                         86 	.ds 4
+      00000B                         87 _strtoul_ret_65536_138:
+      00000B                         88 	.ds 4
+      00000F                         89 _strtoul_range_error_65536_138:
+      00000F                         90 	.ds 1
+      000010                         91 _strtoul_neg_65536_138:
+      000010                         92 	.ds 1
+      000011                         93 _strtoul_digit_196608_145:
+      000011                         94 	.ds 1
+      000012                         95 _strtoul___2621440013_262144_153:
+      000012                         96 	.ds 4
+      000016                         97 _strtoul___2621440015_262144_153:
+      000016                         98 	.ds 8
+      00001E                         99 _strtoul_result_393216_155:
+      00001E                        100 	.ds 8
+      000026                        101 _strtoul_sloc0_1_0:
+      000026                        102 	.ds 4
+      00002A                        103 _strtoul_sloc1_1_0:
+      00002A                        104 	.ds 8
+                                    105 ;--------------------------------------------------------
+                                    106 ; absolute external ram data
+                                    107 ;--------------------------------------------------------
+                                    108 	.area XABS    (ABS,XDATA)
+                                    109 ;--------------------------------------------------------
+                                    110 ; initialized external ram data
+                                    111 ;--------------------------------------------------------
+                                    112 	.area XISEG   (XDATA)
+                                    113 ;--------------------------------------------------------
+                                    114 ; global & static initialisations
+                                    115 ;--------------------------------------------------------
+                                    116 	.area HOME    (CODE)
+                                    117 	.area GSINIT  (CODE)
+                                    118 	.area GSFINAL (CODE)
+                                    119 	.area GSINIT  (CODE)
+                                    120 ;--------------------------------------------------------
+                                    121 ; Home
+                                    122 ;--------------------------------------------------------
+                                    123 	.area HOME    (CODE)
+                                    124 	.area HOME    (CODE)
+                                    125 ;--------------------------------------------------------
+                                    126 ; code
+                                    127 ;--------------------------------------------------------
+                                    128 	.area CSEG    (CODE)
+                                    129 ;------------------------------------------------------------
+                                    130 ;Allocation info for local variables in function '_isdigit'
+                                    131 ;------------------------------------------------------------
+                                    132 ;base                      Allocated with name '__isdigit_PARM_2'
+                                    133 ;c                         Allocated to registers r2 
+                                    134 ;v                         Allocated to registers r3 
+                                    135 ;------------------------------------------------------------
+                                    136 ;	strtoul.c:40: static signed char _isdigit(const char c, unsigned char base)
+                                    137 ;	-----------------------------------------
+                                    138 ;	 function _isdigit
+                                    139 ;	-----------------------------------------
+      000000                        140 __isdigit:
+                           000002   141 	ar2 = 0x02
+                           000003   142 	ar3 = 0x03
+                           000004   143 	ar4 = 0x04
+                           000005   144 	ar5 = 0x05
+                           000006   145 	ar6 = 0x06
+                           000007   146 	ar7 = 0x07
+                           000000   147 	ar0 = 0x00
+                           000001   148 	ar1 = 0x01
+      000000 AA 82            [ 8]  149 	mov	r2,dpl
+                                    150 ;	strtoul.c:44: if (c >= '0' && c <= '9')
+      000002 BA 30 00         [16]  151 	cjne	r2,#0x30,00145$
+      000005                        152 00145$:
+      000005 40 0E            [12]  153 	jc   00110$
+      000007                        154 00146$:
+      000007 C3               [ 4]  155 	clr	c
+      000008 74 39            [ 8]  156 	mov	a,#0x39
+      00000A 9A               [ 4]  157 	subb	a,r2
+      00000B 40 08            [12]  158 	jc   00110$
+      00000D                        159 00147$:
+                                    160 ;	strtoul.c:45: v = c - '0';
+      00000D 8A 03            [ 8]  161 	mov	ar3,r2
+      00000F EB               [ 4]  162 	mov	a,r3
+      000010 24 D0            [ 8]  163 	add	a,#0xd0
+                                    164 ;	genAssign: resultIsFar = TRUE
+      000012 FB               [ 4]  165 	mov	r3,a
+      000013 80 29            [12]  166 	sjmp 00111$
+      000015                        167 00110$:
+                                    168 ;	strtoul.c:46: else if (c >= 'a' && c <='z')
+      000015 BA 61 00         [16]  169 	cjne	r2,#0x61,00148$
+      000018                        170 00148$:
+      000018 40 0E            [12]  171 	jc   00106$
+      00001A                        172 00149$:
+      00001A C3               [ 4]  173 	clr	c
+      00001B 74 7A            [ 8]  174 	mov	a,#0x7a
+      00001D 9A               [ 4]  175 	subb	a,r2
+      00001E 40 08            [12]  176 	jc   00106$
+      000020                        177 00150$:
+                                    178 ;	strtoul.c:47: v = c - 'a' + 10;
+      000020 8A 04            [ 8]  179 	mov	ar4,r2
+      000022 74 A9            [ 8]  180 	mov	a,#0xa9
+      000024 2C               [ 4]  181 	add	a,r4
+      000025 FB               [ 4]  182 	mov	r3,a
+      000026 80 16            [12]  183 	sjmp 00111$
+      000028                        184 00106$:
+                                    185 ;	strtoul.c:48: else if (c >= 'A' && c <='Z')
+      000028 BA 41 00         [16]  186 	cjne	r2,#0x41,00151$
+      00002B                        187 00151$:
+      00002B 40 0C            [12]  188 	jc   00102$
+      00002D                        189 00152$:
+      00002D C3               [ 4]  190 	clr	c
+      00002E 74 5A            [ 8]  191 	mov	a,#0x5a
+      000030 9A               [ 4]  192 	subb	a,r2
+      000031 40 06            [12]  193 	jc   00102$
+      000033                        194 00153$:
+                                    195 ;	strtoul.c:49: v = c - 'A' + 10;
+      000033 74 C9            [ 8]  196 	mov	a,#0xc9
+      000035 2A               [ 4]  197 	add	a,r2
+      000036 FB               [ 4]  198 	mov	r3,a
+      000037 80 05            [12]  199 	sjmp 00111$
+      000039                        200 00102$:
+                                    201 ;	strtoul.c:51: return (-1);
+      000039 75 82 FF         [12]  202 	mov	dpl,#0xff
+      00003C 80 15            [12]  203 	sjmp 00115$
+      00003E                        204 00111$:
+                                    205 ;	strtoul.c:53: if (v >= base)
+      00003E 90s00r00r00      [12]  206 	mov	dptr,#__isdigit_PARM_2
+      000042 C3               [ 4]  207 	clr	c
+      000043 EB               [ 4]  208 	mov	a,r3
+      000044 C5 F0            [ 8]  209 	xch	a, b
+      000046 E0               [ 8]  210 	movx	a,@dptr
+      000047 C5 F0            [ 8]  211 	xch	a, b
+      000049 95 F0            [ 8]  212 	subb	a,b
+      00004B 40 04            [12]  213 	jc   00114$
+      00004D                        214 00154$:
+                                    215 ;	strtoul.c:54: return (-1);
+      00004D 75 82 FF         [12]  216 	mov	dpl,#0xff
+                                    217 ;	strtoul.c:56: return (v);
+                                    218 ;	strtoul.c:57: }
+      000050 22               [16]  219 	ret
+      000051                        220 00114$:
+      000051 8B 82            [ 8]  221 	mov     dpl,r3
+      000053                        222 00115$:
+      000053 22               [16]  223 	ret
+                                    224 ;------------------------------------------------------------
+                                    225 ;Allocation info for local variables in function 'strtoul'
+                                    226 ;------------------------------------------------------------
+                                    227 ;endptr                    Allocated with name '_strtoul_PARM_2'
+                                    228 ;base                      Allocated with name '_strtoul_PARM_3'
+                                    229 ;nptr                      Allocated with name '_strtoul_nptr_65536_137'
+                                    230 ;__1310720004              Allocated to registers 
+                                    231 ;ptr                       Allocated to registers r3 r4 r5 r6 
+                                    232 ;ret                       Allocated with name '_strtoul_ret_65536_138'
+                                    233 ;range_error               Allocated with name '_strtoul_range_error_65536_138'
+                                    234 ;neg                       Allocated with name '_strtoul_neg_65536_138'
+                                    235 ;__1310720005              Allocated to registers 
+                                    236 ;c                         Allocated to registers 
+                                    237 ;__2621440017              Allocated with name '_strtoul___2621440017_262144_145'
+                                    238 ;__2621440012              Allocated to registers r2 
+                                    239 ;__2621440007              Allocated with name '_strtoul___2621440007_262144_145'
+                                    240 ;oldret                    Allocated to registers 
+                                    241 ;digit                     Allocated with name '_strtoul_digit_196608_145'
+                                    242 ;__2621440008              Allocated with name '_strtoul___2621440008_262144_150'
+                                    243 ;__2621440009              Allocated with name '_strtoul___2621440009_262144_150'
+                                    244 ;__2621440010              Allocated with name '_strtoul___2621440010_262144_150'
+                                    245 ;r                         Allocated with name '_strtoul_r_327680_151'
+                                    246 ;a                         Allocated with name '_strtoul_a_327680_151'
+                                    247 ;b                         Allocated with name '_strtoul_b_327680_151'
+                                    248 ;result                    Allocated with name '_strtoul_result_393216_152'
+                                    249 ;__2621440013              Allocated with name '_strtoul___2621440013_262144_153'
+                                    250 ;__2621440014              Allocated to registers 
+                                    251 ;__2621440015              Allocated with name '_strtoul___2621440015_262144_153'
+                                    252 ;r                         Allocated to registers 
+                                    253 ;a                         Allocated to registers 
+                                    254 ;b                         Allocated to registers 
+                                    255 ;result                    Allocated with name '_strtoul_result_393216_155'
+                                    256 ;__2621440018              Allocated with name '_strtoul___2621440018_262144_156'
+                                    257 ;__2621440019              Allocated with name '_strtoul___2621440019_262144_156'
+                                    258 ;__2621440020              Allocated with name '_strtoul___2621440020_262144_156'
+                                    259 ;r                         Allocated with name '_strtoul_r_327680_157'
+                                    260 ;a                         Allocated with name '_strtoul_a_327680_157'
+                                    261 ;b                         Allocated with name '_strtoul_b_327680_157'
+                                    262 ;result                    Allocated with name '_strtoul_result_393216_158'
+                                    263 ;sloc0                     Allocated with name '_strtoul_sloc0_1_0'
+                                    264 ;sloc1                     Allocated with name '_strtoul_sloc1_1_0'
+                                    265 ;------------------------------------------------------------
+                                    266 ;	strtoul.c:59: unsigned long int strtoul(const char *nptr, char **endptr, int base)
+                                    267 ;	-----------------------------------------
+                                    268 ;	 function strtoul
+                                    269 ;	-----------------------------------------
+      000054                        270 _strtoul:
+      000054 75 86 01         [12]  271 	mov     dps, #1
+      000057 90s00r00r07      [12]  272 	mov     dptr, #_strtoul_nptr_65536_137
+      00005B E5 82            [ 8]  273 	mov	a,dpl
+      00005D F0               [ 8]  274 	movx	@dptr,a
+      00005E A3               [12]  275 	inc	dptr
+      00005F E5 83            [ 8]  276 	mov	a,dph
+      000061 F0               [ 8]  277 	movx	@dptr,a
+      000062 A3               [12]  278 	inc	dptr
+      000063 E5 93            [ 8]  279 	mov	a,dpx
+      000065 F0               [ 8]  280 	movx	@dptr,a
+      000066 A3               [12]  281 	inc	dptr
+      000067 E5 F0            [ 8]  282 	mov	a,b
+      000069 F0               [ 8]  283 	movx	@dptr,a
+      00006A 75 86 00         [12]  284 	mov	dps,#0
+                                    285 ;	strtoul.c:63: bool range_error = false;
+                                    286 ;	genAssign: resultIsFar = TRUE
+      00006D 90s00r00r0F      [12]  287 	mov	dptr,#_strtoul_range_error_65536_138
+                                    288 ;	strtoul.c:64: bool neg = false;
+                                    289 ;	genAssign: resultIsFar = TRUE
+      000071 E4               [ 4]  290 	clr   a
+      000072 F0               [ 8]  291 	movx  @dptr,a
+      000073 90s00r00r10      [12]  292 	mov   dptr,#_strtoul_neg_65536_138
+      000077 F0               [ 8]  293 	movx  @dptr,a
+                                    294 ;	strtoul.c:66: while (isblank (*ptr))
+      000078 90s00r00r07      [12]  295 	mov	dptr,#_strtoul_nptr_65536_137
+                                    296 ;	genAssign: resultIsFar = FALSE
+      00007C E0               [ 8]  297 	movx	a,@dptr
+      00007D F8               [ 4]  298 	mov	r0,a
+      00007E A3               [12]  299 	inc	dptr
+      00007F E0               [ 8]  300 	movx	a,@dptr
+      000080 F9               [ 4]  301 	mov	r1,a
+      000081 A3               [12]  302 	inc	dptr
+      000082 E0               [ 8]  303 	movx	a,@dptr
+      000083 FF               [ 4]  304 	mov	r7,a
+      000084 A3               [12]  305 	inc	dptr
+      000085 E0               [ 8]  306 	movx	a,@dptr
+      000086 FA               [ 4]  307 	mov	r2,a
+      000087                        308 00101$:
+      000087 88 82            [ 8]  309 	mov	dpl,r0
+      000089 89 83            [ 8]  310 	mov	dph,r1
+      00008B 8F 93            [ 8]  311 	mov	dpx,r7
+      00008D 8A F0            [ 8]  312 	mov	b,r2
+      00008F 12s00r00r00      [16]  313 	lcall	__gptrget
+      000093 FB               [ 4]  314 	mov	r3,a
+                                    315 ;	../../device/include/ctype.h:53: return ((unsigned char)c == ' ' || (unsigned char)c == '\t');
+      000094 BB 20 02         [16]  316 	cjne	r3,#0x20,00214$
+      000097 80 03            [12]  317 	sjmp 00141$
+      000099                        318 00214$:
+      000099 BB 09 0B         [16]  319 	cjne r3,#0x09,00163$
+      00009C                        320 00216$:
+      00009C                        321 00141$:
+                                    322 ;	strtoul.c:67: ptr++;
+      00009C 08               [ 4]  323 	inc	r0
+      00009D B8 00 05         [16]  324 	cjne	r0,#0x00,00217$
+      0000A0 09               [ 4]  325 	inc	r1
+      0000A1 B9 00 01         [16]  326 	cjne	r1,#0x00,00217$
+      0000A4 0F               [ 4]  327 	inc	r7
+      0000A5                        328 00217$:
+      0000A5 80 E0            [12]  329 	sjmp 00101$
+      0000A7                        330 00163$:
+                                    331 ;	genAssign: resultIsFar = TRUE
+      0000A7 88 03            [ 8]  332 	mov	ar3,r0
+      0000A9 89 04            [ 8]  333 	mov	ar4,r1
+      0000AB 8F 05            [ 8]  334 	mov	ar5,r7
+      0000AD 8A 06            [ 8]  335 	mov	ar6,r2
+                                    336 ;	strtoul.c:70: switch(*ptr)
+      0000AF 88 82            [ 8]  337 	mov	dpl,r0
+      0000B1 89 83            [ 8]  338 	mov	dph,r1
+      0000B3 8F 93            [ 8]  339 	mov	dpx,r7
+      0000B5 8A F0            [ 8]  340 	mov	b,r2
+      0000B7 12s00r00r00      [16]  341 	lcall	__gptrget
+      0000BB FA               [ 4]  342 	mov	r2,a
+      0000BC BA 2B 02         [16]  343 	cjne	r2,#0x2b,00218$
+      0000BF 80 0A            [12]  344 	sjmp 00105$
+      0000C1                        345 00218$:
+      0000C1 BA 2D 10         [16]  346 	cjne r2,#0x2d,00106$
+      0000C4                        347 00220$:
+                                    348 ;	strtoul.c:73: neg = true;
+                                    349 ;	genAssign: resultIsFar = TRUE
+      0000C4 90s00r00r10      [12]  350 	mov	dptr,#_strtoul_neg_65536_138
+      0000C8 74 01            [ 8]  351 	mov	a,#0x01
+      0000CA F0               [ 8]  352 	movx	@dptr,a
+                                    353 ;	strtoul.c:74: case '+':
+      0000CB                        354 00105$:
+                                    355 ;	strtoul.c:75: ptr++;
+      0000CB 0B               [ 4]  356 	inc	r3
+      0000CC BB 00 05         [16]  357 	cjne	r3,#0x00,00221$
+      0000CF 0C               [ 4]  358 	inc	r4
+      0000D0 BC 00 01         [16]  359 	cjne	r4,#0x00,00221$
+      0000D3 0D               [ 4]  360 	inc	r5
+      0000D4                        361 00221$:
+                                    362 ;	strtoul.c:76: }
+      0000D4                        363 00106$:
+                                    364 ;	strtoul.c:79: if (!base)
+      0000D4 90s00r00r05      [12]  365 	mov	dptr,#_strtoul_PARM_3
+      0000D8 E0               [ 8]  366 	movx	a,@dptr
+      0000D9 F5 F0            [ 8]  367 	mov	b,a
+      0000DB A3               [12]  368 	inc	dptr
+      0000DC E0               [ 8]  369 	movx	a,@dptr
+      0000DD 45 F0            [ 8]  370 	orl	a,b
+      0000DF 60 04            [12]  371 	jz	00222$
+      0000E1 02s00r01rB0      [16]  372 	ljmp	00119$
+      0000E5                        373 00222$:
+                                    374 ;	strtoul.c:81: if (!strncmp (ptr, "0x", 2) || !strncmp (ptr, "0X", 2))
+      0000E5 90s00r00r00      [12]  375 	mov	dptr,#_strncmp_PARM_2
+      0000E9 74r00            [ 8]  376 	mov	a,#___str_0
+      0000EB F0               [ 8]  377 	movx	@dptr,a
+      0000EC A3               [12]  378 	inc	dptr
+      0000ED 74s00            [ 8]  379 	mov	a,#(___str_0 >> 8)
+      0000EF F0               [ 8]  380 	movx	@dptr,a
+      0000F0 A3               [12]  381 	inc	dptr
+      0000F1 74s00            [ 8]  382 	mov	a,#(___str_0 >> 16)
+      0000F3 F0               [ 8]  383 	movx	@dptr,a
+      0000F4 A3               [12]  384 	inc	dptr
+      0000F5 74 80            [ 8]  385 	mov	a,#0x80
+      0000F7 F0               [ 8]  386 	movx	@dptr,a
+                                    387 ;	genAssign: resultIsFar = TRUE
+      0000F8 90s00r00r00      [12]  388 	mov	dptr,#_strncmp_PARM_3
+      0000FC 74 02            [ 8]  389 	mov	a,#0x02
+      0000FE F0               [ 8]  390 	movx	@dptr,a
+      0000FF E4               [ 4]  391 	clr	a
+      000100 A3               [12]  392 	inc	dptr
+      000101 F0               [ 8]  393 	movx	@dptr,a
+      000102 C0 03            [ 8]  394 	push	ar3
+      000104 C0 04            [ 8]  395 	push	ar4
+      000106 C0 05            [ 8]  396 	push	ar5
+      000108 C0 06            [ 8]  397 	push	ar6
+      00010A 8B 82            [ 8]  398 	mov	dpl,r3
+      00010C 8C 83            [ 8]  399 	mov	dph,r4
+      00010E 8D 93            [ 8]  400 	mov	dpx,r5
+      000110 8E F0            [ 8]  401 	mov	b,r6
+      000112 12s00r00r00      [16]  402 	lcall	_strncmp
+      000116 D0 06            [ 8]  403 	pop	ar6
+      000118 D0 05            [ 8]  404 	pop	ar5
+      00011A D0 04            [ 8]  405 	pop	ar4
+      00011C D0 03            [ 8]  406 	pop	ar3
+      00011E E5 82            [ 8]  407 	mov	a,dpl
+      000120 45 83            [ 8]  408 	orl	a,dph
+      000122 60 3F            [12]  409 	jz  00110$
+      000124                        410 00223$:
+      000124 90s00r00r00      [12]  411 	mov	dptr,#_strncmp_PARM_2
+      000128 74r03            [ 8]  412 	mov	a,#___str_1
+      00012A F0               [ 8]  413 	movx	@dptr,a
+      00012B A3               [12]  414 	inc	dptr
+      00012C 74s00            [ 8]  415 	mov	a,#(___str_1 >> 8)
+      00012E F0               [ 8]  416 	movx	@dptr,a
+      00012F A3               [12]  417 	inc	dptr
+      000130 74s00            [ 8]  418 	mov	a,#(___str_1 >> 16)
+      000132 F0               [ 8]  419 	movx	@dptr,a
+      000133 A3               [12]  420 	inc	dptr
+      000134 74 80            [ 8]  421 	mov	a,#0x80
+      000136 F0               [ 8]  422 	movx	@dptr,a
+                                    423 ;	genAssign: resultIsFar = TRUE
+      000137 90s00r00r00      [12]  424 	mov	dptr,#_strncmp_PARM_3
+      00013B 74 02            [ 8]  425 	mov	a,#0x02
+      00013D F0               [ 8]  426 	movx	@dptr,a
+      00013E E4               [ 4]  427 	clr	a
+      00013F A3               [12]  428 	inc	dptr
+      000140 F0               [ 8]  429 	movx	@dptr,a
+      000141 C0 03            [ 8]  430 	push	ar3
+      000143 C0 04            [ 8]  431 	push	ar4
+      000145 C0 05            [ 8]  432 	push	ar5
+      000147 C0 06            [ 8]  433 	push	ar6
+      000149 8B 82            [ 8]  434 	mov	dpl,r3
+      00014B 8C 83            [ 8]  435 	mov	dph,r4
+      00014D 8D 93            [ 8]  436 	mov	dpx,r5
+      00014F 8E F0            [ 8]  437 	mov	b,r6
+      000151 12s00r00r00      [16]  438 	lcall	_strncmp
+      000155 D0 06            [ 8]  439 	pop	ar6
+      000157 D0 05            [ 8]  440 	pop	ar5
+      000159 D0 04            [ 8]  441 	pop	ar4
+      00015B D0 03            [ 8]  442 	pop	ar3
+      00015D E5 82            [ 8]  443 	mov	a,dpl
+      00015F 45 83            [ 8]  444 	orl	a,dph
+      000161 70 18            [12]  445 	jnz  00111$
+      000163                        446 00224$:
+      000163                        447 00110$:
+                                    448 ;	strtoul.c:83: base = 16;
+                                    449 ;	genAssign: resultIsFar = TRUE
+      000163 90s00r00r05      [12]  450 	mov	dptr,#_strtoul_PARM_3
+      000167 74 10            [ 8]  451 	mov	a,#0x10
+      000169 F0               [ 8]  452 	movx	@dptr,a
+      00016A E4               [ 4]  453 	clr	a
+      00016B A3               [12]  454 	inc	dptr
+      00016C F0               [ 8]  455 	movx	@dptr,a
+                                    456 ;	strtoul.c:84: ptr += 2;
+      00016D 74 02            [ 8]  457 	mov	a,#0x02
+      00016F 2B               [ 4]  458 	add	a,r3
+      000170 FB               [ 4]  459 	mov	r3,a
+      000171 E4               [ 4]  460 	clr	a
+      000172 3C               [ 4]  461 	addc	a,r4
+      000173 FC               [ 4]  462 	mov	r4,a
+      000174 E4               [ 4]  463 	clr	a
+      000175 3D               [ 4]  464 	addc	a,r5
+      000176 FD               [ 4]  465 	mov	r5,a
+      000177 02s00r02r4B      [16]  466 	ljmp	00120$
+      00017B                        467 00111$:
+                                    468 ;	strtoul.c:86: else if (*ptr == '0')
+      00017B 8B 82            [ 8]  469 	mov	dpl,r3
+      00017D 8C 83            [ 8]  470 	mov	dph,r4
+      00017F 8D 93            [ 8]  471 	mov	dpx,r5
+      000181 8E F0            [ 8]  472 	mov	b,r6
+      000183 12s00r00r00      [16]  473 	lcall	__gptrget
+      000187 FA               [ 4]  474 	mov	r2,a
+      000188 BA 30 17         [16]  475 	cjne r2,#0x30,00108$
+      00018B                        476 00226$:
+                                    477 ;	strtoul.c:88: base = 8;
+                                    478 ;	genAssign: resultIsFar = TRUE
+      00018B 90s00r00r05      [12]  479 	mov	dptr,#_strtoul_PARM_3
+      00018F 74 08            [ 8]  480 	mov	a,#0x08
+      000191 F0               [ 8]  481 	movx	@dptr,a
+      000192 E4               [ 4]  482 	clr	a
+      000193 A3               [12]  483 	inc	dptr
+      000194 F0               [ 8]  484 	movx	@dptr,a
+                                    485 ;	strtoul.c:89: ptr++;
+      000195 0B               [ 4]  486 	inc	r3
+      000196 BB 00 05         [16]  487 	cjne	r3,#0x00,00227$
+      000199 0C               [ 4]  488 	inc	r4
+      00019A BC 00 01         [16]  489 	cjne	r4,#0x00,00227$
+      00019D 0D               [ 4]  490 	inc	r5
+      00019E                        491 00227$:
+      00019E 02s00r02r4B      [16]  492 	ljmp	00120$
+      0001A2                        493 00108$:
+                                    494 ;	strtoul.c:92: base = 10;
+                                    495 ;	genAssign: resultIsFar = TRUE
+      0001A2 90s00r00r05      [12]  496 	mov	dptr,#_strtoul_PARM_3
+      0001A6 74 0A            [ 8]  497 	mov	a,#0x0a
+      0001A8 F0               [ 8]  498 	movx	@dptr,a
+      0001A9 E4               [ 4]  499 	clr	a
+      0001AA A3               [12]  500 	inc	dptr
+      0001AB F0               [ 8]  501 	movx	@dptr,a
+      0001AC 02s00r02r4B      [16]  502 	ljmp	00120$
+      0001B0                        503 00119$:
+                                    504 ;	strtoul.c:95: else if (base == 16 && (!strncmp (ptr, "0x", 2) || !strncmp (ptr, "0X", 2)))
+      0001B0 90s00r00r05      [12]  505 	mov	dptr,#_strtoul_PARM_3
+      0001B4 E0               [ 8]  506 	movx	a,@dptr
+      0001B5 B4 10 07         [16]  507 	cjne	a,#0x10,00228$
+      0001B8 A3               [12]  508 	inc	dptr
+      0001B9 E0               [ 8]  509 	movx	a,@dptr
+      0001BA B4 00 02         [16]  510 	cjne	a,#0x00,00228$
+      0001BD 80 04            [12]  511 	sjmp	00229$
+      0001BF                        512 00228$:
+      0001BF 02s00r02r4B      [16]  513 	ljmp	00120$
+      0001C3                        514 00229$:
+      0001C3 90s00r00r00      [12]  515 	mov	dptr,#_strncmp_PARM_2
+      0001C7 74r00            [ 8]  516 	mov	a,#___str_0
+      0001C9 F0               [ 8]  517 	movx	@dptr,a
+      0001CA A3               [12]  518 	inc	dptr
+      0001CB 74s00            [ 8]  519 	mov	a,#(___str_0 >> 8)
+      0001CD F0               [ 8]  520 	movx	@dptr,a
+      0001CE A3               [12]  521 	inc	dptr
+      0001CF 74s00            [ 8]  522 	mov	a,#(___str_0 >> 16)
+      0001D1 F0               [ 8]  523 	movx	@dptr,a
+      0001D2 A3               [12]  524 	inc	dptr
+      0001D3 74 80            [ 8]  525 	mov	a,#0x80
+      0001D5 F0               [ 8]  526 	movx	@dptr,a
+                                    527 ;	genAssign: resultIsFar = TRUE
+      0001D6 90s00r00r00      [12]  528 	mov	dptr,#_strncmp_PARM_3
+      0001DA 74 02            [ 8]  529 	mov	a,#0x02
+      0001DC F0               [ 8]  530 	movx	@dptr,a
+      0001DD E4               [ 4]  531 	clr	a
+      0001DE A3               [12]  532 	inc	dptr
+      0001DF F0               [ 8]  533 	movx	@dptr,a
+      0001E0 C0 03            [ 8]  534 	push	ar3
+      0001E2 C0 04            [ 8]  535 	push	ar4
+      0001E4 C0 05            [ 8]  536 	push	ar5
+      0001E6 C0 06            [ 8]  537 	push	ar6
+      0001E8 8B 82            [ 8]  538 	mov	dpl,r3
+      0001EA 8C 83            [ 8]  539 	mov	dph,r4
+      0001EC 8D 93            [ 8]  540 	mov	dpx,r5
+      0001EE 8E F0            [ 8]  541 	mov	b,r6
+      0001F0 12s00r00r00      [16]  542 	lcall	_strncmp
+      0001F4 D0 06            [ 8]  543 	pop	ar6
+      0001F6 D0 05            [ 8]  544 	pop	ar5
+      0001F8 D0 04            [ 8]  545 	pop	ar4
+      0001FA D0 03            [ 8]  546 	pop	ar3
+      0001FC E5 82            [ 8]  547 	mov	a,dpl
+      0001FE 45 83            [ 8]  548 	orl	a,dph
+      000200 60 3F            [12]  549 	jz  00114$
+      000202                        550 00230$:
+      000202 90s00r00r00      [12]  551 	mov	dptr,#_strncmp_PARM_2
+      000206 74r03            [ 8]  552 	mov	a,#___str_1
+      000208 F0               [ 8]  553 	movx	@dptr,a
+      000209 A3               [12]  554 	inc	dptr
+      00020A 74s00            [ 8]  555 	mov	a,#(___str_1 >> 8)
+      00020C F0               [ 8]  556 	movx	@dptr,a
+      00020D A3               [12]  557 	inc	dptr
+      00020E 74s00            [ 8]  558 	mov	a,#(___str_1 >> 16)
+      000210 F0               [ 8]  559 	movx	@dptr,a
+      000211 A3               [12]  560 	inc	dptr
+      000212 74 80            [ 8]  561 	mov	a,#0x80
+      000214 F0               [ 8]  562 	movx	@dptr,a
+                                    563 ;	genAssign: resultIsFar = TRUE
+      000215 90s00r00r00      [12]  564 	mov	dptr,#_strncmp_PARM_3
+      000219 74 02            [ 8]  565 	mov	a,#0x02
+      00021B F0               [ 8]  566 	movx	@dptr,a
+      00021C E4               [ 4]  567 	clr	a
+      00021D A3               [12]  568 	inc	dptr
+      00021E F0               [ 8]  569 	movx	@dptr,a
+      00021F C0 03            [ 8]  570 	push	ar3
+      000221 C0 04            [ 8]  571 	push	ar4
+      000223 C0 05            [ 8]  572 	push	ar5
+      000225 C0 06            [ 8]  573 	push	ar6
+      000227 8B 82            [ 8]  574 	mov	dpl,r3
+      000229 8C 83            [ 8]  575 	mov	dph,r4
+      00022B 8D 93            [ 8]  576 	mov	dpx,r5
+      00022D 8E F0            [ 8]  577 	mov	b,r6
+      00022F 12s00r00r00      [16]  578 	lcall	_strncmp
+      000233 D0 06            [ 8]  579 	pop	ar6
+      000235 D0 05            [ 8]  580 	pop	ar5
+      000237 D0 04            [ 8]  581 	pop	ar4
+      000239 D0 03            [ 8]  582 	pop	ar3
+      00023B E5 82            [ 8]  583 	mov	a,dpl
+      00023D 45 83            [ 8]  584 	orl	a,dph
+      00023F 70 0A            [12]  585 	jnz  00120$
+      000241                        586 00231$:
+      000241                        587 00114$:
+                                    588 ;	strtoul.c:96: ptr += 2;
+      000241 74 02            [ 8]  589 	mov	a,#0x02
+      000243 2B               [ 4]  590 	add	a,r3
+      000244 FB               [ 4]  591 	mov	r3,a
+      000245 E4               [ 4]  592 	clr	a
+      000246 3C               [ 4]  593 	addc	a,r4
+      000247 FC               [ 4]  594 	mov	r4,a
+      000248 E4               [ 4]  595 	clr	a
+      000249 3D               [ 4]  596 	addc	a,r5
+      00024A FD               [ 4]  597 	mov	r5,a
+      00024B                        598 00120$:
+                                    599 ;	strtoul.c:100: if (_isdigit (*ptr, base) < 0)
+      00024B 8B 82            [ 8]  600 	mov	dpl,r3
+      00024D 8C 83            [ 8]  601 	mov	dph,r4
+      00024F 8D 93            [ 8]  602 	mov	dpx,r5
+      000251 8E F0            [ 8]  603 	mov	b,r6
+      000253 12s00r00r00      [16]  604 	lcall	__gptrget
+      000257 FA               [ 4]  605 	mov	r2,a
+      000258 90s00r00r05      [12]  606 	mov	dptr,#_strtoul_PARM_3
+      00025C E0               [ 8]  607 	movx	a,@dptr
+                                    608 ;	genAssign: resultIsFar = TRUE
+      00025D FF               [ 4]  609 	mov  r7,a
+      00025E 90s00r00r00      [12]  610 	mov  dptr,#__isdigit_PARM_2
+      000262 F0               [ 8]  611 	movx @dptr,a
+      000263 C0 03            [ 8]  612 	push	ar3
+      000265 C0 04            [ 8]  613 	push	ar4
+      000267 C0 05            [ 8]  614 	push	ar5
+      000269 C0 06            [ 8]  615 	push	ar6
+      00026B C0 07            [ 8]  616 	push	ar7
+      00026D 8A 82            [ 8]  617 	mov	dpl,r2
+      00026F 12s00r00r00      [16]  618 	lcall	__isdigit
+      000273 AA 82            [ 8]  619 	mov	r2,dpl
+      000275 D0 07            [ 8]  620 	pop	ar7
+      000277 D0 06            [ 8]  621 	pop	ar6
+      000279 D0 05            [ 8]  622 	pop	ar5
+      00027B D0 04            [ 8]  623 	pop	ar4
+      00027D D0 03            [ 8]  624 	pop	ar3
+      00027F EA               [ 4]  625 	mov	a,r2
+      000280 30 E7 54         [12]  626 	jnb  acc[7],00124$
+      000283                        627 00232$:
+                                    628 ;	strtoul.c:102: if (endptr)
+      000283 90s00r00r01      [12]  629 	mov	dptr,#_strtoul_PARM_2
+                                    630 ;	genAssign: resultIsFar = FALSE
+      000287 E0               [ 8]  631 	movx	a,@dptr
+      000288 FA               [ 4]  632 	mov	r2,a
+      000289 A3               [12]  633 	inc	dptr
+      00028A E0               [ 8]  634 	movx	a,@dptr
+      00028B FB               [ 4]  635 	mov	r3,a
+      00028C A3               [12]  636 	inc	dptr
+      00028D E0               [ 8]  637 	movx	a,@dptr
+      00028E FC               [ 4]  638 	mov	r4,a
+      00028F A3               [12]  639 	inc	dptr
+      000290 E0               [ 8]  640 	movx	a,@dptr
+      000291 FD               [ 4]  641 	mov	r5,a
+      000292 90s00r00r01      [12]  642 	mov	dptr,#_strtoul_PARM_2
+      000296 E0               [ 8]  643 	movx	a,@dptr
+      000297 F5 F0            [ 8]  644 	mov	b,a
+      000299 A3               [12]  645 	inc	dptr
+      00029A E0               [ 8]  646 	movx	a,@dptr
+      00029B 42 F0            [ 8]  647 	orl	b,a
+      00029D A3               [12]  648 	inc	dptr
+      00029E E0               [ 8]  649 	movx	a,@dptr
+      00029F 45 F0            [ 8]  650 	orl	a,b
+      0002A1 60 29            [12]  651 	jz  00122$
+      0002A3                        652 00233$:
+                                    653 ;	strtoul.c:103: *endptr = (char*)nptr;
+      0002A3 8A 82            [ 8]  654 	mov	dpl,r2
+      0002A5 8B 83            [ 8]  655 	mov	dph,r3
+      0002A7 8C 93            [ 8]  656 	mov	dpx,r4
+      0002A9 8D F0            [ 8]  657 	mov	b,r5
+      0002AB 75 86 01         [12]  658 	mov     dps, #1
+      0002AE 90s00r00r07      [12]  659 	mov     dptr, #_strtoul_nptr_65536_137
+      0002B2 E0               [ 8]  660 	movx	a,@dptr
+      0002B3 F5 9C            [ 8]  661 	mov	acc1, a
+      0002B5 A3               [12]  662 	inc	dptr
+      0002B6 E0               [ 8]  663 	movx	a,@dptr
+      0002B7 15 86            [ 8]  664 	dec	dps
+      0002B9 12s00r00r00      [16]  665 	lcall	__gptrputWord
+      0002BD A3               [12]  666 	inc	dptr
+      0002BE 05 86            [ 8]  667 	inc	dps
+      0002C0 A3               [12]  668 	inc	dptr
+      0002C1 E0               [ 8]  669 	movx	a,@dptr
+      0002C2 F5 9C            [ 8]  670 	mov	acc1, a
+      0002C4 A3               [12]  671 	inc	dptr
+      0002C5 E0               [ 8]  672 	movx	a,@dptr
+      0002C6 15 86            [ 8]  673 	dec	dps
+      0002C8 12s00r00r00      [16]  674 	lcall	__gptrputWord
+      0002CC                        675 00122$:
+                                    676 ;	strtoul.c:104: return (0);
+      0002CC 90 00 00 00      [12]  677 	mov  dptr,#0x0000
+      0002D0 75 F0 00         [12]  678 	mov	b,#0x00
+      0002D3 02s00r05r9C      [16]  679 	ljmp	00138$
+      0002D7                        680 00124$:
+                                    681 ;	strtoul.c:107: for (ret = 0;; ptr++)
+                                    682 ;	genAssign: resultIsFar = TRUE
+      0002D7 90s00r00r0B      [12]  683 	mov	dptr,#_strtoul_ret_65536_138
+      0002DB E4               [ 4]  684 	clr	a
+      0002DC F0               [ 8]  685 	movx	@dptr,a
+      0002DD A3               [12]  686 	inc	dptr
+      0002DE F0               [ 8]  687 	movx	@dptr,a
+      0002DF A3               [12]  688 	inc	dptr
+      0002E0 F0               [ 8]  689 	movx	@dptr,a
+      0002E1 A3               [12]  690 	inc	dptr
+      0002E2 F0               [ 8]  691 	movx	@dptr,a
+                                    692 ;	genAssign: resultIsFar = TRUE
+      0002E3 90s00r00r26      [12]  693 	mov	dptr,#_strtoul_sloc0_1_0
+      0002E7 EB               [ 4]  694 	mov	a,r3
+      0002E8 F0               [ 8]  695 	movx	@dptr,a
+      0002E9 A3               [12]  696 	inc	dptr
+      0002EA EC               [ 4]  697 	mov	a,r4
+      0002EB F0               [ 8]  698 	movx	@dptr,a
+      0002EC A3               [12]  699 	inc	dptr
+      0002ED ED               [ 4]  700 	mov	a,r5
+      0002EE F0               [ 8]  701 	movx	@dptr,a
+      0002EF A3               [12]  702 	inc	dptr
+      0002F0 EE               [ 4]  703 	mov	a,r6
+      0002F1 F0               [ 8]  704 	movx	@dptr,a
+      0002F2                        705 00136$:
+                                    706 ;	strtoul.c:110: signed char digit = _isdigit (*ptr, base);
+      0002F2 90s00r00r26      [12]  707 	mov	dptr,#_strtoul_sloc0_1_0
+      0002F6 E0               [ 8]  708 	movx	a,@dptr
+      0002F7 C0 E0            [ 8]  709 	push	acc
+      0002F9 A3               [12]  710 	inc	dptr
+      0002FA E0               [ 8]  711 	movx	a,@dptr
+      0002FB C0 E0            [ 8]  712 	push	acc
+      0002FD A3               [12]  713 	inc	dptr
+      0002FE E0               [ 8]  714 	movx	a,@dptr
+      0002FF C0 E0            [ 8]  715 	push	acc
+      000301 A3               [12]  716 	inc	dptr
+      000302 E0               [ 8]  717 	movx	a,@dptr
+      000303 F5 F0            [ 8]  718 	mov	b,a
+      000305 D0 93            [ 8]  719 	pop	dpx
+      000307 D0 83            [ 8]  720 	pop	dph
+      000309 D0 82            [ 8]  721 	pop	dpl
+      00030B 12s00r00r00      [16]  722 	lcall	__gptrget
+      00030F FE               [ 4]  723 	mov	r6,a
+                                    724 ;	genAssign: resultIsFar = TRUE
+      000310 90s00r00r00      [12]  725 	mov	dptr,#__isdigit_PARM_2
+      000314 EF               [ 4]  726 	mov	a,r7
+      000315 F0               [ 8]  727 	movx	@dptr,a
+      000316 C0 07            [ 8]  728 	push	ar7
+      000318 8E 82            [ 8]  729 	mov	dpl,r6
+      00031A 12s00r00r00      [16]  730 	lcall	__isdigit
+      00031E AE 82            [ 8]  731 	mov	r6,dpl
+      000320 D0 07            [ 8]  732 	pop	ar7
+                                    733 ;	genAssign: resultIsFar = TRUE
+      000322 90s00r00r11      [12]  734 	mov	dptr,#_strtoul_digit_196608_145
+      000326 EE               [ 4]  735 	mov	a,r6
+      000327 F0               [ 8]  736 	movx	@dptr,a
+                                    737 ;	strtoul.c:112: if (digit < 0)
+      000328 90s00r00r11      [12]  738 	mov	dptr,#_strtoul_digit_196608_145
+      00032C E0               [ 8]  739 	movx	a,@dptr
+      00032D 30 E7 04         [12]  740 	jnb	acc[7],00234$
+      000330 02s00r04rFD      [16]  741 	ljmp	00127$
+      000334                        742 00234$:
+                                    743 ;	strtoul.c:117: range_error |= ckd_mul(&ret, ret, base);
+      000334 C0 07            [ 8]  744 	push	ar7
+      000336 90s00r00r05      [12]  745 	mov	dptr,#_strtoul_PARM_3
+      00033A E0               [ 8]  746 	movx	a,@dptr
+      00033B F8               [ 4]  747 	mov	r0,a
+      00033C A3               [12]  748 	inc	dptr
+      00033D E0               [ 8]  749 	movx	a,@dptr
+      00033E F9               [ 4]  750 	mov	r1,a
+      00033F E0               [ 8]  751 	movx	a,@dptr
+      000340 33               [ 4]  752 	rlc	a
+      000341 95 E0            [ 8]  753 	subb	a,acc
+      000343 FF               [ 4]  754 	mov	r7,a
+      000344 FE               [ 4]  755 	mov	r6,a
+      000345 FA               [ 4]  756 	mov	r2,a
+      000346 FB               [ 4]  757 	mov	r3,a
+      000347 FC               [ 4]  758 	mov	r4,a
+      000348 FD               [ 4]  759 	mov	r5,a
+                                    760 ;	genAssign: resultIsFar = TRUE
+      000349 90s00r00r16      [12]  761 	mov	dptr,#_strtoul___2621440015_262144_153
+      00034D E8               [ 4]  762 	mov	a,r0
+      00034E F0               [ 8]  763 	movx	@dptr,a
+      00034F A3               [12]  764 	inc	dptr
+      000350 E9               [ 4]  765 	mov	a,r1
+      000351 F0               [ 8]  766 	movx	@dptr,a
+      000352 A3               [12]  767 	inc	dptr
+      000353 EF               [ 4]  768 	mov	a,r7
+      000354 F0               [ 8]  769 	movx	@dptr,a
+      000355 A3               [12]  770 	inc	dptr
+      000356 EE               [ 4]  771 	mov	a,r6
+      000357 F0               [ 8]  772 	movx	@dptr,a
+      000358 A3               [12]  773 	inc	dptr
+      000359 EA               [ 4]  774 	mov	a,r2
+      00035A F0               [ 8]  775 	movx	@dptr,a
+      00035B A3               [12]  776 	inc	dptr
+      00035C EB               [ 4]  777 	mov	a,r3
+      00035D F0               [ 8]  778 	movx	@dptr,a
+      00035E A3               [12]  779 	inc	dptr
+      00035F EC               [ 4]  780 	mov	a,r4
+      000360 F0               [ 8]  781 	movx	@dptr,a
+      000361 A3               [12]  782 	inc	dptr
+      000362 ED               [ 4]  783 	mov	a,r5
+      000363 F0               [ 8]  784 	movx	@dptr,a
+      000364 90s00r00r0B      [12]  785 	mov	dptr,#_strtoul_ret_65536_138
+      000368 75 86 01         [12]  786 	mov	dps, #1
+      00036B 90s00r00r2A      [12]  787 	mov	dptr, #_strtoul_sloc1_1_0
+      00036F 15 86            [ 8]  788 	dec	dps
+      000371 E0               [ 8]  789 	movx	a,@dptr
+      000372 05 86            [ 8]  790 	inc	dps
+      000374 F0               [ 8]  791 	movx	@dptr,a
+      000375 15 86            [ 8]  792 	dec	dps
+      000377 A3               [12]  793 	inc	dptr
+      000378 E0               [ 8]  794 	movx	a,@dptr
+      000379 05 86            [ 8]  795 	inc	dps
+      00037B A3               [12]  796 	inc	dptr
+      00037C F0               [ 8]  797 	movx	@dptr,a
+      00037D 15 86            [ 8]  798 	dec	dps
+      00037F A3               [12]  799 	inc	dptr
+      000380 E0               [ 8]  800 	movx	a,@dptr
+      000381 05 86            [ 8]  801 	inc	dps
+      000383 A3               [12]  802 	inc	dptr
+      000384 F0               [ 8]  803 	movx	@dptr,a
+      000385 15 86            [ 8]  804 	dec	dps
+      000387 A3               [12]  805 	inc	dptr
+      000388 E0               [ 8]  806 	movx	a,@dptr
+      000389 05 86            [ 8]  807 	inc	dps
+      00038B A3               [12]  808 	inc	dptr
+      00038C F0               [ 8]  809 	movx	@dptr,a
+      00038D 75 86 01         [12]  810 	mov     dps, #1
+      000390 A3               [12]  811 	inc	dptr
+      000391 E4               [ 4]  812 	clr	a
+      000392 F0               [ 8]  813 	movx	@dptr,a
+      000393 75 86 01         [12]  814 	mov     dps, #1
+      000396 A3               [12]  815 	inc	dptr
+      000397 E4               [ 4]  816 	clr	a
+      000398 F0               [ 8]  817 	movx	@dptr,a
+      000399 75 86 01         [12]  818 	mov     dps, #1
+      00039C A3               [12]  819 	inc	dptr
+      00039D E4               [ 4]  820 	clr	a
+      00039E F0               [ 8]  821 	movx	@dptr,a
+      00039F 75 86 01         [12]  822 	mov     dps, #1
+      0003A2 A3               [12]  823 	inc	dptr
+      0003A3 E4               [ 4]  824 	clr	a
+      0003A4 F0               [ 8]  825 	movx	@dptr,a
+      0003A5 75 86 00         [12]  826 	mov	dps,#0
+      0003A8 90s00r00r12      [12]  827 	mov	dptr,#_strtoul___2621440013_262144_153
+      0003AC 74r0B            [ 8]  828 	mov	a,#_strtoul_ret_65536_138
+      0003AE F0               [ 8]  829 	movx	@dptr,a
+      0003AF A3               [12]  830 	inc	dptr
+      0003B0 74s00            [ 8]  831 	mov	a,#(_strtoul_ret_65536_138 >> 8)
+      0003B2 F0               [ 8]  832 	movx	@dptr,a
+      0003B3 A3               [12]  833 	inc	dptr
+      0003B4 74s00            [ 8]  834 	mov	a,#(_strtoul_ret_65536_138 >> 16)
+      0003B6 F0               [ 8]  835 	movx	@dptr,a
+      0003B7 A3               [12]  836 	inc	dptr
+      0003B8 E4               [ 4]  837 	clr	a
+      0003B9 F0               [ 8]  838 	movx	@dptr,a
+                                    839 ;	../../device/include/stdckdint.h:76: inline _Bool __ckd_mul_ulong __CKD_DEFAULT_IMPL(unsigned long, *)
+      0003BA 90s00r00r16      [12]  840 	mov	dptr,#_strtoul___2621440015_262144_153
+                                    841 ;	genAssign: resultIsFar = TRUE
+      0003BE 75 86 21         [12]  842 	mov	dps,#0x21
+      0003C1 90s00r00r00      [12]  843 	mov	dptr,#__mullonglong_PARM_2
+      0003C5 E0               [ 8]  844 	movx	a,@dptr
+      0003C6 F0               [ 8]  845 	movx	@dptr,a
+      0003C7 A3               [12]  846 	inc	dptr
+      0003C8 A3               [12]  847 	inc	dptr
+      0003C9 E0               [ 8]  848 	movx	a,@dptr
+      0003CA F0               [ 8]  849 	movx	@dptr,a
+      0003CB A3               [12]  850 	inc	dptr
+      0003CC A3               [12]  851 	inc	dptr
+      0003CD E0               [ 8]  852 	movx	a,@dptr
+      0003CE F0               [ 8]  853 	movx	@dptr,a
+      0003CF A3               [12]  854 	inc	dptr
+      0003D0 A3               [12]  855 	inc	dptr
+      0003D1 E0               [ 8]  856 	movx	a,@dptr
+      0003D2 F0               [ 8]  857 	movx	@dptr,a
+      0003D3 A3               [12]  858 	inc	dptr
+      0003D4 A3               [12]  859 	inc	dptr
+      0003D5 E0               [ 8]  860 	movx	a,@dptr
+      0003D6 F0               [ 8]  861 	movx	@dptr,a
+      0003D7 A3               [12]  862 	inc	dptr
+      0003D8 A3               [12]  863 	inc	dptr
+      0003D9 E0               [ 8]  864 	movx	a,@dptr
+      0003DA F0               [ 8]  865 	movx	@dptr,a
+      0003DB A3               [12]  866 	inc	dptr
+      0003DC A3               [12]  867 	inc	dptr
+      0003DD E0               [ 8]  868 	movx	a,@dptr
+      0003DE F0               [ 8]  869 	movx	@dptr,a
+      0003DF A3               [12]  870 	inc	dptr
+      0003E0 A3               [12]  871 	inc	dptr
+      0003E1 E0               [ 8]  872 	movx	a,@dptr
+      0003E2 F0               [ 8]  873 	movx	@dptr,a
+      0003E3 75 86 01         [12]  874 	mov	dps, #1
+      0003E6 90s00r00r2A      [12]  875 	mov	dptr,#_strtoul_sloc1_1_0
+      0003EA E0               [ 8]  876 	movx	a,@dptr
+      0003EB F5 82            [ 8]  877 	mov	dpl,a
+      0003ED A3               [12]  878 	inc	dptr
+      0003EE E0               [ 8]  879 	movx	a,@dptr
+      0003EF F5 83            [ 8]  880 	mov	dph,a
+      0003F1 A3               [12]  881 	inc	dptr
+      0003F2 E0               [ 8]  882 	movx	a,@dptr
+      0003F3 F5 93            [ 8]  883 	mov	dpx,a
+      0003F5 A3               [12]  884 	inc	dptr
+      0003F6 E0               [ 8]  885 	movx	a,@dptr
+      0003F7 F5 F0            [ 8]  886 	mov	b,a
+      0003F9 A3               [12]  887 	inc	dptr
+      0003FA E0               [ 8]  888 	movx	a,@dptr
+      0003FB C0 E0            [ 8]  889 	push	acc
+      0003FD A3               [12]  890 	inc	dptr
+      0003FE E0               [ 8]  891 	movx	a,@dptr
+      0003FF FC               [ 4]  892 	mov	r4,a
+      000400 A3               [12]  893 	inc	dptr
+      000401 E0               [ 8]  894 	movx	a,@dptr
+      000402 FD               [ 4]  895 	mov	r5,a
+      000403 A3               [12]  896 	inc	dptr
+      000404 E0               [ 8]  897 	movx	a,@dptr
+      000405 FE               [ 4]  898 	mov	r6,a
+      000406 D0 E0            [ 8]  899 	pop	acc
+      000408 75 86 00         [12]  900 	mov	dps,#0
+      00040B 12s00r00r00      [16]  901 	lcall	__mullonglong
+      00040F AB 82            [ 8]  902 	mov	r3,dpl
+      000411 AF 83            [ 8]  903 	mov	r7,dph
+      000413 A8 93            [ 8]  904 	mov	r0,dpx
+      000415 A9 F0            [ 8]  905 	mov	r1,b
+      000417 FA               [ 4]  906 	mov	r2,a
+                                    907 ;	genAssign: resultIsFar = TRUE
+      000418 90s00r00r1E      [12]  908 	mov	dptr,#_strtoul_result_393216_155
+      00041C EB               [ 4]  909 	mov	a,r3
+      00041D F0               [ 8]  910 	movx	@dptr,a
+      00041E A3               [12]  911 	inc	dptr
+      00041F EF               [ 4]  912 	mov	a,r7
+      000420 F0               [ 8]  913 	movx	@dptr,a
+      000421 A3               [12]  914 	inc	dptr
+      000422 E8               [ 4]  915 	mov	a,r0
+      000423 F0               [ 8]  916 	movx	@dptr,a
+      000424 A3               [12]  917 	inc	dptr
+      000425 E9               [ 4]  918 	mov	a,r1
+      000426 F0               [ 8]  919 	movx	@dptr,a
+      000427 A3               [12]  920 	inc	dptr
+      000428 EA               [ 4]  921 	mov	a,r2
+      000429 F0               [ 8]  922 	movx	@dptr,a
+      00042A A3               [12]  923 	inc	dptr
+      00042B EC               [ 4]  924 	mov	a,r4
+      00042C F0               [ 8]  925 	movx	@dptr,a
+      00042D A3               [12]  926 	inc	dptr
+      00042E ED               [ 4]  927 	mov	a,r5
+      00042F F0               [ 8]  928 	movx	@dptr,a
+      000430 A3               [12]  929 	inc	dptr
+      000431 EE               [ 4]  930 	mov	a,r6
+      000432 F0               [ 8]  931 	movx	@dptr,a
+      000433 90s00r00r1E      [12]  932 	mov	dptr,#_strtoul_result_393216_155
+      000437 E0               [ 8]  933 	movx	a,@dptr
+      000438 FA               [ 4]  934 	mov	r2,a
+      000439 A3               [12]  935 	inc	dptr
+      00043A E0               [ 8]  936 	movx	a,@dptr
+      00043B FB               [ 4]  937 	mov	r3,a
+      00043C A3               [12]  938 	inc	dptr
+      00043D E0               [ 8]  939 	movx	a,@dptr
+      00043E FC               [ 4]  940 	mov	r4,a
+      00043F A3               [12]  941 	inc	dptr
+      000440 E0               [ 8]  942 	movx	a,@dptr
+      000441 FD               [ 4]  943 	mov	r5,a
+      000442 90s00r00r12      [12]  944 	mov	dptr,#_strtoul___2621440013_262144_153
+      000446 E0               [ 8]  945 	movx	a,@dptr
+      000447 C0 E0            [ 8]  946 	push	acc
+      000449 A3               [12]  947 	inc	dptr
+      00044A E0               [ 8]  948 	movx	a,@dptr
+      00044B C0 E0            [ 8]  949 	push	acc
+      00044D A3               [12]  950 	inc	dptr
+      00044E E0               [ 8]  951 	movx	a,@dptr
+      00044F C0 E0            [ 8]  952 	push	acc
+      000451 A3               [12]  953 	inc	dptr
+      000452 E0               [ 8]  954 	movx	a,@dptr
+      000453 F5 F0            [ 8]  955 	mov	b,a
+      000455 D0 93            [ 8]  956 	pop	dpx
+      000457 D0 83            [ 8]  957 	pop	dph
+      000459 D0 82            [ 8]  958 	pop	dpl
+      00045B 8A 9C            [ 8]  959 	mov	acc1, r2
+      00045D EB               [ 4]  960 	mov	a,r3
+      00045E 12s00r00r00      [16]  961 	lcall	__gptrputWord
+      000462 A3               [12]  962 	inc	dptr
+      000463 8C 9C            [ 8]  963 	mov	acc1, r4
+      000465 ED               [ 4]  964 	mov	a,r5
+      000466 12s00r00r00      [16]  965 	lcall	__gptrputWord
+      00046A 7E 00            [ 8]  966 	mov	r6,#0x00
+      00046C 7F 00            [ 8]  967 	mov	r7,#0x00
+      00046E 78 00            [ 8]  968 	mov	r0,#0x00
+      000470 79 00            [ 8]  969 	mov	r1,#0x00
+      000472 90s00r00r1E      [12]  970 	mov	dptr,#_strtoul_result_393216_155
+      000476 8A F0            [ 8]  971 	mov	b,r2
+      000478 E0               [ 8]  972 	movx	a,@dptr
+      000479 B5 F0 35         [16]  973 	cjne	a,b,00235$
+      00047C 8B F0            [ 8]  974 	mov	b,r3
+      00047E A3               [12]  975 	inc	dptr
+      00047F E0               [ 8]  976 	movx	a,@dptr
+      000480 B5 F0 2E         [16]  977 	cjne	a,b,00235$
+      000483 8C F0            [ 8]  978 	mov	b,r4
+      000485 A3               [12]  979 	inc	dptr
+      000486 E0               [ 8]  980 	movx	a,@dptr
+      000487 B5 F0 27         [16]  981 	cjne	a,b,00235$
+      00048A 8D F0            [ 8]  982 	mov	b,r5
+      00048C A3               [12]  983 	inc	dptr
+      00048D E0               [ 8]  984 	movx	a,@dptr
+      00048E B5 F0 20         [16]  985 	cjne	a,b,00235$
+      000491 8E F0            [ 8]  986 	mov	b,r6
+      000493 A3               [12]  987 	inc	dptr
+      000494 E0               [ 8]  988 	movx	a,@dptr
+      000495 B5 F0 19         [16]  989 	cjne	a,b,00235$
+      000498 8F F0            [ 8]  990 	mov	b,r7
+      00049A A3               [12]  991 	inc	dptr
+      00049B E0               [ 8]  992 	movx	a,@dptr
+      00049C B5 F0 12         [16]  993 	cjne	a,b,00235$
+      00049F 88 F0            [ 8]  994 	mov	b,r0
+      0004A1 A3               [12]  995 	inc	dptr
+      0004A2 E0               [ 8]  996 	movx	a,@dptr
+      0004A3 B5 F0 0B         [16]  997 	cjne	a,b,00235$
+      0004A6 89 F0            [ 8]  998 	mov	b,r1
+      0004A8 A3               [12]  999 	inc	dptr
+      0004A9 E0               [ 8] 1000 	movx	a,@dptr
+      0004AA B5 F0 04         [16] 1001 	cjne	a,b,00235$
+      0004AD 74 01            [ 8] 1002 	mov	a,#0x01
+      0004AF 80 01            [12] 1003 	sjmp	00236$
+      0004B1                       1004 00235$:
+      0004B1 E4               [ 4] 1005 	clr	a
+      0004B2                       1006 00236$:
+      0004B2 24 FF            [ 8] 1007 	add	a,#0xff
+      0004B4 92*00            [ 8] 1008 	mov	_strtoul_sloc2_1_0,c
+      0004B6 A2*00            [ 8] 1009 	mov	c,_strtoul_sloc2_1_0
+      0004B8 B3               [ 4] 1010 	cpl	c
+      0004B9 E4               [ 4] 1011 	clr	a
+      0004BA 33               [ 4] 1012 	rlc	a
+      0004BB FA               [ 4] 1013 	mov	r2,a
+                                   1014 ;	strtoul.c:117: range_error |= ckd_mul(&ret, ret, base);
+      0004BC 90s00r00r0F      [12] 1015 	mov	dptr,#_strtoul_range_error_65536_138
+      0004C0 E0               [ 8] 1016 	movx	a,@dptr
+      0004C1 4A               [ 4] 1017 	orl	a,r2
+      0004C2 F0               [ 8] 1018 	movx	@dptr,a
+                                   1019 ;	strtoul.c:125: ret += (unsigned char)digit;
+      0004C3 90s00r00r11      [12] 1020 	mov	dptr,#_strtoul_digit_196608_145
+      0004C7 E0               [ 8] 1021 	movx	a,@dptr
+      0004C8 FA               [ 4] 1022 	mov	r2,a
+      0004C9 7B 00            [ 8] 1023 	mov	r3,#0x00
+      0004CB 7C 00            [ 8] 1024 	mov	r4,#0x00
+      0004CD 7D 00            [ 8] 1025 	mov	r5,#0x00
+      0004CF 90s00r00r0B      [12] 1026 	mov	dptr,#_strtoul_ret_65536_138
+      0004D3 E0               [ 8] 1027 	movx	a,@dptr
+      0004D4 2A               [ 4] 1028 	add	a,r2
+      0004D5 F0               [ 8] 1029 	movx	@dptr,a
+      0004D6 A3               [12] 1030 	inc	dptr
+      0004D7 E0               [ 8] 1031 	movx	a,@dptr
+      0004D8 3B               [ 4] 1032 	addc	a,r3
+      0004D9 F0               [ 8] 1033 	movx	@dptr,a
+      0004DA A3               [12] 1034 	inc	dptr
+      0004DB E0               [ 8] 1035 	movx	a,@dptr
+      0004DC 3C               [ 4] 1036 	addc	a,r4
+      0004DD F0               [ 8] 1037 	movx	@dptr,a
+      0004DE A3               [12] 1038 	inc	dptr
+      0004DF E0               [ 8] 1039 	movx	a,@dptr
+      0004E0 3D               [ 4] 1040 	addc	a,r5
+      0004E1 F0               [ 8] 1041 	movx	@dptr,a
+                                   1042 ;	strtoul.c:107: for (ret = 0;; ptr++)
+      0004E2 90s00r00r26      [12] 1043 	mov	dptr,#_strtoul_sloc0_1_0
+      0004E6 E0               [ 8] 1044 	movx	a,@dptr
+      0004E7 24 01            [ 8] 1045 	add	a,#0x01
+      0004E9 F0               [ 8] 1046 	movx	@dptr,a
+      0004EA A3               [12] 1047 	inc	dptr
+      0004EB E0               [ 8] 1048 	movx	a,@dptr
+      0004EC 34 00            [ 8] 1049 	addc	a,#0x00
+      0004EE F0               [ 8] 1050 	movx	@dptr,a
+      0004EF A3               [12] 1051 	inc	dptr
+      0004F0 E0               [ 8] 1052 	movx	a,@dptr
+      0004F1 34 00            [ 8] 1053 	addc	a,#0x00
+      0004F3 F0               [ 8] 1054 	movx	@dptr,a
+      0004F4 A3               [12] 1055 	inc	dptr
+      0004F5 E0               [ 8] 1056 	movx	a,@dptr
+      0004F6 F0               [ 8] 1057 	movx	@dptr,a
+      0004F7 D0 07            [ 8] 1058 	pop	ar7
+      0004F9 02s00r02rF2      [16] 1059 	ljmp	00136$
+      0004FD                       1060 00127$:
+                                   1061 ;	strtoul.c:128: if (endptr)
+      0004FD 90s00r00r01      [12] 1062 	mov	dptr,#_strtoul_PARM_2
+                                   1063 ;	genAssign: resultIsFar = FALSE
+      000501 E0               [ 8] 1064 	movx	a,@dptr
+      000502 FA               [ 4] 1065 	mov	r2,a
+      000503 A3               [12] 1066 	inc	dptr
+      000504 E0               [ 8] 1067 	movx	a,@dptr
+      000505 FB               [ 4] 1068 	mov	r3,a
+      000506 A3               [12] 1069 	inc	dptr
+      000507 E0               [ 8] 1070 	movx	a,@dptr
+      000508 FC               [ 4] 1071 	mov	r4,a
+      000509 A3               [12] 1072 	inc	dptr
+      00050A E0               [ 8] 1073 	movx	a,@dptr
+      00050B FD               [ 4] 1074 	mov	r5,a
+      00050C 90s00r00r01      [12] 1075 	mov	dptr,#_strtoul_PARM_2
+      000510 E0               [ 8] 1076 	movx	a,@dptr
+      000511 F5 F0            [ 8] 1077 	mov	b,a
+      000513 A3               [12] 1078 	inc	dptr
+      000514 E0               [ 8] 1079 	movx	a,@dptr
+      000515 42 F0            [ 8] 1080 	orl	b,a
+      000517 A3               [12] 1081 	inc	dptr
+      000518 E0               [ 8] 1082 	movx	a,@dptr
+      000519 45 F0            [ 8] 1083 	orl	a,b
+      00051B 60 29            [12] 1084 	jz  00129$
+      00051D                       1085 00237$:
+                                   1086 ;	strtoul.c:129: *endptr = (char*)ptr;
+      00051D 8A 82            [ 8] 1087 	mov	dpl,r2
+      00051F 8B 83            [ 8] 1088 	mov	dph,r3
+      000521 8C 93            [ 8] 1089 	mov	dpx,r4
+      000523 8D F0            [ 8] 1090 	mov	b,r5
+      000525 75 86 01         [12] 1091 	mov     dps, #1
+      000528 90s00r00r26      [12] 1092 	mov     dptr, #_strtoul_sloc0_1_0
+      00052C E0               [ 8] 1093 	movx	a,@dptr
+      00052D F5 9C            [ 8] 1094 	mov	acc1, a
+      00052F A3               [12] 1095 	inc	dptr
+      000530 E0               [ 8] 1096 	movx	a,@dptr
+      000531 15 86            [ 8] 1097 	dec	dps
+      000533 12s00r00r00      [16] 1098 	lcall	__gptrputWord
+      000537 A3               [12] 1099 	inc	dptr
+      000538 05 86            [ 8] 1100 	inc	dps
+      00053A A3               [12] 1101 	inc	dptr
+      00053B E0               [ 8] 1102 	movx	a,@dptr
+      00053C F5 9C            [ 8] 1103 	mov	acc1, a
+      00053E A3               [12] 1104 	inc	dptr
+      00053F E0               [ 8] 1105 	movx	a,@dptr
+      000540 15 86            [ 8] 1106 	dec	dps
+      000542 12s00r00r00      [16] 1107 	lcall	__gptrputWord
+      000546                       1108 00129$:
+                                   1109 ;	strtoul.c:131: if (range_error)
+      000546 90s00r00r0F      [12] 1110 	mov	dptr,#_strtoul_range_error_65536_138
+      00054A E0               [ 8] 1111 	movx	a,@dptr
+      00054B 60 13            [12] 1112 	jz  00131$
+      00054D                       1113 00238$:
+                                   1114 ;	strtoul.c:133: errno = ERANGE;
+                                   1115 ;	genAssign: resultIsFar = TRUE
+      00054D 90s00r00r00      [12] 1116 	mov	dptr,#_errno
+      000551 74 22            [ 8] 1117 	mov	a,#0x22
+      000553 F0               [ 8] 1118 	movx	@dptr,a
+      000554 E4               [ 4] 1119 	clr	a
+      000555 A3               [12] 1120 	inc	dptr
+      000556 F0               [ 8] 1121 	movx	@dptr,a
+                                   1122 ;	strtoul.c:134: return (ULONG_MAX);
+      000557 90 FF FF FF      [12] 1123 	mov	dptr,#0xffffff
+      00055B 75 F0 FF         [12] 1124 	mov	b,#0xff
+      00055E 80 3C            [12] 1125 	sjmp 00138$
+      000560                       1126 00131$:
+                                   1127 ;	strtoul.c:137: return (neg ? -ret : ret);
+      000560 90s00r00r10      [12] 1128 	mov	dptr,#_strtoul_neg_65536_138
+      000564 E0               [ 8] 1129 	movx	a,@dptr
+      000565 60 1E            [12] 1130 	jz  00143$
+      000567                       1131 00239$:
+      000567 90s00r00r0B      [12] 1132 	mov	dptr,#_strtoul_ret_65536_138
+      00056B E0               [ 8] 1133 	movx	a,@dptr
+      00056C D3               [ 4] 1134 	setb	c
+      00056D F4               [ 4] 1135 	cpl	a
+      00056E 34 00            [ 8] 1136 	addc	a,#0x00
+      000570 FA               [ 4] 1137 	mov	r2,a
+      000571 A3               [12] 1138 	inc	dptr
+      000572 E0               [ 8] 1139 	movx	a,@dptr
+      000573 F4               [ 4] 1140 	cpl	a
+      000574 34 00            [ 8] 1141 	addc	a,#0x00
+      000576 FB               [ 4] 1142 	mov	r3,a
+      000577 A3               [12] 1143 	inc	dptr
+      000578 E0               [ 8] 1144 	movx	a,@dptr
+      000579 F4               [ 4] 1145 	cpl	a
+      00057A 34 00            [ 8] 1146 	addc	a,#0x00
+      00057C FC               [ 4] 1147 	mov	r4,a
+      00057D A3               [12] 1148 	inc	dptr
+      00057E E0               [ 8] 1149 	movx	a,@dptr
+      00057F F4               [ 4] 1150 	cpl	a
+      000580 34 00            [ 8] 1151 	addc	a,#0x00
+      000582 FD               [ 4] 1152 	mov	r5,a
+      000583 80 0F            [12] 1153 	sjmp 00144$
+      000585                       1154 00143$:
+      000585 90s00r00r0B      [12] 1155 	mov	dptr,#_strtoul_ret_65536_138
+                                   1156 ;	genAssign: resultIsFar = FALSE
+      000589 E0               [ 8] 1157 	movx	a,@dptr
+      00058A FA               [ 4] 1158 	mov	r2,a
+      00058B A3               [12] 1159 	inc	dptr
+      00058C E0               [ 8] 1160 	movx	a,@dptr
+      00058D FB               [ 4] 1161 	mov	r3,a
+      00058E A3               [12] 1162 	inc	dptr
+      00058F E0               [ 8] 1163 	movx	a,@dptr
+      000590 FC               [ 4] 1164 	mov	r4,a
+      000591 A3               [12] 1165 	inc	dptr
+      000592 E0               [ 8] 1166 	movx	a,@dptr
+      000593 FD               [ 4] 1167 	mov	r5,a
+      000594                       1168 00144$:
+      000594 8A 82            [ 8] 1169 	mov	dpl,r2
+      000596 8B 83            [ 8] 1170 	mov	dph,r3
+      000598 8C 93            [ 8] 1171 	mov	dpx,r4
+      00059A 8D F0            [ 8] 1172 	mov	b,r5
+      00059C                       1173 00138$:
+                                   1174 ;	strtoul.c:138: }
+      00059C 22               [16] 1175 	ret
+                                   1176 	.area CSEG    (CODE)
+                                   1177 	.area CONST   (CODE)
+                                   1178 	.area CONST   (CODE)
+      000000                       1179 ___str_0:
+      000000 30 78                 1180 	.ascii "0x"
+      000002 00                    1181 	.db 0x00
+                                   1182 	.area CSEG    (CODE)
+                                   1183 	.area CONST   (CODE)
+      000003                       1184 ___str_1:
+      000003 30 58                 1185 	.ascii "0X"
+      000005 00                    1186 	.db 0x00
+                                   1187 	.area CSEG    (CODE)
+                                   1188 	.area XINIT   (CODE)
+                                   1189 	.area CABS    (ABS,CODE)

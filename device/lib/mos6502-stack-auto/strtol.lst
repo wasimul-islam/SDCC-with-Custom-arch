@@ -1,0 +1,416 @@
+                              1 ;--------------------------------------------------------
+                              2 ; File Created by SDCC : free open source ISO C Compiler 
+                              3 ; Version 4.2.14 #0 (Linux)
+                              4 ;--------------------------------------------------------
+                              5 	.module strtol
+                              6 	.optsdcc -mmos6502
+                              7 	
+                              8 ;--------------------------------------------------------
+                              9 ; Public variables in this module
+                             10 ;--------------------------------------------------------
+                             11 	.globl _strtoul
+                             12 	.globl _strtol
+                             13 ;--------------------------------------------------------
+                             14 ; ZP ram data
+                             15 ;--------------------------------------------------------
+                             16 	.area ZP      (PAG)
+                             17 ;--------------------------------------------------------
+                             18 ; overlayable items in ram
+                             19 ;--------------------------------------------------------
+                             20 ;--------------------------------------------------------
+                             21 ; uninitialized external ram data
+                             22 ;--------------------------------------------------------
+                             23 	.area BSS
+                             24 ;--------------------------------------------------------
+                             25 ; absolute external ram data
+                             26 ;--------------------------------------------------------
+                             27 	.area DABS    (ABS)
+                             28 ;--------------------------------------------------------
+                             29 ; initialized external ram data
+                             30 ;--------------------------------------------------------
+                             31 	.area DATA
+                             32 ;--------------------------------------------------------
+                             33 ; global & static initialisations
+                             34 ;--------------------------------------------------------
+                             35 	.area _CODE
+                             36 	.area GSINIT
+                             37 	.area GSFINAL
+                             38 	.area GSINIT
+                             39 ;--------------------------------------------------------
+                             40 ; Home
+                             41 ;--------------------------------------------------------
+                             42 	.area _CODE
+                             43 	.area _CODE
+                             44 ;--------------------------------------------------------
+                             45 ; code
+                             46 ;--------------------------------------------------------
+                             47 	.area CODE
+                             48 ;------------------------------------------------------------
+                             49 ;Allocation info for local variables in function 'strtol'
+                             50 ;------------------------------------------------------------
+                             51 ;endptr                    Allocated to stack - sp +22
+                             52 ;base                      Allocated to stack - sp +24
+                             53 ;nptr                      Allocated to stack - sp +18
+                             54 ;__1310720007              Allocated to registers 
+                             55 ;__1310720004              Allocated to registers 
+                             56 ;ptr                       Allocated to stack - sp +16
+                             57 ;rptr                      Allocated to stack - sp +1
+                             58 ;u                         Allocated to stack - sp +6
+                             59 ;neg                       Allocated to stack - sp +15
+                             60 ;__1310720005              Allocated to registers 
+                             61 ;c                         Allocated to registers 
+                             62 ;__1310720008              Allocated to registers 
+                             63 ;c                         Allocated to registers 
+                             64 ;sloc0                     Allocated to stack - sp +13
+                             65 ;sloc1                     Allocated to stack - sp +11
+                             66 ;sloc2                     Allocated to stack - sp +7
+                             67 ;sloc3                     Allocated to stack - sp +3
+                             68 ;------------------------------------------------------------
+                             69 ;	../strtol.c: 38: long int strtol(const char *nptr, char **endptr, int base)
+                             70 ;	-----------------------------------------
+                             71 ;	 function strtol
+                             72 ;	-----------------------------------------
+                             73 ;	Register assignment is optimal.
+                             74 ;	Stack space usage: 19 bytes.
+   0000                      75 _strtol:
+   0000 85*00         [ 3]   76 	sta	*(__TEMP+0)
+   0002 8A            [ 2]   77 	txa
+   0003 48            [ 3]   78 	pha
+   0004 A5*00         [ 3]   79 	lda	*(__TEMP+0)
+   0006 48            [ 3]   80 	pha
+   0007 86*01         [ 3]   81 	stx	*(__TEMP+1)
+   0009 BA            [ 2]   82 	tsx
+   000A 8A            [ 2]   83 	txa
+   000B 18            [ 2]   84 	clc
+   000C 69 EF         [ 2]   85 	adc	#0xef
+   000E AA            [ 2]   86 	tax
+   000F 9A            [ 2]   87 	txs
+   0010 A6*01         [ 3]   88 	ldx	*(__TEMP+1)
+   0012 A5*00         [ 3]   89 	lda	*(__TEMP+0)
+                             90 ;	../strtol.c: 45: while (isblank (*ptr))
+   0014 BA            [ 2]   91 	tsx
+   0015 BD 12 01      [ 5]   92 	lda	0x112,x
+   0018 9D 10 01      [ 5]   93 	sta	0x110,x
+   001B BD 13 01      [ 5]   94 	lda	0x113,x
+   001E 9D 11 01      [ 5]   95 	sta	0x111,x
+   0021                      96 00101$:
+   0021 BA            [ 2]   97 	tsx
+   0022 BD 10 01      [ 5]   98 	lda	0x110,x
+   0025 85*00         [ 3]   99 	sta	*(__DPTR+0)
+   0027 BD 11 01      [ 5]  100 	lda	0x111,x
+   002A 85*01         [ 3]  101 	sta	*(__DPTR+1)
+   002C A0 00         [ 2]  102 	ldy	#0x00
+   002E B1*00         [ 6]  103 	lda	[__DPTR],y
+                            104 ;	./../../include/ctype.h: 53: return ((unsigned char)c == ' ' || (unsigned char)c == '\t');
+   0030 C9 20         [ 2]  105 	cmp	#0x20
+   0032 F0 04         [ 4]  106 	beq	00132$
+   0034 C9 09         [ 2]  107 	cmp	#0x09
+   0036 D0 15         [ 4]  108 	bne	00158$
+   0038                     109 00132$:
+                            110 ;	../strtol.c: 46: ptr++;
+   0038 BA            [ 2]  111 	tsx
+   0039 BD 10 01      [ 5]  112 	lda	0x110,x
+   003C 18            [ 2]  113 	clc
+   003D 69 01         [ 2]  114 	adc	#0x01
+   003F 9D 10 01      [ 5]  115 	sta	0x110,x
+   0042 BD 11 01      [ 5]  116 	lda	0x111,x
+   0045 69 00         [ 2]  117 	adc	#0x00
+   0047 9D 11 01      [ 5]  118 	sta	0x111,x
+   004A 4Cr21r00      [ 3]  119 	jmp	00101$
+   004D                     120 00158$:
+   004D BA            [ 2]  121 	tsx
+   004E BD 10 01      [ 5]  122 	lda	0x110,x
+   0051 9D 0D 01      [ 5]  123 	sta	0x10d,x
+   0054 BD 11 01      [ 5]  124 	lda	0x111,x
+   0057 9D 0E 01      [ 5]  125 	sta	0x10e,x
+                            126 ;	../strtol.c: 50: if (*ptr == '-')
+   005A BD 10 01      [ 5]  127 	lda	0x110,x
+   005D 85*00         [ 3]  128 	sta	*(__DPTR+0)
+   005F BD 11 01      [ 5]  129 	lda	0x111,x
+   0062 85*01         [ 3]  130 	sta	*(__DPTR+1)
+   0064 A0 00         [ 2]  131 	ldy	#0x00
+   0066 B1*00         [ 6]  132 	lda	[__DPTR],y
+   0068 C9 2D         [ 2]  133 	cmp	#0x2d
+   006A D0 19         [ 4]  134 	bne	00105$
+                            135 ;	../strtol.c: 52: neg = true;
+   006C A9 01         [ 2]  136 	lda	#0x01
+   006E 9D 0F 01      [ 5]  137 	sta	0x10f,x
+                            138 ;	../strtol.c: 53: ptr++;
+   0071 BD 10 01      [ 5]  139 	lda	0x110,x
+   0074 18            [ 2]  140 	clc
+   0075 69 01         [ 2]  141 	adc	#0x01
+   0077 9D 0D 01      [ 5]  142 	sta	0x10d,x
+   007A BD 11 01      [ 5]  143 	lda	0x111,x
+   007D 69 00         [ 2]  144 	adc	#0x00
+   007F 9D 0E 01      [ 5]  145 	sta	0x10e,x
+   0082 4Cr8Br00      [ 3]  146 	jmp	00106$
+   0085                     147 00105$:
+                            148 ;	../strtol.c: 56: neg = false;
+   0085 BA            [ 2]  149 	tsx
+   0086 A9 00         [ 2]  150 	lda	#0x00
+   0088 9D 0F 01      [ 5]  151 	sta	0x10f,x
+   008B                     152 00106$:
+                            153 ;	../strtol.c: 59: if (neg && (isblank (*ptr) || *ptr == '-' || *ptr == '+'))
+   008B BA            [ 2]  154 	tsx
+   008C BD 0F 01      [ 5]  155 	lda	0x10f,x
+   008F F0 4F         [ 4]  156 	beq	00110$
+   0091 BD 0D 01      [ 5]  157 	lda	0x10d,x
+   0094 85*00         [ 3]  158 	sta	*(__DPTR+0)
+   0096 BD 0E 01      [ 5]  159 	lda	0x10e,x
+   0099 85*01         [ 3]  160 	sta	*(__DPTR+1)
+   009B A0 00         [ 2]  161 	ldy	#0x00
+   009D B1*00         [ 6]  162 	lda	[__DPTR],y
+   009F AA            [ 2]  163 	tax
+                            164 ;	./../../include/ctype.h: 53: return ((unsigned char)c == ' ' || (unsigned char)c == '\t');
+   00A0 E0 20         [ 2]  165 	cpx	#0x20
+   00A2 F0 0C         [ 4]  166 	beq	00109$
+   00A4 E0 09         [ 2]  167 	cpx	#0x09
+   00A6 F0 08         [ 4]  168 	beq	00109$
+                            169 ;	../strtol.c: 59: if (neg && (isblank (*ptr) || *ptr == '-' || *ptr == '+'))
+   00A8 C9 2D         [ 2]  170 	cmp	#0x2d
+   00AA F0 04         [ 4]  171 	beq	00109$
+   00AC C9 2B         [ 2]  172 	cmp	#0x2b
+   00AE D0 30         [ 4]  173 	bne	00110$
+   00B0                     174 00109$:
+                            175 ;	../strtol.c: 61: if (endptr)
+   00B0 BA            [ 2]  176 	tsx
+   00B1 BD 16 01      [ 5]  177 	lda	0x116,x
+   00B4 1D 17 01      [ 5]  178 	ora	0x117,x
+   00B7 F0 1D         [ 4]  179 	beq	00108$
+                            180 ;	../strtol.c: 62: *endptr = nptr;
+   00B9 BD 16 01      [ 5]  181 	lda	0x116,x
+   00BC 85*00         [ 3]  182 	sta	*(__TEMP+0)
+   00BE BD 17 01      [ 5]  183 	lda	0x117,x
+   00C1 AA            [ 2]  184 	tax
+   00C2 A5*00         [ 3]  185 	lda	*(__TEMP+0)
+   00C4 85*00         [ 3]  186 	sta	*(__DPTR+0)
+   00C6 86*01         [ 3]  187 	stx	*(__DPTR+1)
+   00C8 BA            [ 2]  188 	tsx
+   00C9 BD 12 01      [ 5]  189 	lda	0x112,x
+   00CC A0 00         [ 2]  190 	ldy	#0x00
+   00CE 91*00         [ 6]  191 	sta	[__DPTR],y
+   00D0 BD 13 01      [ 5]  192 	lda	0x113,x
+   00D3 C8            [ 2]  193 	iny
+   00D4 91*00         [ 6]  194 	sta	[__DPTR],y
+   00D6                     195 00108$:
+                            196 ;	../strtol.c: 63: return (0);
+   00D6 A9 00         [ 2]  197 	lda	#0x00
+   00D8 AA            [ 2]  198 	tax
+   00D9 85*00         [ 3]  199 	sta	*___SDCC_m6502_ret2
+   00DB 85*00         [ 3]  200 	sta	*___SDCC_m6502_ret3
+   00DD 4Cr56r02      [ 3]  201 	jmp	00129$
+   00E0                     202 00110$:
+                            203 ;	../strtol.c: 66: u = strtoul(ptr, &rptr, base);
+   00E0 BA            [ 2]  204 	tsx
+   00E1 E8            [ 2]  205 	inx
+   00E2 8A            [ 2]  206 	txa
+   00E3 A2 01         [ 2]  207 	ldx	#0x01
+   00E5 48            [ 3]  208 	pha
+   00E6 8A            [ 2]  209 	txa
+   00E7 BA            [ 2]  210 	tsx
+   00E8 9D 0D 01      [ 5]  211 	sta	0x10d,x
+   00EB 68            [ 4]  212 	pla
+   00EC 9D 0C 01      [ 5]  213 	sta	0x10c,x
+   00EF BD 1A 01      [ 5]  214 	lda	0x11a, x
+   00F2 48            [ 3]  215 	pha
+   00F3 BD 19 01      [ 5]  216 	lda	0x119,x
+   00F6 48            [ 3]  217 	pha
+   00F7 BD 0D 01      [ 5]  218 	lda	0x10d,x
+   00FA 48            [ 3]  219 	pha
+   00FB BD 0C 01      [ 5]  220 	lda	0x10c,x
+   00FE 48            [ 3]  221 	pha
+   00FF BD 0F 01      [ 5]  222 	lda	0x10f,x
+   0102 AA            [ 2]  223 	tax
+   0103 86*00         [ 3]  224 	stx	*(__TEMP+0)
+   0105 BA            [ 2]  225 	tsx
+   0106 BD 11 01      [ 5]  226 	lda	0x111,x
+   0109 08            [ 3]  227 	php
+   010A A6*00         [ 3]  228 	ldx	*(__TEMP+0)
+   010C 28            [ 4]  229 	plp
+   010D 20r00r00      [ 6]  230 	jsr	_strtoul
+   0110 86*00         [ 3]  231 	stx	*(__TEMP+0)
+   0112 BA            [ 2]  232 	tsx
+   0113 9D 0B 01      [ 5]  233 	sta	0x10b,x
+   0116 A6*00         [ 3]  234 	ldx	*(__TEMP+0)
+   0118 8A            [ 2]  235 	txa
+   0119 BA            [ 2]  236 	tsx
+   011A 9D 0C 01      [ 5]  237 	sta	0x10c,x
+   011D A6*00         [ 3]  238 	ldx	*(__TEMP+0)
+   011F A5*00         [ 3]  239 	lda	*___SDCC_m6502_ret2
+   0121 BA            [ 2]  240 	tsx
+   0122 9D 0D 01      [ 5]  241 	sta	0x10d,x
+   0125 A5*00         [ 3]  242 	lda	*___SDCC_m6502_ret3
+   0127 9D 0E 01      [ 5]  243 	sta	0x10e,x
+   012A 85*00         [ 3]  244 	sta	*(__TEMP+0)
+   012C 68            [ 4]  245 	pla
+   012D 68            [ 4]  246 	pla
+   012E 68            [ 4]  247 	pla
+   012F 68            [ 4]  248 	pla
+                            249 ;	../strtol.c: 69: if (rptr == ptr)
+   0130 BD 05 01      [ 5]  250 	lda	0x105, x
+   0133 DD 11 01      [ 5]  251 	cmp	0x111,x
+   0136 D0 37         [ 4]  252 	bne	00117$
+   0138 BD 06 01      [ 5]  253 	lda	0x106,x
+   013B DD 12 01      [ 5]  254 	cmp	0x112,x
+   013E D0 2F         [ 4]  255 	bne	00117$
+                            256 ;	../strtol.c: 71: if (endptr)
+   0140 BD 1A 01      [ 5]  257 	lda	0x11a,x
+   0143 1D 1B 01      [ 5]  258 	ora	0x11b,x
+   0146 F0 1D         [ 4]  259 	beq	00115$
+                            260 ;	../strtol.c: 72: *endptr = nptr;
+   0148 BD 1A 01      [ 5]  261 	lda	0x11a,x
+   014B 85*00         [ 3]  262 	sta	*(__TEMP+0)
+   014D BD 1B 01      [ 5]  263 	lda	0x11b,x
+   0150 AA            [ 2]  264 	tax
+   0151 A5*00         [ 3]  265 	lda	*(__TEMP+0)
+   0153 85*00         [ 3]  266 	sta	*(__DPTR+0)
+   0155 86*01         [ 3]  267 	stx	*(__DPTR+1)
+   0157 BA            [ 2]  268 	tsx
+   0158 BD 12 01      [ 5]  269 	lda	0x112,x
+   015B A0 00         [ 2]  270 	ldy	#0x00
+   015D 91*00         [ 6]  271 	sta	[__DPTR],y
+   015F BD 13 01      [ 5]  272 	lda	0x113,x
+   0162 C8            [ 2]  273 	iny
+   0163 91*00         [ 6]  274 	sta	[__DPTR],y
+   0165                     275 00115$:
+                            276 ;	../strtol.c: 73: return (0);
+   0165 A9 00         [ 2]  277 	lda	#0x00
+   0167 AA            [ 2]  278 	tax
+   0168 85*00         [ 3]  279 	sta	*___SDCC_m6502_ret2
+   016A 85*00         [ 3]  280 	sta	*___SDCC_m6502_ret3
+   016C 4Cr56r02      [ 3]  281 	jmp	00129$
+   016F                     282 00117$:
+                            283 ;	../strtol.c: 76: if (endptr)
+   016F BA            [ 2]  284 	tsx
+   0170 BD 16 01      [ 5]  285 	lda	0x116,x
+   0173 1D 17 01      [ 5]  286 	ora	0x117,x
+   0176 F0 1D         [ 4]  287 	beq	00119$
+                            288 ;	../strtol.c: 77: *endptr = rptr;
+   0178 BD 16 01      [ 5]  289 	lda	0x116,x
+   017B 85*00         [ 3]  290 	sta	*(__TEMP+0)
+   017D BD 17 01      [ 5]  291 	lda	0x117,x
+   0180 AA            [ 2]  292 	tax
+   0181 A5*00         [ 3]  293 	lda	*(__TEMP+0)
+   0183 85*00         [ 3]  294 	sta	*(__DPTR+0)
+   0185 86*01         [ 3]  295 	stx	*(__DPTR+1)
+   0187 BA            [ 2]  296 	tsx
+   0188 BD 01 01      [ 5]  297 	lda	0x101,x
+   018B A0 00         [ 2]  298 	ldy	#0x00
+   018D 91*00         [ 6]  299 	sta	[__DPTR],y
+   018F BD 02 01      [ 5]  300 	lda	0x102,x
+   0192 C8            [ 2]  301 	iny
+   0193 91*00         [ 6]  302 	sta	[__DPTR],y
+   0195                     303 00119$:
+                            304 ;	../strtol.c: 80: if (!neg && u > LONG_MAX)
+   0195 BA            [ 2]  305 	tsx
+   0196 BD 0F 01      [ 5]  306 	lda	0x10f,x
+   0199 D0 2D         [ 4]  307 	bne	00124$
+   019B A9 FF         [ 2]  308 	lda	#0xff
+   019D 38            [ 2]  309 	sec
+   019E FD 07 01      [ 5]  310 	sbc	0x107,x
+   01A1 A9 FF         [ 2]  311 	lda	#0xff
+   01A3 FD 08 01      [ 5]  312 	sbc	0x108,x
+   01A6 A9 FF         [ 2]  313 	lda	#0xff
+   01A8 FD 09 01      [ 5]  314 	sbc	0x109,x
+   01AB A9 7F         [ 2]  315 	lda	#0x7f
+   01AD FD 0A 01      [ 5]  316 	sbc	0x10a,x
+   01B0 B0 16         [ 4]  317 	bcs	00124$
+                            318 ;	../strtol.c: 82: errno = ERANGE;
+   01B2 A2 22         [ 2]  319 	ldx	#0x22
+   01B4 8Er00r00      [ 4]  320 	stx	_errno
+   01B7 A2 00         [ 2]  321 	ldx	#0x00
+   01B9 8Er01r00      [ 4]  322 	stx	(_errno + 1)
+                            323 ;	../strtol.c: 83: return (LONG_MAX);
+   01BC A9 FF         [ 2]  324 	lda	#0xff
+   01BE AA            [ 2]  325 	tax
+   01BF 85*00         [ 3]  326 	sta	*___SDCC_m6502_ret2
+   01C1 A0 7F         [ 2]  327 	ldy	#0x7f
+   01C3 84*00         [ 3]  328 	sty	*___SDCC_m6502_ret3
+   01C5 4Cr56r02      [ 3]  329 	jmp	00129$
+   01C8                     330 00124$:
+                            331 ;	../strtol.c: 85: else if (neg && u > -LONG_MIN)
+   01C8 BA            [ 2]  332 	tsx
+   01C9 BD 0F 01      [ 5]  333 	lda	0x10f,x
+   01CC F0 2C         [ 4]  334 	beq	00125$
+   01CE A9 00         [ 2]  335 	lda	#0x00
+   01D0 38            [ 2]  336 	sec
+   01D1 FD 07 01      [ 5]  337 	sbc	0x107,x
+   01D4 A9 00         [ 2]  338 	lda	#0x00
+   01D6 FD 08 01      [ 5]  339 	sbc	0x108,x
+   01D9 A9 00         [ 2]  340 	lda	#0x00
+   01DB FD 09 01      [ 5]  341 	sbc	0x109,x
+   01DE A9 80         [ 2]  342 	lda	#0x80
+   01E0 FD 0A 01      [ 5]  343 	sbc	0x10a,x
+   01E3 B0 15         [ 4]  344 	bcs	00125$
+                            345 ;	../strtol.c: 87: errno = ERANGE;
+   01E5 A2 22         [ 2]  346 	ldx	#0x22
+   01E7 8Er00r00      [ 4]  347 	stx	_errno
+   01EA A2 00         [ 2]  348 	ldx	#0x00
+   01EC 8Er01r00      [ 4]  349 	stx	(_errno + 1)
+                            350 ;	../strtol.c: 88: return (LONG_MIN);
+   01EF 8A            [ 2]  351 	txa
+   01F0 AA            [ 2]  352 	tax
+   01F1 85*00         [ 3]  353 	sta	*___SDCC_m6502_ret2
+   01F3 A0 80         [ 2]  354 	ldy	#0x80
+   01F5 84*00         [ 3]  355 	sty	*___SDCC_m6502_ret3
+   01F7 4Cr56r02      [ 3]  356 	jmp	00129$
+   01FA                     357 00125$:
+                            358 ;	../strtol.c: 91: return (neg ? -u : u);
+   01FA BA            [ 2]  359 	tsx
+   01FB BD 0F 01      [ 5]  360 	lda	0x10f,x
+   01FE F0 24         [ 4]  361 	beq	00137$
+   0200 A9 00         [ 2]  362 	lda	#0x00
+   0202 38            [ 2]  363 	sec
+   0203 FD 07 01      [ 5]  364 	sbc	0x107,x
+   0206 9D 03 01      [ 5]  365 	sta	0x103,x
+   0209 A9 00         [ 2]  366 	lda	#0x00
+   020B FD 08 01      [ 5]  367 	sbc	0x108,x
+   020E 9D 04 01      [ 5]  368 	sta	0x104,x
+   0211 A9 00         [ 2]  369 	lda	#0x00
+   0213 FD 09 01      [ 5]  370 	sbc	0x109,x
+   0216 9D 05 01      [ 5]  371 	sta	0x105,x
+   0219 A9 00         [ 2]  372 	lda	#0x00
+   021B FD 0A 01      [ 5]  373 	sbc	0x10a,x
+   021E 9D 06 01      [ 5]  374 	sta	0x106,x
+   0221 4Cr3Dr02      [ 3]  375 	jmp	00138$
+   0224                     376 00137$:
+   0224 BA            [ 2]  377 	tsx
+   0225 BD 07 01      [ 5]  378 	lda	0x107,x
+   0228 9D 03 01      [ 5]  379 	sta	0x103,x
+   022B BD 08 01      [ 5]  380 	lda	0x108,x
+   022E 9D 04 01      [ 5]  381 	sta	0x104,x
+   0231 BD 09 01      [ 5]  382 	lda	0x109,x
+   0234 9D 05 01      [ 5]  383 	sta	0x105,x
+   0237 BD 0A 01      [ 5]  384 	lda	0x10a,x
+   023A 9D 06 01      [ 5]  385 	sta	0x106,x
+   023D                     386 00138$:
+   023D BA            [ 2]  387 	tsx
+   023E BD 06 01      [ 5]  388 	lda	0x106,x
+   0241 85*00         [ 3]  389 	sta	*___SDCC_m6502_ret3
+   0243 BD 05 01      [ 5]  390 	lda	0x105,x
+   0246 85*00         [ 3]  391 	sta	*___SDCC_m6502_ret2
+   0248 BD 04 01      [ 5]  392 	lda	0x104,x
+   024B AA            [ 2]  393 	tax
+   024C 86*00         [ 3]  394 	stx	*(__TEMP+0)
+   024E BA            [ 2]  395 	tsx
+   024F BD 03 01      [ 5]  396 	lda	0x103,x
+   0252 08            [ 3]  397 	php
+   0253 A6*00         [ 3]  398 	ldx	*(__TEMP+0)
+   0255 28            [ 4]  399 	plp
+   0256                     400 00129$:
+                            401 ;	../strtol.c: 92: }
+   0256 85*00         [ 3]  402 	sta	*(__TEMP+0)
+   0258 86*01         [ 3]  403 	stx	*(__TEMP+1)
+   025A BA            [ 2]  404 	tsx
+   025B 8A            [ 2]  405 	txa
+   025C 18            [ 2]  406 	clc
+   025D 69 13         [ 2]  407 	adc	#0x13
+   025F AA            [ 2]  408 	tax
+   0260 9A            [ 2]  409 	txs
+   0261 A6*01         [ 3]  410 	ldx	*(__TEMP+1)
+   0263 A5*00         [ 3]  411 	lda	*(__TEMP+0)
+   0265 60            [ 6]  412 	rts
+                            413 	.area CODE
+                            414 	.area RODATA
+                            415 	.area XINIT
+                            416 	.area CABS    (ABS)

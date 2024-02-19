@@ -1,0 +1,366 @@
+                                      1 ;--------------------------------------------------------
+                                      2 ; File Created by SDCC : free open source ISO C Compiler 
+                                      3 ; Version 4.2.14 #0 (Linux)
+                                      4 ;--------------------------------------------------------
+                                      5 	.module mbrtoc32
+                                      6 	.optsdcc -mds390 --model-flat24
+                                      7 	
+                                      8 ;--------------------------------------------------------
+                                      9 ; CPU specific extensions
+                                     10 ;--------------------------------------------------------
+                                     11 	.DS80C390
+                                     12 	.amode	2	; 24 bit flat addressing
+                           000082    13 dpl	=	0x82
+                           000083    14 dph	=	0x83
+                           000084    15 dpl1	=	0x84
+                           000085    16 dph1	=	0x85
+                           000086    17 dps	=	0x86
+                           000093    18 dpx	=	0x93
+                           000095    19 dpx1	=	0x95
+                           00009B    20 esp	=	0x9B
+                           00009C    21 ap	=	0x9C
+                           00009C    22 acc1	=	0x9C
+                           0000D1    23 mcnt0	=	0xD1
+                           0000D2    24 mcnt1	=	0xD2
+                           0000D3    25 ma	=	0xD3
+                           0000D4    26 mb	=	0xD4
+                           0000D5    27 mc	=	0xD5
+                           00009D    28 acon	=	0x9D
+                           0000C6    29 mcon	=	0xC6
+                           0000D1    30 F1	=	0xD1	; user flag
+                                     31 ;--------------------------------------------------------
+                                     32 ; Public variables in this module
+                                     33 ;--------------------------------------------------------
+                                     34 	.globl _mbrtowc
+                                     35 	.globl _mbrtoc32_PARM_4
+                                     36 	.globl _mbrtoc32_PARM_3
+                                     37 	.globl _mbrtoc32_PARM_2
+                                     38 	.globl _mbrtoc32
+                                     39 ;--------------------------------------------------------
+                                     40 ; special function registers
+                                     41 ;--------------------------------------------------------
+                                     42 ;--------------------------------------------------------
+                                     43 ; special function bits
+                                     44 ;--------------------------------------------------------
+                                     45 ;--------------------------------------------------------
+                                     46 ; overlayable register banks
+                                     47 ;--------------------------------------------------------
+                                     48 	.area REG_BANK_0	(REL,OVR,DATA)
+      000000                         49 	.ds 8
+                                     50 ;--------------------------------------------------------
+                                     51 ; internal ram data
+                                     52 ;--------------------------------------------------------
+                                     53 	.area DSEG    (DATA)
+                                     54 ;--------------------------------------------------------
+                                     55 ; overlayable items in internal ram
+                                     56 ;--------------------------------------------------------
+                                     57 ;--------------------------------------------------------
+                                     58 ; indirectly addressable internal ram data
+                                     59 ;--------------------------------------------------------
+                                     60 	.area ISEG    (DATA)
+                                     61 ;--------------------------------------------------------
+                                     62 ; absolute internal ram data
+                                     63 ;--------------------------------------------------------
+                                     64 	.area IABS    (ABS,DATA)
+                                     65 	.area IABS    (ABS,DATA)
+                                     66 ;--------------------------------------------------------
+                                     67 ; bit data
+                                     68 ;--------------------------------------------------------
+                                     69 	.area BSEG    (BIT)
+                                     70 ;--------------------------------------------------------
+                                     71 ; paged external ram data
+                                     72 ;--------------------------------------------------------
+                                     73 	.area PSEG    (PAG,XDATA)
+                                     74 ;--------------------------------------------------------
+                                     75 ; uninitialized external ram data
+                                     76 ;--------------------------------------------------------
+                                     77 	.area XSEG    (XDATA)
+      000000                         78 _mbrtoc32_PARM_2:
+      000000                         79 	.ds 4
+      000004                         80 _mbrtoc32_PARM_3:
+      000004                         81 	.ds 2
+      000006                         82 _mbrtoc32_PARM_4:
+      000006                         83 	.ds 4
+      00000A                         84 _mbrtoc32_wc_65536_16:
+      00000A                         85 	.ds 4
+      00000E                         86 _mbrtoc32_sps_65536_16:
+      00000E                         87 	.ds 3
+                                     88 ;--------------------------------------------------------
+                                     89 ; absolute external ram data
+                                     90 ;--------------------------------------------------------
+                                     91 	.area XABS    (ABS,XDATA)
+                                     92 ;--------------------------------------------------------
+                                     93 ; initialized external ram data
+                                     94 ;--------------------------------------------------------
+                                     95 	.area XISEG   (XDATA)
+                                     96 ;--------------------------------------------------------
+                                     97 ; global & static initialisations
+                                     98 ;--------------------------------------------------------
+                                     99 	.area HOME    (CODE)
+                                    100 	.area GSINIT  (CODE)
+                                    101 	.area GSFINAL (CODE)
+                                    102 	.area GSINIT  (CODE)
+                                    103 ;--------------------------------------------------------
+                                    104 ; Home
+                                    105 ;--------------------------------------------------------
+                                    106 	.area HOME    (CODE)
+                                    107 	.area HOME    (CODE)
+                                    108 ;--------------------------------------------------------
+                                    109 ; code
+                                    110 ;--------------------------------------------------------
+                                    111 	.area CSEG    (CODE)
+                                    112 ;------------------------------------------------------------
+                                    113 ;Allocation info for local variables in function 'mbrtoc32'
+                                    114 ;------------------------------------------------------------
+                                    115 ;s                         Allocated with name '_mbrtoc32_PARM_2'
+                                    116 ;n                         Allocated with name '_mbrtoc32_PARM_3'
+                                    117 ;ps                        Allocated with name '_mbrtoc32_PARM_4'
+                                    118 ;pc32                      Allocated to registers r2 r3 r4 r5 
+                                    119 ;wc                        Allocated with name '_mbrtoc32_wc_65536_16'
+                                    120 ;ret                       Allocated to registers r6 r7 
+                                    121 ;sps                       Allocated with name '_mbrtoc32_sps_65536_16'
+                                    122 ;sloc0                     Allocated with name '_mbrtoc32_sloc0_1_0'
+                                    123 ;------------------------------------------------------------
+                                    124 ;	mbrtoc32.c:34: size_t mbrtoc32(char32_t *restrict pc32, const char *restrict s, size_t n, mbstate_t *restrict ps)
+                                    125 ;	-----------------------------------------
+                                    126 ;	 function mbrtoc32
+                                    127 ;	-----------------------------------------
+      000000                        128 _mbrtoc32:
+                           000002   129 	ar2 = 0x02
+                           000003   130 	ar3 = 0x03
+                           000004   131 	ar4 = 0x04
+                           000005   132 	ar5 = 0x05
+                           000006   133 	ar6 = 0x06
+                           000007   134 	ar7 = 0x07
+                           000000   135 	ar0 = 0x00
+                           000001   136 	ar1 = 0x01
+      000000 AA 82            [ 8]  137 	mov	r2,dpl
+      000002 AB 83            [ 8]  138 	mov	r3,dph
+      000004 AC 93            [ 8]  139 	mov	r4,dpx
+      000006 AD F0            [ 8]  140 	mov	r5,b
+                                    141 ;	mbrtoc32.c:40: if(!ps)
+      000008 90s00r00r06      [12]  142 	mov	dptr,#_mbrtoc32_PARM_4
+      00000C E0               [ 8]  143 	movx	a,@dptr
+      00000D F5 F0            [ 8]  144 	mov	b,a
+      00000F A3               [12]  145 	inc	dptr
+      000010 E0               [ 8]  146 	movx	a,@dptr
+      000011 42 F0            [ 8]  147 	orl	b,a
+      000013 A3               [12]  148 	inc	dptr
+      000014 E0               [ 8]  149 	movx	a,@dptr
+      000015 45 F0            [ 8]  150 	orl	a,b
+      000017 70 12            [12]  151 	jnz  00102$
+      000019                        152 00121$:
+                                    153 ;	mbrtoc32.c:41: ps = &sps;
+      000019 90s00r00r06      [12]  154 	mov	dptr,#_mbrtoc32_PARM_4
+      00001D 74r0E            [ 8]  155 	mov	a,#_mbrtoc32_sps_65536_16
+      00001F F0               [ 8]  156 	movx	@dptr,a
+      000020 A3               [12]  157 	inc	dptr
+      000021 74s00            [ 8]  158 	mov	a,#(_mbrtoc32_sps_65536_16 >> 8)
+      000023 F0               [ 8]  159 	movx	@dptr,a
+      000024 A3               [12]  160 	inc	dptr
+      000025 74s00            [ 8]  161 	mov	a,#(_mbrtoc32_sps_65536_16 >> 16)
+      000027 F0               [ 8]  162 	movx	@dptr,a
+      000028 A3               [12]  163 	inc	dptr
+      000029 E4               [ 4]  164 	clr	a
+      00002A F0               [ 8]  165 	movx	@dptr,a
+      00002B                        166 00102$:
+                                    167 ;	mbrtoc32.c:43: if(!pc32)
+      00002B EA               [ 4]  168 	mov	a,r2
+      00002C 4B               [ 4]  169 	orl	a,r3
+      00002D 4C               [ 4]  170 	orl	a,r4
+      00002E 70 5F            [12]  171 	jnz  00104$
+      000030                        172 00122$:
+                                    173 ;	mbrtoc32.c:44: return(mbrtowc(0, s, n, ps));
+      000030 90s00r00r00      [12]  174 	mov	dptr,#_mbrtoc32_PARM_2
+                                    175 ;	genAssign: resultIsFar = FALSE
+      000034 E0               [ 8]  176 	movx	a,@dptr
+      000035 FA               [ 4]  177 	mov	r2,a
+      000036 A3               [12]  178 	inc	dptr
+      000037 E0               [ 8]  179 	movx	a,@dptr
+      000038 FB               [ 4]  180 	mov	r3,a
+      000039 A3               [12]  181 	inc	dptr
+      00003A E0               [ 8]  182 	movx	a,@dptr
+      00003B FC               [ 4]  183 	mov	r4,a
+      00003C A3               [12]  184 	inc	dptr
+      00003D E0               [ 8]  185 	movx	a,@dptr
+      00003E FD               [ 4]  186 	mov	r5,a
+      00003F 90s00r00r06      [12]  187 	mov	dptr,#_mbrtoc32_PARM_4
+                                    188 ;	genAssign: resultIsFar = FALSE
+      000043 E0               [ 8]  189 	movx	a,@dptr
+      000044 FE               [ 4]  190 	mov	r6,a
+      000045 A3               [12]  191 	inc	dptr
+      000046 E0               [ 8]  192 	movx	a,@dptr
+      000047 FF               [ 4]  193 	mov	r7,a
+      000048 A3               [12]  194 	inc	dptr
+      000049 E0               [ 8]  195 	movx	a,@dptr
+      00004A F8               [ 4]  196 	mov	r0,a
+      00004B A3               [12]  197 	inc	dptr
+      00004C E0               [ 8]  198 	movx	a,@dptr
+      00004D F9               [ 4]  199 	mov	r1,a
+                                    200 ;	genAssign: resultIsFar = TRUE
+      00004E 90s00r00r00      [12]  201 	mov	dptr,#_mbrtowc_PARM_2
+      000052 EA               [ 4]  202 	mov	a,r2
+      000053 F0               [ 8]  203 	movx	@dptr,a
+      000054 A3               [12]  204 	inc	dptr
+      000055 EB               [ 4]  205 	mov	a,r3
+      000056 F0               [ 8]  206 	movx	@dptr,a
+      000057 A3               [12]  207 	inc	dptr
+      000058 EC               [ 4]  208 	mov	a,r4
+      000059 F0               [ 8]  209 	movx	@dptr,a
+      00005A A3               [12]  210 	inc	dptr
+      00005B ED               [ 4]  211 	mov	a,r5
+      00005C F0               [ 8]  212 	movx	@dptr,a
+      00005D 90s00r00r04      [12]  213 	mov	dptr,#_mbrtoc32_PARM_3
+                                    214 ;	genAssign: resultIsFar = TRUE
+      000061 75 86 21         [12]  215 	mov	dps,#0x21
+      000064 90s00r00r00      [12]  216 	mov	dptr,#_mbrtowc_PARM_3
+      000068 E0               [ 8]  217 	movx	a,@dptr
+      000069 F0               [ 8]  218 	movx	@dptr,a
+      00006A A3               [12]  219 	inc	dptr
+      00006B A3               [12]  220 	inc	dptr
+      00006C E0               [ 8]  221 	movx	a,@dptr
+      00006D F0               [ 8]  222 	movx	@dptr,a
+      00006E 75 86 00         [12]  223 	mov	dps,#0
+                                    224 ;	genAssign: resultIsFar = TRUE
+      000071 90s00r00r00      [12]  225 	mov	dptr,#_mbrtowc_PARM_4
+      000075 EE               [ 4]  226 	mov	a,r6
+      000076 F0               [ 8]  227 	movx	@dptr,a
+      000077 A3               [12]  228 	inc	dptr
+      000078 EF               [ 4]  229 	mov	a,r7
+      000079 F0               [ 8]  230 	movx	@dptr,a
+      00007A A3               [12]  231 	inc	dptr
+      00007B E8               [ 4]  232 	mov	a,r0
+      00007C F0               [ 8]  233 	movx	@dptr,a
+      00007D A3               [12]  234 	inc	dptr
+      00007E E9               [ 4]  235 	mov	a,r1
+      00007F F0               [ 8]  236 	movx	@dptr,a
+      000080 90 00 00 00      [12]  237 	mov  dptr,#0x0000
+      000084 75 F0 00         [12]  238 	mov	b,#0x00
+      000087 12s00r00r00      [16]  239 	lcall	_mbrtowc
+      00008B 02s00r01r3F      [16]  240 	ljmp	00107$
+      00008F                        241 00104$:
+                                    242 ;	mbrtoc32.c:46: ret = mbrtowc(&wc, s, n, ps);
+      00008F C0 02            [ 8]  243 	push	ar2
+      000091 C0 03            [ 8]  244 	push	ar3
+      000093 C0 04            [ 8]  245 	push	ar4
+      000095 C0 05            [ 8]  246 	push	ar5
+      000097 90s00r00r00      [12]  247 	mov	dptr,#_mbrtoc32_PARM_2
+                                    248 ;	genAssign: resultIsFar = FALSE
+      00009B E0               [ 8]  249 	movx	a,@dptr
+      00009C FE               [ 4]  250 	mov	r6,a
+      00009D A3               [12]  251 	inc	dptr
+      00009E E0               [ 8]  252 	movx	a,@dptr
+      00009F FF               [ 4]  253 	mov	r7,a
+      0000A0 A3               [12]  254 	inc	dptr
+      0000A1 E0               [ 8]  255 	movx	a,@dptr
+      0000A2 F8               [ 4]  256 	mov	r0,a
+      0000A3 A3               [12]  257 	inc	dptr
+      0000A4 E0               [ 8]  258 	movx	a,@dptr
+      0000A5 F9               [ 4]  259 	mov	r1,a
+      0000A6 90s00r00r06      [12]  260 	mov	dptr,#_mbrtoc32_PARM_4
+                                    261 ;	genAssign: resultIsFar = FALSE
+      0000AA E0               [ 8]  262 	movx	a,@dptr
+      0000AB FA               [ 4]  263 	mov	r2,a
+      0000AC A3               [12]  264 	inc	dptr
+      0000AD E0               [ 8]  265 	movx	a,@dptr
+      0000AE FB               [ 4]  266 	mov	r3,a
+      0000AF A3               [12]  267 	inc	dptr
+      0000B0 E0               [ 8]  268 	movx	a,@dptr
+      0000B1 FC               [ 4]  269 	mov	r4,a
+      0000B2 A3               [12]  270 	inc	dptr
+      0000B3 E0               [ 8]  271 	movx	a,@dptr
+      0000B4 FD               [ 4]  272 	mov	r5,a
+                                    273 ;	genAssign: resultIsFar = TRUE
+      0000B5 90s00r00r00      [12]  274 	mov	dptr,#_mbrtowc_PARM_2
+      0000B9 EE               [ 4]  275 	mov	a,r6
+      0000BA F0               [ 8]  276 	movx	@dptr,a
+      0000BB A3               [12]  277 	inc	dptr
+      0000BC EF               [ 4]  278 	mov	a,r7
+      0000BD F0               [ 8]  279 	movx	@dptr,a
+      0000BE A3               [12]  280 	inc	dptr
+      0000BF E8               [ 4]  281 	mov	a,r0
+      0000C0 F0               [ 8]  282 	movx	@dptr,a
+      0000C1 A3               [12]  283 	inc	dptr
+      0000C2 E9               [ 4]  284 	mov	a,r1
+      0000C3 F0               [ 8]  285 	movx	@dptr,a
+      0000C4 90s00r00r04      [12]  286 	mov	dptr,#_mbrtoc32_PARM_3
+                                    287 ;	genAssign: resultIsFar = TRUE
+      0000C8 75 86 21         [12]  288 	mov	dps,#0x21
+      0000CB 90s00r00r00      [12]  289 	mov	dptr,#_mbrtowc_PARM_3
+      0000CF E0               [ 8]  290 	movx	a,@dptr
+      0000D0 F0               [ 8]  291 	movx	@dptr,a
+      0000D1 A3               [12]  292 	inc	dptr
+      0000D2 A3               [12]  293 	inc	dptr
+      0000D3 E0               [ 8]  294 	movx	a,@dptr
+      0000D4 F0               [ 8]  295 	movx	@dptr,a
+      0000D5 75 86 00         [12]  296 	mov	dps,#0
+                                    297 ;	genAssign: resultIsFar = TRUE
+      0000D8 90s00r00r00      [12]  298 	mov	dptr,#_mbrtowc_PARM_4
+      0000DC EA               [ 4]  299 	mov	a,r2
+      0000DD F0               [ 8]  300 	movx	@dptr,a
+      0000DE A3               [12]  301 	inc	dptr
+      0000DF EB               [ 4]  302 	mov	a,r3
+      0000E0 F0               [ 8]  303 	movx	@dptr,a
+      0000E1 A3               [12]  304 	inc	dptr
+      0000E2 EC               [ 4]  305 	mov	a,r4
+      0000E3 F0               [ 8]  306 	movx	@dptr,a
+      0000E4 A3               [12]  307 	inc	dptr
+      0000E5 ED               [ 4]  308 	mov	a,r5
+      0000E6 F0               [ 8]  309 	movx	@dptr,a
+      0000E7 C0 04            [ 8]  310 	push	ar4
+      0000E9 C0 05            [ 8]  311 	push	ar5
+      0000EB 90s00r00r0A      [12]  312 	mov dptr,#_mbrtoc32_wc_65536_16
+      0000EF 75 F0 00         [12]  313 	mov	b,#0x00
+      0000F2 12s00r00r00      [16]  314 	lcall	_mbrtowc
+      0000F6 AA 82            [ 8]  315 	mov	r2,dpl
+      0000F8 AB 83            [ 8]  316 	mov	r3,dph
+      0000FA D0 05            [ 8]  317 	pop	ar5
+      0000FC D0 04            [ 8]  318 	pop	ar4
+                                    319 ;	genAssign: resultIsFar = FALSE
+      0000FE 8A 06            [ 8]  320 	mov	ar6,r2
+      000100 8B 07            [ 8]  321 	mov	ar7,r3
+                                    322 ;	mbrtoc32.c:48: if(ret <= MB_LEN_MAX)
+      000102 C3               [ 4]  323 	clr	c
+      000103 74 04            [ 8]  324 	mov	a,#0x04
+      000105 9E               [ 4]  325 	subb	a,r6
+      000106 E4               [ 4]  326 	clr	a
+      000107 9F               [ 4]  327 	subb	a,r7
+      000108 D0 05            [ 8]  328 	pop	ar5
+      00010A D0 04            [ 8]  329 	pop	ar4
+      00010C D0 03            [ 8]  330 	pop	ar3
+      00010E D0 02            [ 8]  331 	pop	ar2
+      000110 40 29            [12]  332 	jc   00106$
+      000112                        333 00123$:
+                                    334 ;	mbrtoc32.c:49: *pc32 = wc;
+      000112 8A 82            [ 8]  335 	mov	dpl,r2
+      000114 8B 83            [ 8]  336 	mov	dph,r3
+      000116 8C 93            [ 8]  337 	mov	dpx,r4
+      000118 8D F0            [ 8]  338 	mov	b,r5
+      00011A 75 86 01         [12]  339 	mov     dps, #1
+      00011D 90s00r00r0A      [12]  340 	mov     dptr, #_mbrtoc32_wc_65536_16
+      000121 E0               [ 8]  341 	movx	a,@dptr
+      000122 F5 9C            [ 8]  342 	mov	acc1, a
+      000124 A3               [12]  343 	inc	dptr
+      000125 E0               [ 8]  344 	movx	a,@dptr
+      000126 15 86            [ 8]  345 	dec	dps
+      000128 12s00r00r00      [16]  346 	lcall	__gptrputWord
+      00012C A3               [12]  347 	inc	dptr
+      00012D 05 86            [ 8]  348 	inc	dps
+      00012F A3               [12]  349 	inc	dptr
+      000130 E0               [ 8]  350 	movx	a,@dptr
+      000131 F5 9C            [ 8]  351 	mov	acc1, a
+      000133 A3               [12]  352 	inc	dptr
+      000134 E0               [ 8]  353 	movx	a,@dptr
+      000135 15 86            [ 8]  354 	dec	dps
+      000137 12s00r00r00      [16]  355 	lcall	__gptrputWord
+      00013B                        356 00106$:
+                                    357 ;	mbrtoc32.c:51: return(ret);
+      00013B 8E 82            [ 8]  358 	mov	dpl,r6
+      00013D 8F 83            [ 8]  359 	mov	dph,r7
+      00013F                        360 00107$:
+                                    361 ;	mbrtoc32.c:52: }
+      00013F 22               [16]  362 	ret
+                                    363 	.area CSEG    (CODE)
+                                    364 	.area CONST   (CODE)
+                                    365 	.area XINIT   (CODE)
+                                    366 	.area CABS    (ABS,CODE)

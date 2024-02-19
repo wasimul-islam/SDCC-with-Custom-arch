@@ -1,0 +1,341 @@
+                              1 ;--------------------------------------------------------
+                              2 ; File Created by SDCC : free open source ISO C Compiler 
+                              3 ; Version 4.2.14 #0 (Linux)
+                              4 ;--------------------------------------------------------
+                              5 	.module sprintf
+                              6 	.optsdcc -mmos6502
+                              7 	
+                              8 ;--------------------------------------------------------
+                              9 ; Public variables in this module
+                             10 ;--------------------------------------------------------
+                             11 	.globl __print_format
+                             12 	.globl _vsprintf
+                             13 	.globl _sprintf
+                             14 ;--------------------------------------------------------
+                             15 ; ZP ram data
+                             16 ;--------------------------------------------------------
+                             17 	.area ZP      (PAG)
+                             18 ;--------------------------------------------------------
+                             19 ; overlayable items in ram
+                             20 ;--------------------------------------------------------
+                             21 ;--------------------------------------------------------
+                             22 ; uninitialized external ram data
+                             23 ;--------------------------------------------------------
+                             24 	.area BSS
+                             25 ;--------------------------------------------------------
+                             26 ; absolute external ram data
+                             27 ;--------------------------------------------------------
+                             28 	.area DABS    (ABS)
+                             29 ;--------------------------------------------------------
+                             30 ; initialized external ram data
+                             31 ;--------------------------------------------------------
+                             32 	.area DATA
+                             33 ;--------------------------------------------------------
+                             34 ; global & static initialisations
+                             35 ;--------------------------------------------------------
+                             36 	.area _CODE
+                             37 	.area GSINIT
+                             38 	.area GSFINAL
+                             39 	.area GSINIT
+                             40 ;--------------------------------------------------------
+                             41 ; Home
+                             42 ;--------------------------------------------------------
+                             43 	.area _CODE
+                             44 	.area _CODE
+                             45 ;--------------------------------------------------------
+                             46 ; code
+                             47 ;--------------------------------------------------------
+                             48 	.area CODE
+                             49 ;------------------------------------------------------------
+                             50 ;Allocation info for local variables in function 'put_char_to_string'
+                             51 ;------------------------------------------------------------
+                             52 ;p                         Allocated to stack - sp +10
+                             53 ;c                         Allocated to stack - sp +7
+                             54 ;buf                       Allocated to stack - sp +5
+                             55 ;sloc0                     Allocated to stack - sp +3
+                             56 ;sloc1                     Allocated to stack - sp +1
+                             57 ;------------------------------------------------------------
+                             58 ;	../sprintf.c: 34: put_char_to_string (char c, void* p) _REENTRANT
+                             59 ;	-----------------------------------------
+                             60 ;	 function put_char_to_string
+                             61 ;	-----------------------------------------
+                             62 ;	Register assignment is optimal.
+                             63 ;	Stack space usage: 7 bytes.
+   0000                      64 _put_char_to_string:
+   0000 48            [ 3]   65 	pha
+   0001 48            [ 3]   66 	pha
+   0002 48            [ 3]   67 	pha
+   0003 48            [ 3]   68 	pha
+   0004 48            [ 3]   69 	pha
+   0005 48            [ 3]   70 	pha
+   0006 48            [ 3]   71 	pha
+                             72 ;	../sprintf.c: 36: char **buf = (char **)p;
+   0007 BA            [ 2]   73 	tsx
+   0008 BD 0A 01      [ 5]   74 	lda	0x10a,x
+   000B 9D 05 01      [ 5]   75 	sta	0x105,x
+   000E BD 0B 01      [ 5]   76 	lda	0x10b,x
+   0011 9D 06 01      [ 5]   77 	sta	0x106,x
+                             78 ;	../sprintf.c: 37: *(*buf)++ = c;
+   0014 BD 05 01      [ 5]   79 	lda	0x105,x
+   0017 85*00         [ 3]   80 	sta	*(__DPTR+0)
+   0019 BD 06 01      [ 5]   81 	lda	0x106,x
+   001C 85*01         [ 3]   82 	sta	*(__DPTR+1)
+   001E A0 00         [ 2]   83 	ldy	#0x00
+   0020 B1*00         [ 6]   84 	lda	[__DPTR],y
+   0022 9D 03 01      [ 5]   85 	sta	0x103,x
+   0025 C8            [ 2]   86 	iny
+   0026 B1*00         [ 6]   87 	lda	[__DPTR],y
+   0028 9D 04 01      [ 5]   88 	sta	0x104,x
+   002B BD 03 01      [ 5]   89 	lda	0x103,x
+   002E 18            [ 2]   90 	clc
+   002F 69 01         [ 2]   91 	adc	#0x01
+   0031 9D 01 01      [ 5]   92 	sta	0x101,x
+   0034 BD 04 01      [ 5]   93 	lda	0x104,x
+   0037 69 00         [ 2]   94 	adc	#0x00
+   0039 9D 02 01      [ 5]   95 	sta	0x102,x
+   003C BD 05 01      [ 5]   96 	lda	0x105,x
+   003F 85*00         [ 3]   97 	sta	*(__DPTR+0)
+   0041 BD 06 01      [ 5]   98 	lda	0x106,x
+   0044 85*01         [ 3]   99 	sta	*(__DPTR+1)
+   0046 BD 01 01      [ 5]  100 	lda	0x101,x
+   0049 88            [ 2]  101 	dey
+   004A 91*00         [ 6]  102 	sta	[__DPTR],y
+   004C BD 02 01      [ 5]  103 	lda	0x102,x
+   004F C8            [ 2]  104 	iny
+   0050 91*00         [ 6]  105 	sta	[__DPTR],y
+   0052 BD 03 01      [ 5]  106 	lda	0x103,x
+   0055 85*00         [ 3]  107 	sta	*(__DPTR+0)
+   0057 BD 04 01      [ 5]  108 	lda	0x104,x
+   005A 85*01         [ 3]  109 	sta	*(__DPTR+1)
+   005C BD 07 01      [ 5]  110 	lda	0x107,x
+   005F 88            [ 2]  111 	dey
+   0060 91*00         [ 6]  112 	sta	[__DPTR],y
+                            113 ;	../sprintf.c: 38: }
+   0062 85*00         [ 3]  114 	sta	*(__TEMP+0)
+   0064 68            [ 4]  115 	pla
+   0065 68            [ 4]  116 	pla
+   0066 68            [ 4]  117 	pla
+   0067 68            [ 4]  118 	pla
+   0068 68            [ 4]  119 	pla
+   0069 68            [ 4]  120 	pla
+   006A 68            [ 4]  121 	pla
+   006B A5*00         [ 3]  122 	lda	*(__TEMP+0)
+   006D 60            [ 6]  123 	rts
+                            124 ;------------------------------------------------------------
+                            125 ;Allocation info for local variables in function 'vsprintf'
+                            126 ;------------------------------------------------------------
+                            127 ;format                    Allocated to stack - sp +9
+                            128 ;ap                        Allocated to stack - sp +11
+                            129 ;buf                       Allocated to stack - sp +5
+                            130 ;i                         Allocated to stack - sp +3
+                            131 ;sloc0                     Allocated to stack - sp +1
+                            132 ;------------------------------------------------------------
+                            133 ;	../sprintf.c: 41: vsprintf (char *buf, const char *format, va_list ap)
+                            134 ;	-----------------------------------------
+                            135 ;	 function vsprintf
+                            136 ;	-----------------------------------------
+                            137 ;	Register assignment is optimal.
+                            138 ;	Stack space usage: 6 bytes.
+   006E                     139 _vsprintf:
+   006E 85*00         [ 3]  140 	sta	*(__TEMP+0)
+   0070 8A            [ 2]  141 	txa
+   0071 48            [ 3]  142 	pha
+   0072 A5*00         [ 3]  143 	lda	*(__TEMP+0)
+   0074 48            [ 3]  144 	pha
+   0075 48            [ 3]  145 	pha
+   0076 48            [ 3]  146 	pha
+   0077 48            [ 3]  147 	pha
+   0078 48            [ 3]  148 	pha
+                            149 ;	../sprintf.c: 44: i = _print_format (put_char_to_string, &buf, format, ap);
+   0079 BA            [ 2]  150 	tsx
+   007A 8A            [ 2]  151 	txa
+   007B 18            [ 2]  152 	clc
+   007C 69 05         [ 2]  153 	adc	#0x05
+   007E A2 01         [ 2]  154 	ldx	#0x01
+   0080 48            [ 3]  155 	pha
+   0081 8A            [ 2]  156 	txa
+   0082 BA            [ 2]  157 	tsx
+   0083 9D 03 01      [ 5]  158 	sta	0x103,x
+   0086 68            [ 4]  159 	pla
+   0087 9D 02 01      [ 5]  160 	sta	0x102,x
+   008A BD 0D 01      [ 5]  161 	lda	0x10d, x
+   008D 48            [ 3]  162 	pha
+   008E BD 0C 01      [ 5]  163 	lda	0x10c,x
+   0091 48            [ 3]  164 	pha
+   0092 BD 0B 01      [ 5]  165 	lda	0x10b,x
+   0095 48            [ 3]  166 	pha
+   0096 BD 0A 01      [ 5]  167 	lda	0x10a,x
+   0099 48            [ 3]  168 	pha
+   009A BD 03 01      [ 5]  169 	lda	0x103,x
+   009D 48            [ 3]  170 	pha
+   009E BD 02 01      [ 5]  171 	lda	0x102,x
+   00A1 48            [ 3]  172 	pha
+   00A2 A2s00         [ 2]  173 	ldx	#>(_put_char_to_string)
+   00A4 A9r00         [ 2]  174 	lda	#(_put_char_to_string)
+   00A6 20r00r00      [ 6]  175 	jsr	__print_format
+   00A9 86*00         [ 3]  176 	stx	*(__TEMP+0)
+   00AB BA            [ 2]  177 	tsx
+   00AC 9D 09 01      [ 5]  178 	sta	0x109,x
+   00AF A6*00         [ 3]  179 	ldx	*(__TEMP+0)
+   00B1 8A            [ 2]  180 	txa
+   00B2 BA            [ 2]  181 	tsx
+   00B3 9D 0A 01      [ 5]  182 	sta	0x10a,x
+   00B6 A6*00         [ 3]  183 	ldx	*(__TEMP+0)
+   00B8 85*00         [ 3]  184 	sta	*(__TEMP+0)
+   00BA 68            [ 4]  185 	pla
+   00BB 68            [ 4]  186 	pla
+   00BC 68            [ 4]  187 	pla
+   00BD 68            [ 4]  188 	pla
+   00BE 68            [ 4]  189 	pla
+   00BF 68            [ 4]  190 	pla
+   00C0 A5*00         [ 3]  191 	lda	*(__TEMP+0)
+                            192 ;	../sprintf.c: 45: *buf = 0;
+   00C2 BA            [ 2]  193 	tsx
+   00C3 BD 05 01      [ 5]  194 	lda	0x105,x
+   00C6 85*00         [ 3]  195 	sta	*(__TEMP+0)
+   00C8 BD 06 01      [ 5]  196 	lda	0x106,x
+   00CB AA            [ 2]  197 	tax
+   00CC A5*00         [ 3]  198 	lda	*(__TEMP+0)
+   00CE 85*00         [ 3]  199 	sta	*(__DPTR+0)
+   00D0 86*01         [ 3]  200 	stx	*(__DPTR+1)
+   00D2 A9 00         [ 2]  201 	lda	#0x00
+   00D4 A8            [ 2]  202 	tay
+   00D5 91*00         [ 6]  203 	sta	[__DPTR],y
+                            204 ;	../sprintf.c: 46: return i;
+   00D7 BA            [ 2]  205 	tsx
+   00D8 BD 04 01      [ 5]  206 	lda	0x104,x
+   00DB AA            [ 2]  207 	tax
+   00DC 86*00         [ 3]  208 	stx	*(__TEMP+0)
+   00DE BA            [ 2]  209 	tsx
+   00DF BD 03 01      [ 5]  210 	lda	0x103,x
+   00E2 08            [ 3]  211 	php
+   00E3 A6*00         [ 3]  212 	ldx	*(__TEMP+0)
+   00E5 28            [ 4]  213 	plp
+                            214 ;	../sprintf.c: 47: }
+   00E6 85*00         [ 3]  215 	sta	*(__TEMP+0)
+   00E8 68            [ 4]  216 	pla
+   00E9 68            [ 4]  217 	pla
+   00EA 68            [ 4]  218 	pla
+   00EB 68            [ 4]  219 	pla
+   00EC 68            [ 4]  220 	pla
+   00ED 68            [ 4]  221 	pla
+   00EE A5*00         [ 3]  222 	lda	*(__TEMP+0)
+   00F0 60            [ 6]  223 	rts
+                            224 ;------------------------------------------------------------
+                            225 ;Allocation info for local variables in function 'sprintf'
+                            226 ;------------------------------------------------------------
+                            227 ;buf                       Allocated to stack - sp +9
+                            228 ;format                    Allocated to stack - sp +11
+                            229 ;arg                       Allocated to stack - sp +5
+                            230 ;i                         Allocated to stack - sp +3
+                            231 ;sloc0                     Allocated to stack - sp +1
+                            232 ;------------------------------------------------------------
+                            233 ;	../sprintf.c: 50: sprintf (char *buf, const char *format, ...)
+                            234 ;	-----------------------------------------
+                            235 ;	 function sprintf
+                            236 ;	-----------------------------------------
+                            237 ;	Register assignment is optimal.
+                            238 ;	Stack space usage: 6 bytes.
+   00F1                     239 _sprintf:
+   00F1 48            [ 3]  240 	pha
+   00F2 48            [ 3]  241 	pha
+   00F3 48            [ 3]  242 	pha
+   00F4 48            [ 3]  243 	pha
+   00F5 48            [ 3]  244 	pha
+   00F6 48            [ 3]  245 	pha
+                            246 ;	../sprintf.c: 55: va_start (arg, format);
+   00F7 BA            [ 2]  247 	tsx
+   00F8 8A            [ 2]  248 	txa
+   00F9 18            [ 2]  249 	clc
+   00FA 69 0B         [ 2]  250 	adc	#0x0b
+   00FC A2 01         [ 2]  251 	ldx	#0x01
+   00FE 18            [ 2]  252 	clc
+   00FF 69 02         [ 2]  253 	adc	#0x02
+   0101 86*00         [ 3]  254 	stx	*(__TEMP+0)
+   0103 BA            [ 2]  255 	tsx
+   0104 9D 05 01      [ 5]  256 	sta	0x105,x
+   0107 A2 01         [ 2]  257 	ldx	#0x01
+   0109 8A            [ 2]  258 	txa
+   010A 69 00         [ 2]  259 	adc	#0x00
+   010C 86*00         [ 3]  260 	stx	*(__TEMP+0)
+   010E BA            [ 2]  261 	tsx
+   010F 9D 06 01      [ 5]  262 	sta	0x106,x
+                            263 ;	../sprintf.c: 56: i = _print_format (put_char_to_string, &buf, format, arg);
+   0112 BA            [ 2]  264 	tsx
+   0113 8A            [ 2]  265 	txa
+   0114 18            [ 2]  266 	clc
+   0115 69 09         [ 2]  267 	adc	#0x09
+   0117 A2 01         [ 2]  268 	ldx	#0x01
+   0119 48            [ 3]  269 	pha
+   011A 8A            [ 2]  270 	txa
+   011B BA            [ 2]  271 	tsx
+   011C 9D 03 01      [ 5]  272 	sta	0x103,x
+   011F 68            [ 4]  273 	pla
+   0120 9D 02 01      [ 5]  274 	sta	0x102,x
+   0123 BD 07 01      [ 5]  275 	lda	0x107, x
+   0126 48            [ 3]  276 	pha
+   0127 BD 06 01      [ 5]  277 	lda	0x106,x
+   012A 48            [ 3]  278 	pha
+   012B BD 0D 01      [ 5]  279 	lda	0x10d,x
+   012E 48            [ 3]  280 	pha
+   012F BD 0C 01      [ 5]  281 	lda	0x10c,x
+   0132 48            [ 3]  282 	pha
+   0133 BD 03 01      [ 5]  283 	lda	0x103,x
+   0136 48            [ 3]  284 	pha
+   0137 BD 02 01      [ 5]  285 	lda	0x102,x
+   013A 48            [ 3]  286 	pha
+   013B A2s00         [ 2]  287 	ldx	#>(_put_char_to_string)
+   013D A9r00         [ 2]  288 	lda	#(_put_char_to_string)
+   013F 20r00r00      [ 6]  289 	jsr	__print_format
+   0142 86*00         [ 3]  290 	stx	*(__TEMP+0)
+   0144 BA            [ 2]  291 	tsx
+   0145 9D 09 01      [ 5]  292 	sta	0x109,x
+   0148 A6*00         [ 3]  293 	ldx	*(__TEMP+0)
+   014A 8A            [ 2]  294 	txa
+   014B BA            [ 2]  295 	tsx
+   014C 9D 0A 01      [ 5]  296 	sta	0x10a,x
+   014F A6*00         [ 3]  297 	ldx	*(__TEMP+0)
+   0151 85*00         [ 3]  298 	sta	*(__TEMP+0)
+   0153 68            [ 4]  299 	pla
+   0154 68            [ 4]  300 	pla
+   0155 68            [ 4]  301 	pla
+   0156 68            [ 4]  302 	pla
+   0157 68            [ 4]  303 	pla
+   0158 68            [ 4]  304 	pla
+   0159 A5*00         [ 3]  305 	lda	*(__TEMP+0)
+                            306 ;	../sprintf.c: 57: *buf = 0;
+   015B BA            [ 2]  307 	tsx
+   015C BD 09 01      [ 5]  308 	lda	0x109,x
+   015F 85*00         [ 3]  309 	sta	*(__TEMP+0)
+   0161 BD 0A 01      [ 5]  310 	lda	0x10a,x
+   0164 AA            [ 2]  311 	tax
+   0165 A5*00         [ 3]  312 	lda	*(__TEMP+0)
+   0167 85*00         [ 3]  313 	sta	*(__DPTR+0)
+   0169 86*01         [ 3]  314 	stx	*(__DPTR+1)
+   016B A9 00         [ 2]  315 	lda	#0x00
+   016D A8            [ 2]  316 	tay
+   016E 91*00         [ 6]  317 	sta	[__DPTR],y
+                            318 ;	../sprintf.c: 60: return i;
+   0170 BA            [ 2]  319 	tsx
+   0171 BD 04 01      [ 5]  320 	lda	0x104,x
+   0174 AA            [ 2]  321 	tax
+   0175 86*00         [ 3]  322 	stx	*(__TEMP+0)
+   0177 BA            [ 2]  323 	tsx
+   0178 BD 03 01      [ 5]  324 	lda	0x103,x
+   017B 08            [ 3]  325 	php
+   017C A6*00         [ 3]  326 	ldx	*(__TEMP+0)
+   017E 28            [ 4]  327 	plp
+                            328 ;	../sprintf.c: 61: }
+   017F 85*00         [ 3]  329 	sta	*(__TEMP+0)
+   0181 68            [ 4]  330 	pla
+   0182 68            [ 4]  331 	pla
+   0183 68            [ 4]  332 	pla
+   0184 68            [ 4]  333 	pla
+   0185 68            [ 4]  334 	pla
+   0186 68            [ 4]  335 	pla
+   0187 A5*00         [ 3]  336 	lda	*(__TEMP+0)
+   0189 60            [ 6]  337 	rts
+                            338 	.area CODE
+                            339 	.area RODATA
+                            340 	.area XINIT
+                            341 	.area CABS    (ABS)

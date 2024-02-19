@@ -1,0 +1,400 @@
+                              1 ;--------------------------------------------------------
+                              2 ; File Created by SDCC : free open source ISO C Compiler 
+                              3 ; Version 4.2.14 #0 (Linux)
+                              4 ;--------------------------------------------------------
+                              5 	.module qsort
+                              6 	.optsdcc -mmos6502
+                              7 	
+                              8 ;--------------------------------------------------------
+                              9 ; Public variables in this module
+                             10 ;--------------------------------------------------------
+                             11 	.globl _qsort
+                             12 ;--------------------------------------------------------
+                             13 ; ZP ram data
+                             14 ;--------------------------------------------------------
+                             15 	.area ZP      (PAG)
+                             16 ;--------------------------------------------------------
+                             17 ; overlayable items in ram
+                             18 ;--------------------------------------------------------
+                             19 ;--------------------------------------------------------
+                             20 ; uninitialized external ram data
+                             21 ;--------------------------------------------------------
+                             22 	.area BSS
+                             23 ;--------------------------------------------------------
+                             24 ; absolute external ram data
+                             25 ;--------------------------------------------------------
+                             26 	.area DABS    (ABS)
+                             27 ;--------------------------------------------------------
+                             28 ; initialized external ram data
+                             29 ;--------------------------------------------------------
+                             30 	.area DATA
+                             31 ;--------------------------------------------------------
+                             32 ; global & static initialisations
+                             33 ;--------------------------------------------------------
+                             34 	.area _CODE
+                             35 	.area GSINIT
+                             36 	.area GSFINAL
+                             37 	.area GSINIT
+                             38 ;--------------------------------------------------------
+                             39 ; Home
+                             40 ;--------------------------------------------------------
+                             41 	.area _CODE
+                             42 	.area _CODE
+                             43 ;--------------------------------------------------------
+                             44 ; code
+                             45 ;--------------------------------------------------------
+                             46 	.area CODE
+                             47 ;------------------------------------------------------------
+                             48 ;Allocation info for local variables in function 'swap'
+                             49 ;------------------------------------------------------------
+                             50 ;src                       Allocated to stack - sp +12
+                             51 ;n                         Allocated to stack - sp +14
+                             52 ;dst                       Allocated to registers a x 
+                             53 ;d                         Allocated to registers 
+                             54 ;s                         Allocated to registers 
+                             55 ;tmp                       Allocated to stack - sp +9
+                             56 ;sloc0                     Allocated to stack - sp +7
+                             57 ;sloc1                     Allocated to stack - sp +5
+                             58 ;sloc2                     Allocated to stack - sp +3
+                             59 ;sloc3                     Allocated to stack - sp +1
+                             60 ;------------------------------------------------------------
+                             61 ;	../qsort.c: 33: static void swap(void *restrict dst, void *restrict src, size_t n)
+                             62 ;	-----------------------------------------
+                             63 ;	 function swap
+                             64 ;	-----------------------------------------
+                             65 ;	Register assignment is optimal.
+                             66 ;	Stack space usage: 9 bytes.
+   0000                      67 _swap:
+   0000 85*00         [ 3]   68 	sta	*(__TEMP+0)
+   0002 86*01         [ 3]   69 	stx	*(__TEMP+1)
+   0004 BA            [ 2]   70 	tsx
+   0005 8A            [ 2]   71 	txa
+   0006 18            [ 2]   72 	clc
+   0007 69 F7         [ 2]   73 	adc	#0xf7
+   0009 AA            [ 2]   74 	tax
+   000A 9A            [ 2]   75 	txs
+   000B A6*01         [ 3]   76 	ldx	*(__TEMP+1)
+   000D A5*00         [ 3]   77 	lda	*(__TEMP+0)
+                             78 ;	../qsort.c: 35: unsigned char *restrict d = dst;
+   000F 48            [ 3]   79 	pha
+   0010 8A            [ 2]   80 	txa
+   0011 BA            [ 2]   81 	tsx
+   0012 9D 09 01      [ 5]   82 	sta	0x109,x
+   0015 68            [ 4]   83 	pla
+   0016 9D 08 01      [ 5]   84 	sta	0x108,x
+                             85 ;	../qsort.c: 36: unsigned char *restrict s = src;
+   0019 BD 0D 01      [ 5]   86 	lda	0x10d, x
+   001C 9D 06 01      [ 5]   87 	sta	0x106,x
+   001F BD 0E 01      [ 5]   88 	lda	0x10e,x
+   0022 9D 07 01      [ 5]   89 	sta	0x107,x
+                             90 ;	../qsort.c: 38: while(n--)
+   0025 BD 0F 01      [ 5]   91 	lda	0x10f,x
+   0028 9D 04 01      [ 5]   92 	sta	0x104,x
+   002B BD 10 01      [ 5]   93 	lda	0x110,x
+   002E 9D 05 01      [ 5]   94 	sta	0x105,x
+   0031                      95 00101$:
+   0031 BA            [ 2]   96 	tsx
+   0032 BD 03 01      [ 5]   97 	lda	0x103,x
+   0035 9D 01 01      [ 5]   98 	sta	0x101,x
+   0038 BD 04 01      [ 5]   99 	lda	0x104,x
+   003B 9D 02 01      [ 5]  100 	sta	0x102,x
+   003E BD 03 01      [ 5]  101 	lda	0x103,x
+   0041 38            [ 2]  102 	sec
+   0042 E9 01         [ 2]  103 	sbc	#0x01
+   0044 9D 03 01      [ 5]  104 	sta	0x103,x
+   0047 BD 04 01      [ 5]  105 	lda	0x104,x
+   004A E9 00         [ 2]  106 	sbc	#0x00
+   004C 9D 04 01      [ 5]  107 	sta	0x104,x
+   004F BD 01 01      [ 5]  108 	lda	0x101,x
+   0052 1D 02 01      [ 5]  109 	ora	0x102,x
+   0055 F0 61         [ 4]  110 	beq	00104$
+                            111 ;	../qsort.c: 40: unsigned char tmp = *d;
+   0057 BD 07 01      [ 5]  112 	lda	0x107,x
+   005A 85*00         [ 3]  113 	sta	*(__DPTR+0)
+   005C BD 08 01      [ 5]  114 	lda	0x108,x
+   005F 85*01         [ 3]  115 	sta	*(__DPTR+1)
+   0061 A0 00         [ 2]  116 	ldy	#0x00
+   0063 B1*00         [ 6]  117 	lda	[__DPTR],y
+   0065 9D 09 01      [ 5]  118 	sta	0x109,x
+                            119 ;	../qsort.c: 41: *d = *s;
+   0068 BD 05 01      [ 5]  120 	lda	0x105,x
+   006B 85*00         [ 3]  121 	sta	*(__DPTR+0)
+   006D BD 06 01      [ 5]  122 	lda	0x106,x
+   0070 85*01         [ 3]  123 	sta	*(__DPTR+1)
+   0072 B1*00         [ 6]  124 	lda	[__DPTR],y
+   0074 85*00         [ 3]  125 	sta	*(__TEMP+0)
+   0076 BD 07 01      [ 5]  126 	lda	0x107,x
+   0079 85*00         [ 3]  127 	sta	*(__DPTR+0)
+   007B BD 08 01      [ 5]  128 	lda	0x108,x
+   007E 85*01         [ 3]  129 	sta	*(__DPTR+1)
+   0080 A5*00         [ 3]  130 	lda	*(__TEMP+0)
+   0082 91*00         [ 6]  131 	sta	[__DPTR],y
+                            132 ;	../qsort.c: 42: *s = tmp;
+   0084 BD 05 01      [ 5]  133 	lda	0x105,x
+   0087 85*00         [ 3]  134 	sta	*(__DPTR+0)
+   0089 BD 06 01      [ 5]  135 	lda	0x106,x
+   008C 85*01         [ 3]  136 	sta	*(__DPTR+1)
+   008E BD 09 01      [ 5]  137 	lda	0x109,x
+   0091 91*00         [ 6]  138 	sta	[__DPTR],y
+                            139 ;	../qsort.c: 43: d++;
+   0093 BD 07 01      [ 5]  140 	lda	0x107,x
+   0096 18            [ 2]  141 	clc
+   0097 69 01         [ 2]  142 	adc	#0x01
+   0099 9D 07 01      [ 5]  143 	sta	0x107,x
+   009C BD 08 01      [ 5]  144 	lda	0x108,x
+   009F 69 00         [ 2]  145 	adc	#0x00
+   00A1 9D 08 01      [ 5]  146 	sta	0x108,x
+                            147 ;	../qsort.c: 44: s++;
+   00A4 BD 05 01      [ 5]  148 	lda	0x105,x
+   00A7 18            [ 2]  149 	clc
+   00A8 69 01         [ 2]  150 	adc	#0x01
+   00AA 9D 05 01      [ 5]  151 	sta	0x105,x
+   00AD BD 06 01      [ 5]  152 	lda	0x106,x
+   00B0 69 00         [ 2]  153 	adc	#0x00
+   00B2 9D 06 01      [ 5]  154 	sta	0x106,x
+   00B5 4Cr31r00      [ 3]  155 	jmp	00101$
+   00B8                     156 00104$:
+                            157 ;	../qsort.c: 46: }
+   00B8 85*00         [ 3]  158 	sta	*(__TEMP+0)
+   00BA 86*01         [ 3]  159 	stx	*(__TEMP+1)
+   00BC BA            [ 2]  160 	tsx
+   00BD 8A            [ 2]  161 	txa
+   00BE 18            [ 2]  162 	clc
+   00BF 69 09         [ 2]  163 	adc	#0x09
+   00C1 AA            [ 2]  164 	tax
+   00C2 9A            [ 2]  165 	txs
+   00C3 A6*01         [ 3]  166 	ldx	*(__TEMP+1)
+   00C5 A5*00         [ 3]  167 	lda	*(__TEMP+0)
+   00C7 60            [ 6]  168 	rts
+                            169 ;------------------------------------------------------------
+                            170 ;Allocation info for local variables in function 'qsort'
+                            171 ;------------------------------------------------------------
+                            172 ;nmemb                     Allocated to stack - sp +19
+                            173 ;size                      Allocated to stack - sp +21
+                            174 ;compar                    Allocated to stack - sp +23
+                            175 ;base                      Allocated to registers a x 
+                            176 ;b                         Allocated to stack - sp +15
+                            177 ;i                         Allocated to stack - sp +13
+                            178 ;j                         Allocated to stack - sp +11
+                            179 ;sloc0                     Allocated to stack - sp +9
+                            180 ;sloc1                     Allocated to stack - sp +7
+                            181 ;sloc2                     Allocated to stack - sp +5
+                            182 ;sloc3                     Allocated to stack - sp +3
+                            183 ;sloc4                     Allocated to stack - sp +1
+                            184 ;------------------------------------------------------------
+                            185 ;	../qsort.c: 48: void qsort(void *base, size_t nmemb, size_t size, int (*compar)(const void *, const void *) __reentrant)
+                            186 ;	-----------------------------------------
+                            187 ;	 function qsort
+                            188 ;	-----------------------------------------
+                            189 ;	Register assignment is optimal.
+                            190 ;	Stack space usage: 16 bytes.
+   00C8                     191 _qsort:
+   00C8 85*00         [ 3]  192 	sta	*(__TEMP+0)
+   00CA 86*01         [ 3]  193 	stx	*(__TEMP+1)
+   00CC BA            [ 2]  194 	tsx
+   00CD 8A            [ 2]  195 	txa
+   00CE 18            [ 2]  196 	clc
+   00CF 69 F0         [ 2]  197 	adc	#0xf0
+   00D1 AA            [ 2]  198 	tax
+   00D2 9A            [ 2]  199 	txs
+   00D3 A6*01         [ 3]  200 	ldx	*(__TEMP+1)
+   00D5 A5*00         [ 3]  201 	lda	*(__TEMP+0)
+                            202 ;	../qsort.c: 50: unsigned char *b = base;
+   00D7 48            [ 3]  203 	pha
+   00D8 8A            [ 2]  204 	txa
+   00D9 BA            [ 2]  205 	tsx
+   00DA 9D 0B 01      [ 5]  206 	sta	0x10b,x
+   00DD 68            [ 4]  207 	pla
+   00DE 9D 0A 01      [ 5]  208 	sta	0x10a, x
+   00E1 9D 10 01      [ 5]  209 	sta	0x110,x
+   00E4 BD 0B 01      [ 5]  210 	lda	0x10b,x
+   00E7 9D 11 01      [ 5]  211 	sta	0x111,x
+                            212 ;	../qsort.c: 52: if(nmemb <= 1)
+   00EA A9 01         [ 2]  213 	lda	#0x01
+   00EC 38            [ 2]  214 	sec
+   00ED FD 14 01      [ 5]  215 	sbc	0x114,x
+   00F0 A9 00         [ 2]  216 	lda	#0x00
+   00F2 FD 15 01      [ 5]  217 	sbc	0x115,x
+   00F5 90 03         [ 4]  218 	bcc	00102$
+                            219 ;	../qsort.c: 53: return;
+   00F7 4Cr4Br02      [ 3]  220 	jmp	00112$
+   00FA                     221 00102$:
+                            222 ;	../qsort.c: 55: for(unsigned char *i = base; i < b + nmemb * size; i += size)
+   00FA BA            [ 2]  223 	tsx
+   00FB BD 09 01      [ 5]  224 	lda	0x109,x
+   00FE 9D 0D 01      [ 5]  225 	sta	0x10d,x
+   0101 BD 0A 01      [ 5]  226 	lda	0x10a,x
+   0104 9D 0E 01      [ 5]  227 	sta	0x10e,x
+   0107 BD 15 01      [ 5]  228 	lda	0x115,x
+   010A 9D 09 01      [ 5]  229 	sta	0x109,x
+   010D BD 16 01      [ 5]  230 	lda	0x116,x
+   0110 9D 0A 01      [ 5]  231 	sta	0x10a, x
+   0113 48            [ 3]  232 	pha
+   0114 BD 09 01      [ 5]  233 	lda	0x109,x
+   0117 48            [ 3]  234 	pha
+   0118 BD 14 01      [ 5]  235 	lda	0x114,x
+   011B AA            [ 2]  236 	tax
+   011C 86*00         [ 3]  237 	stx	*(__TEMP+0)
+   011E BA            [ 2]  238 	tsx
+   011F BD 15 01      [ 5]  239 	lda	0x115,x
+   0122 08            [ 3]  240 	php
+   0123 A6*00         [ 3]  241 	ldx	*(__TEMP+0)
+   0125 28            [ 4]  242 	plp
+   0126 20r00r00      [ 6]  243 	jsr	__mulint
+   0129 86*00         [ 3]  244 	stx	*(__TEMP+0)
+   012B BA            [ 2]  245 	tsx
+   012C 9D 09 01      [ 5]  246 	sta	0x109,x
+   012F A6*00         [ 3]  247 	ldx	*(__TEMP+0)
+   0131 8A            [ 2]  248 	txa
+   0132 BA            [ 2]  249 	tsx
+   0133 9D 0A 01      [ 5]  250 	sta	0x10a,x
+   0136 A6*00         [ 3]  251 	ldx	*(__TEMP+0)
+   0138 85*00         [ 3]  252 	sta	*(__TEMP+0)
+   013A 68            [ 4]  253 	pla
+   013B 68            [ 4]  254 	pla
+   013C A5*00         [ 3]  255 	lda	*(__TEMP+0)
+   013E BA            [ 2]  256 	tsx
+   013F BD 0F 01      [ 5]  257 	lda	0x10f,x
+   0142 18            [ 2]  258 	clc
+   0143 7D 07 01      [ 5]  259 	adc	0x107,x
+   0146 9D 07 01      [ 5]  260 	sta	0x107,x
+   0149 BD 10 01      [ 5]  261 	lda	0x110,x
+   014C 7D 08 01      [ 5]  262 	adc	0x108,x
+   014F 9D 08 01      [ 5]  263 	sta	0x108,x
+   0152                     264 00110$:
+   0152 BA            [ 2]  265 	tsx
+   0153 BD 0D 01      [ 5]  266 	lda	0x10d,x
+   0156 38            [ 2]  267 	sec
+   0157 FD 07 01      [ 5]  268 	sbc	0x107,x
+   015A BD 0E 01      [ 5]  269 	lda	0x10e,x
+   015D FD 08 01      [ 5]  270 	sbc	0x108,x
+   0160 90 03         [ 4]  271 	bcc	00139$
+   0162 4Cr4Br02      [ 3]  272 	jmp	00112$
+   0165                     273 00139$:
+                            274 ;	../qsort.c: 57: for(unsigned char *j = i; (j > b) && (*compar)(j, j - size) < 0; j -= size)
+   0165 BD 0D 01      [ 5]  275 	lda	0x10d,x
+   0168 9D 0B 01      [ 5]  276 	sta	0x10b,x
+   016B BD 0E 01      [ 5]  277 	lda	0x10e,x
+   016E 9D 0C 01      [ 5]  278 	sta	0x10c,x
+   0171                     279 00107$:
+   0171 BA            [ 2]  280 	tsx
+   0172 BD 0F 01      [ 5]  281 	lda	0x10f,x
+   0175 38            [ 2]  282 	sec
+   0176 FD 0B 01      [ 5]  283 	sbc	0x10b,x
+   0179 BD 10 01      [ 5]  284 	lda	0x110,x
+   017C FD 0C 01      [ 5]  285 	sbc	0x10c,x
+   017F 90 03         [ 4]  286 	bcc	00140$
+   0181 4Cr34r02      [ 3]  287 	jmp	00111$
+   0184                     288 00140$:
+   0184 BD 0B 01      [ 5]  289 	lda	0x10b,x
+   0187 38            [ 2]  290 	sec
+   0188 FD 09 01      [ 5]  291 	sbc	0x109,x
+   018B 9D 05 01      [ 5]  292 	sta	0x105,x
+   018E BD 0C 01      [ 5]  293 	lda	0x10c,x
+   0191 FD 0A 01      [ 5]  294 	sbc	0x10a,x
+   0194 9D 06 01      [ 5]  295 	sta	0x106,x
+   0197 BD 05 01      [ 5]  296 	lda	0x105,x
+   019A 9D 03 01      [ 5]  297 	sta	0x103,x
+   019D BD 06 01      [ 5]  298 	lda	0x106,x
+   01A0 9D 04 01      [ 5]  299 	sta	0x104,x
+   01A3 BD 0B 01      [ 5]  300 	lda	0x10b,x
+   01A6 9D 01 01      [ 5]  301 	sta	0x101,x
+   01A9 BD 0C 01      [ 5]  302 	lda	0x10c,x
+   01AC 9D 02 01      [ 5]  303 	sta	0x102,x
+   01AF BD 04 01      [ 5]  304 	lda	0x104,x
+   01B2 48            [ 3]  305 	pha
+   01B3 BD 03 01      [ 5]  306 	lda	0x103,x
+   01B6 48            [ 3]  307 	pha
+   01B7 BD 17 01      [ 5]  308 	lda	0x117,x
+   01BA 85*00         [ 3]  309 	sta	*(__TEMP+0)
+   01BC BD 18 01      [ 5]  310 	lda	0x118,x
+   01BF 85*01         [ 3]  311 	sta	*(__TEMP+1)
+   01C1 BD 02 01      [ 5]  312 	lda	0x102,x
+   01C4 AA            [ 2]  313 	tax
+   01C5 86*02         [ 3]  314 	stx	*(__TEMP+2)
+   01C7 BA            [ 2]  315 	tsx
+   01C8 BD 03 01      [ 5]  316 	lda	0x103,x
+   01CB 08            [ 3]  317 	php
+   01CC A6*02         [ 3]  318 	ldx	*(__TEMP+2)
+   01CE 28            [ 4]  319 	plp
+   01CF 20r00r00      [ 6]  320 	jsr	__sdcc_indirect_jsr
+   01D2 85*00         [ 3]  321 	sta	*(__TEMP+0)
+   01D4 68            [ 4]  322 	pla
+   01D5 68            [ 4]  323 	pla
+   01D6 8A            [ 2]  324 	txa
+   01D7 38            [ 2]  325 	sec
+   01D8 E9 00         [ 2]  326 	sbc	#0x00
+   01DA 50 04         [ 4]  327 	bvc	00142$
+   01DC 10 04         [ 4]  328 	bpl	00141$
+   01DE 30 54         [ 4]  329 	bmi	00111$
+   01E0                     330 00142$:
+   01E0 10 52         [ 4]  331 	bpl	00111$
+   01E2                     332 00141$:
+                            333 ;	../qsort.c: 58: swap(j, j - size, size);
+   01E2 BA            [ 2]  334 	tsx
+   01E3 BD 05 01      [ 5]  335 	lda	0x105,x
+   01E6 9D 01 01      [ 5]  336 	sta	0x101,x
+   01E9 BD 06 01      [ 5]  337 	lda	0x106,x
+   01EC 9D 02 01      [ 5]  338 	sta	0x102,x
+   01EF BD 0B 01      [ 5]  339 	lda	0x10b,x
+   01F2 9D 03 01      [ 5]  340 	sta	0x103,x
+   01F5 BD 0C 01      [ 5]  341 	lda	0x10c,x
+   01F8 9D 04 01      [ 5]  342 	sta	0x104,x
+   01FB BD 0A 01      [ 5]  343 	lda	0x10a,x
+   01FE 48            [ 3]  344 	pha
+   01FF BD 09 01      [ 5]  345 	lda	0x109,x
+   0202 48            [ 3]  346 	pha
+   0203 BD 02 01      [ 5]  347 	lda	0x102,x
+   0206 48            [ 3]  348 	pha
+   0207 BD 01 01      [ 5]  349 	lda	0x101,x
+   020A 48            [ 3]  350 	pha
+   020B BD 04 01      [ 5]  351 	lda	0x104,x
+   020E AA            [ 2]  352 	tax
+   020F 86*00         [ 3]  353 	stx	*(__TEMP+0)
+   0211 BA            [ 2]  354 	tsx
+   0212 BD 07 01      [ 5]  355 	lda	0x107,x
+   0215 08            [ 3]  356 	php
+   0216 A6*00         [ 3]  357 	ldx	*(__TEMP+0)
+   0218 28            [ 4]  358 	plp
+   0219 20r00r00      [ 6]  359 	jsr	_swap
+   021C 85*00         [ 3]  360 	sta	*(__TEMP+0)
+   021E 68            [ 4]  361 	pla
+   021F 68            [ 4]  362 	pla
+   0220 68            [ 4]  363 	pla
+   0221 68            [ 4]  364 	pla
+   0222 A5*00         [ 3]  365 	lda	*(__TEMP+0)
+                            366 ;	../qsort.c: 57: for(unsigned char *j = i; (j > b) && (*compar)(j, j - size) < 0; j -= size)
+   0224 BA            [ 2]  367 	tsx
+   0225 BD 05 01      [ 5]  368 	lda	0x105,x
+   0228 9D 0B 01      [ 5]  369 	sta	0x10b,x
+   022B BD 06 01      [ 5]  370 	lda	0x106,x
+   022E 9D 0C 01      [ 5]  371 	sta	0x10c,x
+   0231 4Cr71r01      [ 3]  372 	jmp	00107$
+   0234                     373 00111$:
+                            374 ;	../qsort.c: 55: for(unsigned char *i = base; i < b + nmemb * size; i += size)
+   0234 BA            [ 2]  375 	tsx
+   0235 BD 0D 01      [ 5]  376 	lda	0x10d,x
+   0238 18            [ 2]  377 	clc
+   0239 7D 09 01      [ 5]  378 	adc	0x109,x
+   023C 9D 0D 01      [ 5]  379 	sta	0x10d,x
+   023F BD 0E 01      [ 5]  380 	lda	0x10e,x
+   0242 7D 0A 01      [ 5]  381 	adc	0x10a,x
+   0245 9D 0E 01      [ 5]  382 	sta	0x10e,x
+   0248 4Cr52r01      [ 3]  383 	jmp	00110$
+   024B                     384 00112$:
+                            385 ;	../qsort.c: 60: }
+   024B 85*00         [ 3]  386 	sta	*(__TEMP+0)
+   024D 86*01         [ 3]  387 	stx	*(__TEMP+1)
+   024F BA            [ 2]  388 	tsx
+   0250 8A            [ 2]  389 	txa
+   0251 18            [ 2]  390 	clc
+   0252 69 10         [ 2]  391 	adc	#0x10
+   0254 AA            [ 2]  392 	tax
+   0255 9A            [ 2]  393 	txs
+   0256 A6*01         [ 3]  394 	ldx	*(__TEMP+1)
+   0258 A5*00         [ 3]  395 	lda	*(__TEMP+0)
+   025A 60            [ 6]  396 	rts
+                            397 	.area CODE
+                            398 	.area RODATA
+                            399 	.area XINIT
+                            400 	.area CABS    (ABS)

@@ -1,0 +1,790 @@
+                              1 ;--------------------------------------------------------
+                              2 ; File Created by SDCC : free open source ISO C Compiler 
+                              3 ; Version 4.2.14 #0 (Linux)
+                              4 ;--------------------------------------------------------
+                              5 	.module realloc
+                              6 	.optsdcc -mmos6502
+                              7 	
+                              8 ;--------------------------------------------------------
+                              9 ; Public variables in this module
+                             10 ;--------------------------------------------------------
+                             11 	.globl ___memcpy
+                             12 	.globl _memmove
+                             13 	.globl _free
+                             14 	.globl _malloc
+                             15 	.globl _realloc
+                             16 ;--------------------------------------------------------
+                             17 ; ZP ram data
+                             18 ;--------------------------------------------------------
+                             19 	.area ZP      (PAG)
+                             20 ;--------------------------------------------------------
+                             21 ; overlayable items in ram
+                             22 ;--------------------------------------------------------
+                             23 ;--------------------------------------------------------
+                             24 ; uninitialized external ram data
+                             25 ;--------------------------------------------------------
+                             26 	.area BSS
+                             27 ;--------------------------------------------------------
+                             28 ; absolute external ram data
+                             29 ;--------------------------------------------------------
+                             30 	.area DABS    (ABS)
+                             31 ;--------------------------------------------------------
+                             32 ; initialized external ram data
+                             33 ;--------------------------------------------------------
+                             34 	.area DATA
+                             35 ;--------------------------------------------------------
+                             36 ; global & static initialisations
+                             37 ;--------------------------------------------------------
+                             38 	.area _CODE
+                             39 	.area GSINIT
+                             40 	.area GSFINAL
+                             41 	.area GSINIT
+                             42 ;--------------------------------------------------------
+                             43 ; Home
+                             44 ;--------------------------------------------------------
+                             45 	.area _CODE
+                             46 	.area _CODE
+                             47 ;--------------------------------------------------------
+                             48 ; code
+                             49 ;--------------------------------------------------------
+                             50 	.area CODE
+                             51 ;------------------------------------------------------------
+                             52 ;Allocation info for local variables in function 'realloc'
+                             53 ;------------------------------------------------------------
+                             54 ;size                      Allocated to stack - sp +33
+                             55 ;ptr                       Allocated to stack - sp +29
+                             56 ;ret                       Allocated to stack - sp +1
+                             57 ;h                         Allocated to stack - sp +27
+                             58 ;next_free                 Allocated to stack - sp +25
+                             59 ;prev_free                 Allocated to stack - sp +23
+                             60 ;f                         Allocated to stack - sp +21
+                             61 ;pf                        Allocated to stack - sp +19
+                             62 ;blocksize                 Allocated to stack - sp +17
+                             63 ;oldblocksize              Allocated to stack - sp +15
+                             64 ;maxblocksize              Allocated to stack - sp +13
+                             65 ;newheader                 Allocated to stack - sp +11
+                             66 ;oldsize                   Allocated to stack - sp +9
+                             67 ;sloc0                     Allocated to stack - sp +7
+                             68 ;sloc1                     Allocated to stack - sp +5
+                             69 ;sloc2                     Allocated to stack - sp +3
+                             70 ;sloc3                     Allocated to stack - sp +1
+                             71 ;------------------------------------------------------------
+                             72 ;	../realloc.c: 60: void *realloc(void *ptr, size_t size)
+                             73 ;	-----------------------------------------
+                             74 ;	 function realloc
+                             75 ;	-----------------------------------------
+                             76 ;	Register assignment might be sub-optimal.
+                             77 ;	Stack space usage: 30 bytes.
+   0000                      78 _realloc:
+   0000 85*00         [ 3]   79 	sta	*(__TEMP+0)
+   0002 8A            [ 2]   80 	txa
+   0003 48            [ 3]   81 	pha
+   0004 A5*00         [ 3]   82 	lda	*(__TEMP+0)
+   0006 48            [ 3]   83 	pha
+   0007 86*01         [ 3]   84 	stx	*(__TEMP+1)
+   0009 BA            [ 2]   85 	tsx
+   000A 8A            [ 2]   86 	txa
+   000B 18            [ 2]   87 	clc
+   000C 69 E4         [ 2]   88 	adc	#0xe4
+   000E AA            [ 2]   89 	tax
+   000F 9A            [ 2]   90 	txs
+   0010 A6*01         [ 3]   91 	ldx	*(__TEMP+1)
+   0012 A5*00         [ 3]   92 	lda	*(__TEMP+0)
+                             93 ;	../realloc.c: 73: if(!ptr)
+   0014 BA            [ 2]   94 	tsx
+   0015 BD 1D 01      [ 5]   95 	lda	0x11d,x
+   0018 1D 1E 01      [ 5]   96 	ora	0x11e,x
+   001B D0 14         [ 4]   97 	bne	00102$
+                             98 ;	../realloc.c: 74: return(malloc(size));
+   001D BD 22 01      [ 5]   99 	lda	0x122,x
+   0020 AA            [ 2]  100 	tax
+   0021 86*00         [ 3]  101 	stx	*(__TEMP+0)
+   0023 BA            [ 2]  102 	tsx
+   0024 BD 21 01      [ 5]  103 	lda	0x121,x
+   0027 08            [ 3]  104 	php
+   0028 A6*00         [ 3]  105 	ldx	*(__TEMP+0)
+   002A 28            [ 4]  106 	plp
+   002B 20r00r00      [ 6]  107 	jsr	_malloc
+   002E 4Cr94r05      [ 3]  108 	jmp	00131$
+   0031                     109 00102$:
+                            110 ;	../realloc.c: 76: if(!size)
+   0031 BA            [ 2]  111 	tsx
+   0032 BD 21 01      [ 5]  112 	lda	0x121,x
+   0035 1D 22 01      [ 5]  113 	ora	0x122,x
+   0038 D0 17         [ 4]  114 	bne	00104$
+                            115 ;	../realloc.c: 78: free(ptr);
+   003A BD 1E 01      [ 5]  116 	lda	0x11e,x
+   003D AA            [ 2]  117 	tax
+   003E 86*00         [ 3]  118 	stx	*(__TEMP+0)
+   0040 BA            [ 2]  119 	tsx
+   0041 BD 1D 01      [ 5]  120 	lda	0x11d,x
+   0044 08            [ 3]  121 	php
+   0045 A6*00         [ 3]  122 	ldx	*(__TEMP+0)
+   0047 28            [ 4]  123 	plp
+   0048 20r00r00      [ 6]  124 	jsr	_free
+                            125 ;	../realloc.c: 79: return(0);
+   004B A9 00         [ 2]  126 	lda	#0x00
+   004D AA            [ 2]  127 	tax
+   004E 4Cr94r05      [ 3]  128 	jmp	00131$
+   0051                     129 00104$:
+                            130 ;	../realloc.c: 82: prev_free = 0, pf = 0;
+   0051 BA            [ 2]  131 	tsx
+   0052 A9 00         [ 2]  132 	lda	#0x00
+   0054 9D 17 01      [ 5]  133 	sta	0x117,x
+   0057 9D 18 01      [ 5]  134 	sta	0x118,x
+   005A 9D 13 01      [ 5]  135 	sta	0x113,x
+   005D 9D 14 01      [ 5]  136 	sta	0x114,x
+                            137 ;	../realloc.c: 83: for(h = __sdcc_heap_free, f = &__sdcc_heap_free; h && h < ptr; prev_free = h, pf = f, f = &(h->next_free), h = h->next_free); // Find adjacent blocks in free list
+   0060 ADr00r00      [ 4]  138 	lda	___sdcc_heap_free
+   0063 9D 07 01      [ 5]  139 	sta	0x107,x
+   0066 ADr01r00      [ 4]  140 	lda	(___sdcc_heap_free + 1)
+   0069 9D 08 01      [ 5]  141 	sta	0x108,x
+   006C A9r00         [ 2]  142 	lda	#___sdcc_heap_free
+   006E 9D 05 01      [ 5]  143 	sta	0x105,x
+   0071 A9s00         [ 2]  144 	lda	#>___sdcc_heap_free
+   0073 9D 06 01      [ 5]  145 	sta	0x106,x
+   0076                     146 00129$:
+   0076 BA            [ 2]  147 	tsx
+   0077 BD 07 01      [ 5]  148 	lda	0x107,x
+   007A 1D 08 01      [ 5]  149 	ora	0x108,x
+   007D F0 6A         [ 4]  150 	beq	00105$
+   007F BD 1D 01      [ 5]  151 	lda	0x11d,x
+   0082 9D 03 01      [ 5]  152 	sta	0x103,x
+   0085 BD 1E 01      [ 5]  153 	lda	0x11e,x
+   0088 9D 04 01      [ 5]  154 	sta	0x104,x
+   008B BD 07 01      [ 5]  155 	lda	0x107,x
+   008E 38            [ 2]  156 	sec
+   008F FD 03 01      [ 5]  157 	sbc	0x103,x
+   0092 BD 08 01      [ 5]  158 	lda	0x108,x
+   0095 FD 04 01      [ 5]  159 	sbc	0x104,x
+   0098 B0 4F         [ 4]  160 	bcs	00105$
+   009A BD 07 01      [ 5]  161 	lda	0x107,x
+   009D 9D 17 01      [ 5]  162 	sta	0x117,x
+   00A0 BD 08 01      [ 5]  163 	lda	0x108,x
+   00A3 9D 18 01      [ 5]  164 	sta	0x118,x
+   00A6 BD 05 01      [ 5]  165 	lda	0x105,x
+   00A9 9D 13 01      [ 5]  166 	sta	0x113,x
+   00AC BD 06 01      [ 5]  167 	lda	0x106,x
+   00AF 9D 14 01      [ 5]  168 	sta	0x114,x
+   00B2 BD 07 01      [ 5]  169 	lda	0x107,x
+   00B5 18            [ 2]  170 	clc
+   00B6 69 02         [ 2]  171 	adc	#0x02
+   00B8 9D 15 01      [ 5]  172 	sta	0x115,x
+   00BB BD 08 01      [ 5]  173 	lda	0x108,x
+   00BE 69 00         [ 2]  174 	adc	#0x00
+   00C0 9D 16 01      [ 5]  175 	sta	0x116,x
+   00C3 BD 15 01      [ 5]  176 	lda	0x115,x
+   00C6 9D 05 01      [ 5]  177 	sta	0x105,x
+   00C9 BD 16 01      [ 5]  178 	lda	0x116,x
+   00CC 9D 06 01      [ 5]  179 	sta	0x106,x
+   00CF BD 15 01      [ 5]  180 	lda	0x115,x
+   00D2 85*00         [ 3]  181 	sta	*(__DPTR+0)
+   00D4 BD 16 01      [ 5]  182 	lda	0x116,x
+   00D7 85*01         [ 3]  183 	sta	*(__DPTR+1)
+   00D9 A0 00         [ 2]  184 	ldy	#0x00
+   00DB B1*00         [ 6]  185 	lda	[__DPTR],y
+   00DD 9D 07 01      [ 5]  186 	sta	0x107,x
+   00E0 C8            [ 2]  187 	iny
+   00E1 B1*00         [ 6]  188 	lda	[__DPTR],y
+   00E3 9D 08 01      [ 5]  189 	sta	0x108,x
+   00E6 4Cr76r00      [ 3]  190 	jmp	00129$
+   00E9                     191 00105$:
+                            192 ;	../realloc.c: 84: next_free = h;
+   00E9 BA            [ 2]  193 	tsx
+   00EA BD 07 01      [ 5]  194 	lda	0x107,x
+   00ED 9D 19 01      [ 5]  195 	sta	0x119,x
+   00F0 BD 08 01      [ 5]  196 	lda	0x108,x
+   00F3 9D 1A 01      [ 5]  197 	sta	0x11a,x
+                            198 ;	../realloc.c: 86: if(size + offsetof(struct header, next_free) < size) // Handle overflow
+   00F6 BD 21 01      [ 5]  199 	lda	0x121,x
+   00F9 18            [ 2]  200 	clc
+   00FA 69 02         [ 2]  201 	adc	#0x02
+   00FC 9D 03 01      [ 5]  202 	sta	0x103,x
+   00FF BD 22 01      [ 5]  203 	lda	0x122,x
+   0102 69 00         [ 2]  204 	adc	#0x00
+   0104 9D 04 01      [ 5]  205 	sta	0x104,x
+   0107 BD 03 01      [ 5]  206 	lda	0x103,x
+   010A 38            [ 2]  207 	sec
+   010B FD 21 01      [ 5]  208 	sbc	0x121,x
+   010E BD 04 01      [ 5]  209 	lda	0x104,x
+   0111 FD 22 01      [ 5]  210 	sbc	0x122,x
+   0114 B0 06         [ 4]  211 	bcs	00107$
+                            212 ;	../realloc.c: 87: return(0);
+   0116 A9 00         [ 2]  213 	lda	#0x00
+   0118 AA            [ 2]  214 	tax
+   0119 4Cr94r05      [ 3]  215 	jmp	00131$
+   011C                     216 00107$:
+                            217 ;	../realloc.c: 88: blocksize = size + offsetof(struct header, next_free);
+   011C BA            [ 2]  218 	tsx
+   011D BD 21 01      [ 5]  219 	lda	0x121,x
+   0120 18            [ 2]  220 	clc
+   0121 69 02         [ 2]  221 	adc	#0x02
+   0123 9D 11 01      [ 5]  222 	sta	0x111,x
+   0126 BD 22 01      [ 5]  223 	lda	0x122,x
+   0129 69 00         [ 2]  224 	adc	#0x00
+   012B 9D 12 01      [ 5]  225 	sta	0x112,x
+                            226 ;	../realloc.c: 89: if(blocksize < sizeof(struct header)) // Requiring a minimum size makes it easier to implement free(), and avoid memory leaks.
+   012E BD 11 01      [ 5]  227 	lda	0x111,x
+   0131 38            [ 2]  228 	sec
+   0132 E9 04         [ 2]  229 	sbc	#0x04
+   0134 BD 12 01      [ 5]  230 	lda	0x112,x
+   0137 E9 00         [ 2]  231 	sbc	#0x00
+   0139 B0 0A         [ 4]  232 	bcs	00109$
+                            233 ;	../realloc.c: 90: blocksize = sizeof(struct header);
+   013B A9 04         [ 2]  234 	lda	#0x04
+   013D 9D 11 01      [ 5]  235 	sta	0x111,x
+   0140 A9 00         [ 2]  236 	lda	#0x00
+   0142 9D 12 01      [ 5]  237 	sta	0x112,x
+   0145                     238 00109$:
+                            239 ;	../realloc.c: 92: h = (void HEAPSPACE *)((char HEAPSPACE *)(ptr) - offsetof(struct header, next_free));
+   0145 BA            [ 2]  240 	tsx
+   0146 BD 1D 01      [ 5]  241 	lda	0x11d,x
+   0149 85*00         [ 3]  242 	sta	*(__TEMP+0)
+   014B BD 1E 01      [ 5]  243 	lda	0x11e,x
+   014E AA            [ 2]  244 	tax
+   014F A5*00         [ 3]  245 	lda	*(__TEMP+0)
+   0151 38            [ 2]  246 	sec
+   0152 E9 02         [ 2]  247 	sbc	#0x02
+   0154 B0 01         [ 4]  248 	bcs	00238$
+   0156 CA            [ 2]  249 	dex
+   0157                     250 00238$:
+   0157 48            [ 3]  251 	pha
+   0158 8A            [ 2]  252 	txa
+   0159 BA            [ 2]  253 	tsx
+   015A 9D 1D 01      [ 5]  254 	sta	0x11d,x
+   015D 68            [ 4]  255 	pla
+                            256 ;	../realloc.c: 93: oldblocksize = (char HEAPSPACE *)(h->next) - (char HEAPSPACE *)h;
+   015E 9D 1C 01      [ 5]  257 	sta	0x11c, x
+   0161 85*00         [ 3]  258 	sta	*(__DPTR+0)
+   0163 BD 1D 01      [ 5]  259 	lda	0x11d,x
+   0166 85*01         [ 3]  260 	sta	*(__DPTR+1)
+   0168 A0 00         [ 2]  261 	ldy	#0x00
+   016A B1*00         [ 6]  262 	lda	[__DPTR],y
+   016C 9D 04 01      [ 5]  263 	sta	0x104,x
+   016F C8            [ 2]  264 	iny
+   0170 B1*00         [ 6]  265 	lda	[__DPTR],y
+   0172 9D 05 01      [ 5]  266 	sta	0x105,x
+   0175 BD 04 01      [ 5]  267 	lda	0x104,x
+   0178 9D 08 01      [ 5]  268 	sta	0x108,x
+   017B BD 05 01      [ 5]  269 	lda	0x105,x
+   017E 9D 09 01      [ 5]  270 	sta	0x109,x
+   0181 BD 1C 01      [ 5]  271 	lda	0x11c,x
+   0184 9D 02 01      [ 5]  272 	sta	0x102,x
+   0187 BD 1D 01      [ 5]  273 	lda	0x11d,x
+   018A 9D 03 01      [ 5]  274 	sta	0x103,x
+   018D BD 08 01      [ 5]  275 	lda	0x108,x
+   0190 38            [ 2]  276 	sec
+   0191 FD 02 01      [ 5]  277 	sbc	0x102,x
+   0194 9D 10 01      [ 5]  278 	sta	0x110,x
+   0197 BD 09 01      [ 5]  279 	lda	0x109,x
+   019A FD 03 01      [ 5]  280 	sbc	0x103,x
+   019D 9D 11 01      [ 5]  281 	sta	0x111,x
+                            282 ;	../realloc.c: 95: maxblocksize = oldblocksize;
+   01A0 BD 10 01      [ 5]  283 	lda	0x110,x
+   01A3 9D 0E 01      [ 5]  284 	sta	0x10e,x
+   01A6 BD 11 01      [ 5]  285 	lda	0x111,x
+   01A9 9D 0F 01      [ 5]  286 	sta	0x10f,x
+                            287 ;	../realloc.c: 96: if(prev_free && prev_free->next == h) // Can merge with previous block
+   01AC BD 18 01      [ 5]  288 	lda	0x118,x
+   01AF 1D 19 01      [ 5]  289 	ora	0x119,x
+   01B2 F0 5B         [ 4]  290 	beq	00111$
+   01B4 BD 18 01      [ 5]  291 	lda	0x118,x
+   01B7 85*00         [ 3]  292 	sta	*(__DPTR+0)
+   01B9 BD 19 01      [ 5]  293 	lda	0x119,x
+   01BC 85*01         [ 3]  294 	sta	*(__DPTR+1)
+   01BE 88            [ 2]  295 	dey
+   01BF B1*00         [ 6]  296 	lda	[__DPTR],y
+   01C1 9D 08 01      [ 5]  297 	sta	0x108,x
+   01C4 C8            [ 2]  298 	iny
+   01C5 B1*00         [ 6]  299 	lda	[__DPTR],y
+   01C7 9D 09 01      [ 5]  300 	sta	0x109,x
+   01CA BD 08 01      [ 5]  301 	lda	0x108,x
+   01CD DD 1C 01      [ 5]  302 	cmp	0x11c,x
+   01D0 D0 3D         [ 4]  303 	bne	00111$
+   01D2 BD 09 01      [ 5]  304 	lda	0x109,x
+   01D5 DD 1D 01      [ 5]  305 	cmp	0x11d,x
+   01D8 D0 35         [ 4]  306 	bne	00111$
+                            307 ;	../realloc.c: 97: maxblocksize += (char HEAPSPACE *)h - (char HEAPSPACE *)prev_free;
+   01DA BD 18 01      [ 5]  308 	lda	0x118,x
+   01DD 9D 08 01      [ 5]  309 	sta	0x108,x
+   01E0 BD 19 01      [ 5]  310 	lda	0x119,x
+   01E3 9D 09 01      [ 5]  311 	sta	0x109,x
+   01E6 BD 02 01      [ 5]  312 	lda	0x102,x
+   01E9 38            [ 2]  313 	sec
+   01EA FD 08 01      [ 5]  314 	sbc	0x108,x
+   01ED 48            [ 3]  315 	pha
+   01EE BD 03 01      [ 5]  316 	lda	0x103,x
+   01F1 FD 09 01      [ 5]  317 	sbc	0x109,x
+   01F4 BA            [ 2]  318 	tsx
+   01F5 9D 03 01      [ 5]  319 	sta	0x103,x
+   01F8 68            [ 4]  320 	pla
+   01F9 9D 02 01      [ 5]  321 	sta	0x102,x
+   01FC BD 10 01      [ 5]  322 	lda	0x110, x
+   01FF 18            [ 2]  323 	clc
+   0200 7D 02 01      [ 5]  324 	adc	0x102,x
+   0203 9D 0E 01      [ 5]  325 	sta	0x10e,x
+   0206 BD 11 01      [ 5]  326 	lda	0x111,x
+   0209 7D 03 01      [ 5]  327 	adc	0x103,x
+   020C 9D 0F 01      [ 5]  328 	sta	0x10f,x
+   020F                     329 00111$:
+                            330 ;	../realloc.c: 98: if(next_free == h->next) // Can merge with next block
+   020F BA            [ 2]  331 	tsx
+   0210 BD 19 01      [ 5]  332 	lda	0x119,x
+   0213 DD 03 01      [ 5]  333 	cmp	0x103,x
+   0216 D0 59         [ 4]  334 	bne	00114$
+   0218 BD 1A 01      [ 5]  335 	lda	0x11a,x
+   021B DD 04 01      [ 5]  336 	cmp	0x104,x
+   021E D0 51         [ 4]  337 	bne	00114$
+                            338 ;	../realloc.c: 99: maxblocksize += (char HEAPSPACE *)(next_free->next) - (char HEAPSPACE *)next_free;
+   0220 BD 19 01      [ 5]  339 	lda	0x119,x
+   0223 85*00         [ 3]  340 	sta	*(__DPTR+0)
+   0225 BD 1A 01      [ 5]  341 	lda	0x11a,x
+   0228 85*01         [ 3]  342 	sta	*(__DPTR+1)
+   022A A0 01         [ 2]  343 	ldy	#0x01
+   022C B1*00         [ 6]  344 	lda	[__DPTR],y
+   022E AA            [ 2]  345 	tax
+   022F 88            [ 2]  346 	dey
+   0230 B1*00         [ 6]  347 	lda	[__DPTR],y
+   0232 48            [ 3]  348 	pha
+   0233 8A            [ 2]  349 	txa
+   0234 BA            [ 2]  350 	tsx
+   0235 9D 03 01      [ 5]  351 	sta	0x103,x
+   0238 68            [ 4]  352 	pla
+   0239 9D 02 01      [ 5]  353 	sta	0x102,x
+   023C BD 1A 01      [ 5]  354 	lda	0x11a, x
+   023F 9D 04 01      [ 5]  355 	sta	0x104,x
+   0242 BD 1B 01      [ 5]  356 	lda	0x11b,x
+   0245 9D 05 01      [ 5]  357 	sta	0x105,x
+   0248 BD 02 01      [ 5]  358 	lda	0x102,x
+   024B 38            [ 2]  359 	sec
+   024C FD 04 01      [ 5]  360 	sbc	0x104,x
+   024F 48            [ 3]  361 	pha
+   0250 BD 03 01      [ 5]  362 	lda	0x103,x
+   0253 FD 05 01      [ 5]  363 	sbc	0x105,x
+   0256 BA            [ 2]  364 	tsx
+   0257 9D 03 01      [ 5]  365 	sta	0x103,x
+   025A 68            [ 4]  366 	pla
+   025B 9D 02 01      [ 5]  367 	sta	0x102,x
+   025E BD 0E 01      [ 5]  368 	lda	0x10e, x
+   0261 18            [ 2]  369 	clc
+   0262 7D 02 01      [ 5]  370 	adc	0x102,x
+   0265 9D 0E 01      [ 5]  371 	sta	0x10e,x
+   0268 BD 0F 01      [ 5]  372 	lda	0x10f,x
+   026B 7D 03 01      [ 5]  373 	adc	0x103,x
+   026E 9D 0F 01      [ 5]  374 	sta	0x10f,x
+   0271                     375 00114$:
+                            376 ;	../realloc.c: 101: if(blocksize <= maxblocksize) // Can resize in place.
+   0271 BA            [ 2]  377 	tsx
+   0272 BD 0D 01      [ 5]  378 	lda	0x10d,x
+   0275 38            [ 2]  379 	sec
+   0276 FD 11 01      [ 5]  380 	sbc	0x111,x
+   0279 BD 0E 01      [ 5]  381 	lda	0x10e,x
+   027C FD 12 01      [ 5]  382 	sbc	0x112,x
+   027F B0 03         [ 4]  383 	bcs	00246$
+   0281 4CrDBr04      [ 3]  384 	jmp	00124$
+   0284                     385 00246$:
+                            386 ;	../realloc.c: 103: if(prev_free && prev_free->next == h) // Always move into previous block to defragment
+   0284 BD 17 01      [ 5]  387 	lda	0x117,x
+   0287 1D 18 01      [ 5]  388 	ora	0x118,x
+   028A D0 03         [ 4]  389 	bne	00247$
+   028C 4Cr56r03      [ 3]  390 	jmp	00116$
+   028F                     391 00247$:
+   028F BD 17 01      [ 5]  392 	lda	0x117,x
+   0292 85*00         [ 3]  393 	sta	*(__DPTR+0)
+   0294 BD 18 01      [ 5]  394 	lda	0x118,x
+   0297 85*01         [ 3]  395 	sta	*(__DPTR+1)
+   0299 A0 00         [ 2]  396 	ldy	#0x00
+   029B B1*00         [ 6]  397 	lda	[__DPTR],y
+   029D 9D 01 01      [ 5]  398 	sta	0x101,x
+   02A0 C8            [ 2]  399 	iny
+   02A1 B1*00         [ 6]  400 	lda	[__DPTR],y
+   02A3 9D 02 01      [ 5]  401 	sta	0x102,x
+   02A6 BD 01 01      [ 5]  402 	lda	0x101,x
+   02A9 DD 1B 01      [ 5]  403 	cmp	0x11b,x
+   02AC D0 08         [ 4]  404 	bne	00249$
+   02AE BD 02 01      [ 5]  405 	lda	0x102,x
+   02B1 DD 1C 01      [ 5]  406 	cmp	0x11c,x
+   02B4 F0 03         [ 4]  407 	beq	00250$
+   02B6                     408 00249$:
+   02B6 4Cr56r03      [ 3]  409 	jmp	00116$
+   02B9                     410 00250$:
+                            411 ;	../realloc.c: 105: memmove(prev_free, h, blocksize <= oldblocksize ? blocksize : oldblocksize);
+   02B9 BD 0F 01      [ 5]  412 	lda	0x10f,x
+   02BC 38            [ 2]  413 	sec
+   02BD FD 11 01      [ 5]  414 	sbc	0x111,x
+   02C0 BD 10 01      [ 5]  415 	lda	0x110,x
+   02C3 FD 12 01      [ 5]  416 	sbc	0x112,x
+   02C6 90 0F         [ 4]  417 	bcc	00133$
+   02C8 BD 11 01      [ 5]  418 	lda	0x111,x
+   02CB 9D 01 01      [ 5]  419 	sta	0x101,x
+   02CE BD 12 01      [ 5]  420 	lda	0x112,x
+   02D1 9D 02 01      [ 5]  421 	sta	0x102,x
+   02D4 4CrE4r02      [ 3]  422 	jmp	00134$
+   02D7                     423 00133$:
+   02D7 BA            [ 2]  424 	tsx
+   02D8 BD 0F 01      [ 5]  425 	lda	0x10f,x
+   02DB 9D 01 01      [ 5]  426 	sta	0x101,x
+   02DE BD 10 01      [ 5]  427 	lda	0x110,x
+   02E1 9D 02 01      [ 5]  428 	sta	0x102,x
+   02E4                     429 00134$:
+   02E4 BA            [ 2]  430 	tsx
+   02E5 BD 1B 01      [ 5]  431 	lda	0x11b,x
+   02E8 9D 03 01      [ 5]  432 	sta	0x103,x
+   02EB BD 1C 01      [ 5]  433 	lda	0x11c,x
+   02EE 9D 04 01      [ 5]  434 	sta	0x104,x
+   02F1 BD 17 01      [ 5]  435 	lda	0x117,x
+   02F4 9D 07 01      [ 5]  436 	sta	0x107,x
+   02F7 BD 18 01      [ 5]  437 	lda	0x118,x
+   02FA 9D 08 01      [ 5]  438 	sta	0x108,x
+   02FD BD 02 01      [ 5]  439 	lda	0x102,x
+   0300 48            [ 3]  440 	pha
+   0301 BD 01 01      [ 5]  441 	lda	0x101,x
+   0304 48            [ 3]  442 	pha
+   0305 BD 04 01      [ 5]  443 	lda	0x104,x
+   0308 48            [ 3]  444 	pha
+   0309 BD 03 01      [ 5]  445 	lda	0x103,x
+   030C 48            [ 3]  446 	pha
+   030D BD 08 01      [ 5]  447 	lda	0x108,x
+   0310 AA            [ 2]  448 	tax
+   0311 86*00         [ 3]  449 	stx	*(__TEMP+0)
+   0313 BA            [ 2]  450 	tsx
+   0314 BD 0B 01      [ 5]  451 	lda	0x10b,x
+   0317 08            [ 3]  452 	php
+   0318 A6*00         [ 3]  453 	ldx	*(__TEMP+0)
+   031A 28            [ 4]  454 	plp
+   031B 20r00r00      [ 6]  455 	jsr	_memmove
+   031E 85*00         [ 3]  456 	sta	*(__TEMP+0)
+   0320 68            [ 4]  457 	pla
+   0321 68            [ 4]  458 	pla
+   0322 68            [ 4]  459 	pla
+   0323 68            [ 4]  460 	pla
+   0324 A5*00         [ 3]  461 	lda	*(__TEMP+0)
+                            462 ;	../realloc.c: 106: h = prev_free;
+   0326 BA            [ 2]  463 	tsx
+   0327 BD 17 01      [ 5]  464 	lda	0x117,x
+   032A 9D 1B 01      [ 5]  465 	sta	0x11b,x
+   032D BD 18 01      [ 5]  466 	lda	0x118,x
+   0330 9D 1C 01      [ 5]  467 	sta	0x11c,x
+                            468 ;	../realloc.c: 107: *pf = next_free;
+   0333 BD 13 01      [ 5]  469 	lda	0x113,x
+   0336 85*00         [ 3]  470 	sta	*(__DPTR+0)
+   0338 BD 14 01      [ 5]  471 	lda	0x114,x
+   033B 85*01         [ 3]  472 	sta	*(__DPTR+1)
+   033D BD 19 01      [ 5]  473 	lda	0x119,x
+   0340 A0 00         [ 2]  474 	ldy	#0x00
+   0342 91*00         [ 6]  475 	sta	[__DPTR],y
+   0344 BD 1A 01      [ 5]  476 	lda	0x11a,x
+   0347 C8            [ 2]  477 	iny
+   0348 91*00         [ 6]  478 	sta	[__DPTR],y
+                            479 ;	../realloc.c: 108: f = pf;
+   034A BD 13 01      [ 5]  480 	lda	0x113,x
+   034D 9D 05 01      [ 5]  481 	sta	0x105,x
+   0350 BD 14 01      [ 5]  482 	lda	0x114,x
+   0353 9D 06 01      [ 5]  483 	sta	0x106,x
+   0356                     484 00116$:
+                            485 ;	../realloc.c: 111: if(next_free && next_free == h->next) // Merge with following block
+   0356 BA            [ 2]  486 	tsx
+   0357 BD 19 01      [ 5]  487 	lda	0x119,x
+   035A 1D 1A 01      [ 5]  488 	ora	0x11a,x
+   035D D0 03         [ 4]  489 	bne	00252$
+   035F 4CrEEr03      [ 3]  490 	jmp	00119$
+   0362                     491 00252$:
+   0362 BD 1B 01      [ 5]  492 	lda	0x11b,x
+   0365 85*00         [ 3]  493 	sta	*(__DPTR+0)
+   0367 BD 1C 01      [ 5]  494 	lda	0x11c,x
+   036A 85*01         [ 3]  495 	sta	*(__DPTR+1)
+   036C A0 00         [ 2]  496 	ldy	#0x00
+   036E B1*00         [ 6]  497 	lda	[__DPTR],y
+   0370 9D 01 01      [ 5]  498 	sta	0x101,x
+   0373 C8            [ 2]  499 	iny
+   0374 B1*00         [ 6]  500 	lda	[__DPTR],y
+   0376 9D 02 01      [ 5]  501 	sta	0x102,x
+   0379 BD 19 01      [ 5]  502 	lda	0x119,x
+   037C DD 01 01      [ 5]  503 	cmp	0x101,x
+   037F D0 6D         [ 4]  504 	bne	00119$
+   0381 BD 1A 01      [ 5]  505 	lda	0x11a,x
+   0384 DD 02 01      [ 5]  506 	cmp	0x102,x
+   0387 D0 65         [ 4]  507 	bne	00119$
+                            508 ;	../realloc.c: 113: h->next = next_free->next;
+   0389 BD 19 01      [ 5]  509 	lda	0x119,x
+   038C 85*00         [ 3]  510 	sta	*(__DPTR+0)
+   038E BD 1A 01      [ 5]  511 	lda	0x11a,x
+   0391 85*01         [ 3]  512 	sta	*(__DPTR+1)
+   0393 88            [ 2]  513 	dey
+   0394 B1*00         [ 6]  514 	lda	[__DPTR],y
+   0396 9D 01 01      [ 5]  515 	sta	0x101,x
+   0399 C8            [ 2]  516 	iny
+   039A B1*00         [ 6]  517 	lda	[__DPTR],y
+   039C 9D 02 01      [ 5]  518 	sta	0x102,x
+   039F BD 1B 01      [ 5]  519 	lda	0x11b,x
+   03A2 85*00         [ 3]  520 	sta	*(__DPTR+0)
+   03A4 BD 1C 01      [ 5]  521 	lda	0x11c,x
+   03A7 85*01         [ 3]  522 	sta	*(__DPTR+1)
+   03A9 BD 01 01      [ 5]  523 	lda	0x101,x
+   03AC 88            [ 2]  524 	dey
+   03AD 91*00         [ 6]  525 	sta	[__DPTR],y
+   03AF BD 02 01      [ 5]  526 	lda	0x102,x
+   03B2 C8            [ 2]  527 	iny
+   03B3 91*00         [ 6]  528 	sta	[__DPTR],y
+                            529 ;	../realloc.c: 114: *f = next_free->next_free;
+   03B5 BD 19 01      [ 5]  530 	lda	0x119,x
+   03B8 9D 01 01      [ 5]  531 	sta	0x101,x
+   03BB BD 1A 01      [ 5]  532 	lda	0x11a,x
+   03BE 9D 02 01      [ 5]  533 	sta	0x102,x
+   03C1 BD 01 01      [ 5]  534 	lda	0x101,x
+   03C4 85*00         [ 3]  535 	sta	*(__DPTR+0)
+   03C6 BD 02 01      [ 5]  536 	lda	0x102,x
+   03C9 85*01         [ 3]  537 	sta	*(__DPTR+1)
+   03CB C8            [ 2]  538 	iny
+   03CC B1*00         [ 6]  539 	lda	[__DPTR],y
+   03CE 9D 01 01      [ 5]  540 	sta	0x101,x
+   03D1 C8            [ 2]  541 	iny
+   03D2 B1*00         [ 6]  542 	lda	[__DPTR],y
+   03D4 9D 02 01      [ 5]  543 	sta	0x102,x
+   03D7 BD 05 01      [ 5]  544 	lda	0x105,x
+   03DA 85*00         [ 3]  545 	sta	*(__DPTR+0)
+   03DC BD 06 01      [ 5]  546 	lda	0x106,x
+   03DF 85*01         [ 3]  547 	sta	*(__DPTR+1)
+   03E1 BD 01 01      [ 5]  548 	lda	0x101,x
+   03E4 A0 00         [ 2]  549 	ldy	#0x00
+   03E6 91*00         [ 6]  550 	sta	[__DPTR],y
+   03E8 BD 02 01      [ 5]  551 	lda	0x102,x
+   03EB C8            [ 2]  552 	iny
+   03EC 91*00         [ 6]  553 	sta	[__DPTR],y
+   03EE                     554 00119$:
+                            555 ;	../realloc.c: 117: if(maxblocksize >= blocksize + sizeof(struct header)) // Create new block from free space
+   03EE BA            [ 2]  556 	tsx
+   03EF BD 11 01      [ 5]  557 	lda	0x111,x
+   03F2 18            [ 2]  558 	clc
+   03F3 69 04         [ 2]  559 	adc	#0x04
+   03F5 9D 01 01      [ 5]  560 	sta	0x101,x
+   03F8 BD 12 01      [ 5]  561 	lda	0x112,x
+   03FB 69 00         [ 2]  562 	adc	#0x00
+   03FD 9D 02 01      [ 5]  563 	sta	0x102,x
+   0400 BD 0D 01      [ 5]  564 	lda	0x10d,x
+   0403 38            [ 2]  565 	sec
+   0404 FD 01 01      [ 5]  566 	sbc	0x101,x
+   0407 BD 0E 01      [ 5]  567 	lda	0x10e,x
+   040A FD 02 01      [ 5]  568 	sbc	0x102,x
+   040D B0 03         [ 4]  569 	bcs	00256$
+   040F 4CrC6r04      [ 3]  570 	jmp	00122$
+   0412                     571 00256$:
+                            572 ;	../realloc.c: 119: header_t *const newheader = (header_t *const)((char HEAPSPACE *)h + blocksize);
+   0412 BD 1B 01      [ 5]  573 	lda	0x11b,x
+   0415 9D 01 01      [ 5]  574 	sta	0x101,x
+   0418 BD 1C 01      [ 5]  575 	lda	0x11c,x
+   041B 9D 02 01      [ 5]  576 	sta	0x102,x
+   041E BD 01 01      [ 5]  577 	lda	0x101,x
+   0421 18            [ 2]  578 	clc
+   0422 7D 11 01      [ 5]  579 	adc	0x111,x
+   0425 48            [ 3]  580 	pha
+   0426 BD 02 01      [ 5]  581 	lda	0x102,x
+   0429 7D 12 01      [ 5]  582 	adc	0x112,x
+   042C BA            [ 2]  583 	tsx
+   042D 9D 0D 01      [ 5]  584 	sta	0x10d,x
+   0430 68            [ 4]  585 	pla
+   0431 9D 0C 01      [ 5]  586 	sta	0x10c,x
+                            587 ;	../realloc.c: 120: newheader->next = h->next;
+   0434 BD 1C 01      [ 5]  588 	lda	0x11c, x
+   0437 85*00         [ 3]  589 	sta	*(__DPTR+0)
+   0439 BD 1D 01      [ 5]  590 	lda	0x11d,x
+   043C 85*01         [ 3]  591 	sta	*(__DPTR+1)
+   043E A0 00         [ 2]  592 	ldy	#0x00
+   0440 B1*00         [ 6]  593 	lda	[__DPTR],y
+   0442 9D 02 01      [ 5]  594 	sta	0x102,x
+   0445 C8            [ 2]  595 	iny
+   0446 B1*00         [ 6]  596 	lda	[__DPTR],y
+   0448 9D 03 01      [ 5]  597 	sta	0x103,x
+   044B BD 0C 01      [ 5]  598 	lda	0x10c,x
+   044E 85*00         [ 3]  599 	sta	*(__DPTR+0)
+   0450 BD 0D 01      [ 5]  600 	lda	0x10d,x
+   0453 85*01         [ 3]  601 	sta	*(__DPTR+1)
+   0455 BD 02 01      [ 5]  602 	lda	0x102,x
+   0458 88            [ 2]  603 	dey
+   0459 91*00         [ 6]  604 	sta	[__DPTR],y
+   045B BD 03 01      [ 5]  605 	lda	0x103,x
+   045E C8            [ 2]  606 	iny
+   045F 91*00         [ 6]  607 	sta	[__DPTR],y
+                            608 ;	../realloc.c: 121: newheader->next_free = *f;
+   0461 BD 0C 01      [ 5]  609 	lda	0x10c,x
+   0464 9D 02 01      [ 5]  610 	sta	0x102,x
+   0467 BD 0D 01      [ 5]  611 	lda	0x10d,x
+   046A 9D 03 01      [ 5]  612 	sta	0x103,x
+   046D BD 06 01      [ 5]  613 	lda	0x106,x
+   0470 85*00         [ 3]  614 	sta	*(__DPTR+0)
+   0472 BD 07 01      [ 5]  615 	lda	0x107,x
+   0475 85*01         [ 3]  616 	sta	*(__DPTR+1)
+   0477 88            [ 2]  617 	dey
+   0478 B1*00         [ 6]  618 	lda	[__DPTR],y
+   047A 9D 04 01      [ 5]  619 	sta	0x104,x
+   047D C8            [ 2]  620 	iny
+   047E B1*00         [ 6]  621 	lda	[__DPTR],y
+   0480 9D 05 01      [ 5]  622 	sta	0x105,x
+   0483 BD 02 01      [ 5]  623 	lda	0x102,x
+   0486 85*00         [ 3]  624 	sta	*(__DPTR+0)
+   0488 BD 03 01      [ 5]  625 	lda	0x103,x
+   048B 85*01         [ 3]  626 	sta	*(__DPTR+1)
+   048D BD 04 01      [ 5]  627 	lda	0x104,x
+   0490 C8            [ 2]  628 	iny
+   0491 91*00         [ 6]  629 	sta	[__DPTR],y
+   0493 BD 05 01      [ 5]  630 	lda	0x105,x
+   0496 C8            [ 2]  631 	iny
+   0497 91*00         [ 6]  632 	sta	[__DPTR],y
+                            633 ;	../realloc.c: 122: *f = newheader;
+   0499 BD 06 01      [ 5]  634 	lda	0x106,x
+   049C 85*00         [ 3]  635 	sta	*(__DPTR+0)
+   049E BD 07 01      [ 5]  636 	lda	0x107,x
+   04A1 85*01         [ 3]  637 	sta	*(__DPTR+1)
+   04A3 BD 0C 01      [ 5]  638 	lda	0x10c,x
+   04A6 A0 00         [ 2]  639 	ldy	#0x00
+   04A8 91*00         [ 6]  640 	sta	[__DPTR],y
+   04AA BD 0D 01      [ 5]  641 	lda	0x10d,x
+   04AD C8            [ 2]  642 	iny
+   04AE 91*00         [ 6]  643 	sta	[__DPTR],y
+                            644 ;	../realloc.c: 123: h->next = newheader;
+   04B0 BD 1C 01      [ 5]  645 	lda	0x11c,x
+   04B3 85*00         [ 3]  646 	sta	*(__DPTR+0)
+   04B5 BD 1D 01      [ 5]  647 	lda	0x11d,x
+   04B8 85*01         [ 3]  648 	sta	*(__DPTR+1)
+   04BA BD 0C 01      [ 5]  649 	lda	0x10c,x
+   04BD 88            [ 2]  650 	dey
+   04BE 91*00         [ 6]  651 	sta	[__DPTR],y
+   04C0 BD 0D 01      [ 5]  652 	lda	0x10d,x
+   04C3 C8            [ 2]  653 	iny
+   04C4 91*00         [ 6]  654 	sta	[__DPTR],y
+   04C6                     655 00122$:
+                            656 ;	../realloc.c: 126: return(&(h->next_free));
+   04C6 BA            [ 2]  657 	tsx
+   04C7 BD 1B 01      [ 5]  658 	lda	0x11b,x
+   04CA 85*00         [ 3]  659 	sta	*(__TEMP+0)
+   04CC BD 1C 01      [ 5]  660 	lda	0x11c,x
+   04CF AA            [ 2]  661 	tax
+   04D0 A5*00         [ 3]  662 	lda	*(__TEMP+0)
+   04D2 18            [ 2]  663 	clc
+   04D3 69 02         [ 2]  664 	adc	#0x02
+   04D5 90 01         [ 4]  665 	bcc	00257$
+   04D7 E8            [ 2]  666 	inx
+   04D8                     667 00257$:
+   04D8 4Cr94r05      [ 3]  668 	jmp	00131$
+   04DB                     669 00124$:
+                            670 ;	../realloc.c: 129: if(ret = malloc(size))
+   04DB BA            [ 2]  671 	tsx
+   04DC BD 22 01      [ 5]  672 	lda	0x122,x
+   04DF AA            [ 2]  673 	tax
+   04E0 86*00         [ 3]  674 	stx	*(__TEMP+0)
+   04E2 BA            [ 2]  675 	tsx
+   04E3 BD 21 01      [ 5]  676 	lda	0x121,x
+   04E6 08            [ 3]  677 	php
+   04E7 A6*00         [ 3]  678 	ldx	*(__TEMP+0)
+   04E9 28            [ 4]  679 	plp
+   04EA 20r00r00      [ 6]  680 	jsr	_malloc
+   04ED 48            [ 3]  681 	pha
+   04EE 86*00         [ 3]  682 	stx	*(__TEMP+0)
+   04F0 8A            [ 2]  683 	txa
+   04F1 BA            [ 2]  684 	tsx
+   04F2 9D 03 01      [ 5]  685 	sta	0x103,x
+   04F5 68            [ 4]  686 	pla
+   04F6 9D 02 01      [ 5]  687 	sta	0x102,x
+   04F9 A6*00         [ 3]  688 	ldx	*(__TEMP+0)
+   04FB C9 00         [ 2]  689 	cmp	#0x00
+   04FD D0 02         [ 4]  690 	bne	00258$
+   04FF E0 00         [ 2]  691 	cpx	#0x00
+   0501                     692 00258$:
+   0501 D0 03         [ 4]  693 	bne	00259$
+   0503 4Cr91r05      [ 3]  694 	jmp	00126$
+   0506                     695 00259$:
+                            696 ;	../realloc.c: 131: size_t oldsize = oldblocksize - offsetof(struct header, next_free);
+   0506 BA            [ 2]  697 	tsx
+   0507 BD 0F 01      [ 5]  698 	lda	0x10f,x
+   050A 38            [ 2]  699 	sec
+   050B E9 02         [ 2]  700 	sbc	#0x02
+   050D 9D 09 01      [ 5]  701 	sta	0x109,x
+   0510 BD 10 01      [ 5]  702 	lda	0x110,x
+   0513 E9 00         [ 2]  703 	sbc	#0x00
+   0515 9D 0A 01      [ 5]  704 	sta	0x10a,x
+                            705 ;	../realloc.c: 132: memcpy(ret, ptr, size <= oldsize ? size : oldsize);
+   0518 BD 09 01      [ 5]  706 	lda	0x109,x
+   051B 38            [ 2]  707 	sec
+   051C FD 21 01      [ 5]  708 	sbc	0x121,x
+   051F BD 0A 01      [ 5]  709 	lda	0x10a,x
+   0522 FD 22 01      [ 5]  710 	sbc	0x122,x
+   0525 90 0F         [ 4]  711 	bcc	00135$
+   0527 BD 21 01      [ 5]  712 	lda	0x121,x
+   052A 9D 03 01      [ 5]  713 	sta	0x103,x
+   052D BD 22 01      [ 5]  714 	lda	0x122,x
+   0530 9D 04 01      [ 5]  715 	sta	0x104,x
+   0533 4Cr43r05      [ 3]  716 	jmp	00136$
+   0536                     717 00135$:
+   0536 BA            [ 2]  718 	tsx
+   0537 BD 09 01      [ 5]  719 	lda	0x109,x
+   053A 9D 03 01      [ 5]  720 	sta	0x103,x
+   053D BD 0A 01      [ 5]  721 	lda	0x10a,x
+   0540 9D 04 01      [ 5]  722 	sta	0x104,x
+   0543                     723 00136$:
+   0543 BA            [ 2]  724 	tsx
+   0544 BD 04 01      [ 5]  725 	lda	0x104,x
+   0547 48            [ 3]  726 	pha
+   0548 BD 03 01      [ 5]  727 	lda	0x103,x
+   054B 48            [ 3]  728 	pha
+   054C BD 1E 01      [ 5]  729 	lda	0x11e,x
+   054F 48            [ 3]  730 	pha
+   0550 BD 1D 01      [ 5]  731 	lda	0x11d,x
+   0553 48            [ 3]  732 	pha
+   0554 BD 02 01      [ 5]  733 	lda	0x102,x
+   0557 AA            [ 2]  734 	tax
+   0558 86*00         [ 3]  735 	stx	*(__TEMP+0)
+   055A BA            [ 2]  736 	tsx
+   055B BD 05 01      [ 5]  737 	lda	0x105,x
+   055E 08            [ 3]  738 	php
+   055F A6*00         [ 3]  739 	ldx	*(__TEMP+0)
+   0561 28            [ 4]  740 	plp
+   0562 20r00r00      [ 6]  741 	jsr	___memcpy
+   0565 85*00         [ 3]  742 	sta	*(__TEMP+0)
+   0567 68            [ 4]  743 	pla
+   0568 68            [ 4]  744 	pla
+   0569 68            [ 4]  745 	pla
+   056A 68            [ 4]  746 	pla
+   056B A5*00         [ 3]  747 	lda	*(__TEMP+0)
+                            748 ;	../realloc.c: 133: free(ptr);
+   056D BA            [ 2]  749 	tsx
+   056E BD 1E 01      [ 5]  750 	lda	0x11e,x
+   0571 AA            [ 2]  751 	tax
+   0572 86*00         [ 3]  752 	stx	*(__TEMP+0)
+   0574 BA            [ 2]  753 	tsx
+   0575 BD 1D 01      [ 5]  754 	lda	0x11d,x
+   0578 08            [ 3]  755 	php
+   0579 A6*00         [ 3]  756 	ldx	*(__TEMP+0)
+   057B 28            [ 4]  757 	plp
+   057C 20r00r00      [ 6]  758 	jsr	_free
+                            759 ;	../realloc.c: 134: return(ret);
+   057F BA            [ 2]  760 	tsx
+   0580 BD 02 01      [ 5]  761 	lda	0x102,x
+   0583 AA            [ 2]  762 	tax
+   0584 86*00         [ 3]  763 	stx	*(__TEMP+0)
+   0586 BA            [ 2]  764 	tsx
+   0587 BD 01 01      [ 5]  765 	lda	0x101,x
+   058A 08            [ 3]  766 	php
+   058B A6*00         [ 3]  767 	ldx	*(__TEMP+0)
+   058D 28            [ 4]  768 	plp
+   058E 4Cr94r05      [ 3]  769 	jmp	00131$
+   0591                     770 00126$:
+                            771 ;	../realloc.c: 137: return(0);
+   0591 A9 00         [ 2]  772 	lda	#0x00
+   0593 AA            [ 2]  773 	tax
+   0594                     774 00131$:
+                            775 ;	../realloc.c: 138: }
+   0594 85*00         [ 3]  776 	sta	*(__TEMP+0)
+   0596 86*01         [ 3]  777 	stx	*(__TEMP+1)
+   0598 BA            [ 2]  778 	tsx
+   0599 8A            [ 2]  779 	txa
+   059A 18            [ 2]  780 	clc
+   059B 69 1E         [ 2]  781 	adc	#0x1e
+   059D AA            [ 2]  782 	tax
+   059E 9A            [ 2]  783 	txs
+   059F A6*01         [ 3]  784 	ldx	*(__TEMP+1)
+   05A1 A5*00         [ 3]  785 	lda	*(__TEMP+0)
+   05A3 60            [ 6]  786 	rts
+                            787 	.area CODE
+                            788 	.area RODATA
+                            789 	.area XINIT
+                            790 	.area CABS    (ABS)

@@ -1,0 +1,388 @@
+                                      1 ;--------------------------------------------------------
+                                      2 ; File Created by SDCC : free open source ISO C Compiler 
+                                      3 ; Version 4.2.14 #0 (Linux)
+                                      4 ;--------------------------------------------------------
+                                      5 	.module wcstombs
+                                      6 	.optsdcc -mds400 --model-flat24
+                                      7 	
+                                      8 ;--------------------------------------------------------
+                                      9 ; CPU specific extensions
+                                     10 ;--------------------------------------------------------
+                                     11 	.DS80C390
+                                     12 	.amode	2	; 24 bit flat addressing
+                           000082    13 dpl	=	0x82
+                           000083    14 dph	=	0x83
+                           000084    15 dpl1	=	0x84
+                           000085    16 dph1	=	0x85
+                           000086    17 dps	=	0x86
+                           000093    18 dpx	=	0x93
+                           000095    19 dpx1	=	0x95
+                           00009B    20 esp	=	0x9B
+                           00009C    21 ap	=	0x9C
+                           00009C    22 acc1	=	0x9C
+                           0000D1    23 mcnt0	=	0xD1
+                           0000D2    24 mcnt1	=	0xD2
+                           0000D3    25 ma	=	0xD3
+                           0000D4    26 mb	=	0xD4
+                           0000D5    27 mc	=	0xD5
+                           00009D    28 acon	=	0x9D
+                           0000C6    29 mcon	=	0xC6
+                           0000D1    30 F1	=	0xD1	; user flag
+                                     31 ;--------------------------------------------------------
+                                     32 ; Public variables in this module
+                                     33 ;--------------------------------------------------------
+                                     34 	.globl _wctomb
+                                     35 	.globl _wcstombs_PARM_3
+                                     36 	.globl _wcstombs_PARM_2
+                                     37 	.globl _wcstombs
+                                     38 ;--------------------------------------------------------
+                                     39 ; special function registers
+                                     40 ;--------------------------------------------------------
+                                     41 ;--------------------------------------------------------
+                                     42 ; special function bits
+                                     43 ;--------------------------------------------------------
+                                     44 ;--------------------------------------------------------
+                                     45 ; overlayable register banks
+                                     46 ;--------------------------------------------------------
+                                     47 	.area REG_BANK_0	(REL,OVR,DATA)
+      000000                         48 	.ds 8
+                                     49 	.area REG_BANK_3	(REL,OVR,DATA)
+      000000                         50 	.ds 8
+                                     51 ;--------------------------------------------------------
+                                     52 ; internal ram data
+                                     53 ;--------------------------------------------------------
+                                     54 	.area DSEG    (DATA)
+                                     55 ;--------------------------------------------------------
+                                     56 ; overlayable items in internal ram
+                                     57 ;--------------------------------------------------------
+                                     58 ;--------------------------------------------------------
+                                     59 ; indirectly addressable internal ram data
+                                     60 ;--------------------------------------------------------
+                                     61 	.area ISEG    (DATA)
+                                     62 ;--------------------------------------------------------
+                                     63 ; absolute internal ram data
+                                     64 ;--------------------------------------------------------
+                                     65 	.area IABS    (ABS,DATA)
+                                     66 	.area IABS    (ABS,DATA)
+                                     67 ;--------------------------------------------------------
+                                     68 ; bit data
+                                     69 ;--------------------------------------------------------
+                                     70 	.area BSEG    (BIT)
+                                     71 ;--------------------------------------------------------
+                                     72 ; paged external ram data
+                                     73 ;--------------------------------------------------------
+                                     74 	.area PSEG    (PAG,XDATA)
+                                     75 ;--------------------------------------------------------
+                                     76 ; uninitialized external ram data
+                                     77 ;--------------------------------------------------------
+                                     78 	.area XSEG    (XDATA)
+      000000                         79 _wcstombs_PARM_2:
+      000000                         80 	.ds 4
+      000004                         81 _wcstombs_PARM_3:
+      000004                         82 	.ds 2
+      000006                         83 _wcstombs_s_65536_36:
+      000006                         84 	.ds 4
+      00000A                         85 _wcstombs_m_65536_37:
+      00000A                         86 	.ds 2
+      00000C                         87 _wcstombs_buffer_65536_37:
+      00000C                         88 	.ds 4
+                                     89 ;--------------------------------------------------------
+                                     90 ; absolute external ram data
+                                     91 ;--------------------------------------------------------
+                                     92 	.area XABS    (ABS,XDATA)
+                                     93 ;--------------------------------------------------------
+                                     94 ; initialized external ram data
+                                     95 ;--------------------------------------------------------
+                                     96 	.area XISEG   (XDATA)
+                                     97 ;--------------------------------------------------------
+                                     98 ; global & static initialisations
+                                     99 ;--------------------------------------------------------
+                                    100 	.area HOME    (CODE)
+                                    101 	.area GSINIT  (CODE)
+                                    102 	.area GSFINAL (CODE)
+                                    103 	.area GSINIT  (CODE)
+                                    104 ;--------------------------------------------------------
+                                    105 ; Home
+                                    106 ;--------------------------------------------------------
+                                    107 	.area HOME    (CODE)
+                                    108 	.area HOME    (CODE)
+                                    109 ;--------------------------------------------------------
+                                    110 ; code
+                                    111 ;--------------------------------------------------------
+                                    112 	.area CSEG    (CODE)
+                                    113 ;------------------------------------------------------------
+                                    114 ;Allocation info for local variables in function 'wcstombs'
+                                    115 ;------------------------------------------------------------
+                                    116 ;pwcs                      Allocated with name '_wcstombs_PARM_2'
+                                    117 ;n                         Allocated with name '_wcstombs_PARM_3'
+                                    118 ;s                         Allocated with name '_wcstombs_s_65536_36'
+                                    119 ;m                         Allocated with name '_wcstombs_m_65536_37'
+                                    120 ;buffer                    Allocated with name '_wcstombs_buffer_65536_37'
+                                    121 ;b                         Allocated to registers r2 r3 
+                                    122 ;------------------------------------------------------------
+                                    123 ;	wcstombs.c:33: size_t wcstombs(char *restrict s, const wchar_t *restrict pwcs, size_t n)
+                                    124 ;	-----------------------------------------
+                                    125 ;	 function wcstombs
+                                    126 ;	-----------------------------------------
+      000000                        127 _wcstombs:
+                           000002   128 	ar2 = 0x02
+                           000003   129 	ar3 = 0x03
+                           000004   130 	ar4 = 0x04
+                           000005   131 	ar5 = 0x05
+                           000006   132 	ar6 = 0x06
+                           000007   133 	ar7 = 0x07
+                           000000   134 	ar0 = 0x00
+                           000001   135 	ar1 = 0x01
+      000000 75 86 01         [12]  136 	mov     dps, #1
+      000003 90s00r00r06      [12]  137 	mov     dptr, #_wcstombs_s_65536_36
+      000007 E5 82            [ 8]  138 	mov	a,dpl
+      000009 F0               [ 8]  139 	movx	@dptr,a
+      00000A A3               [12]  140 	inc	dptr
+      00000B E5 83            [ 8]  141 	mov	a,dph
+      00000D F0               [ 8]  142 	movx	@dptr,a
+      00000E A3               [12]  143 	inc	dptr
+      00000F E5 93            [ 8]  144 	mov	a,dpx
+      000011 F0               [ 8]  145 	movx	@dptr,a
+      000012 A3               [12]  146 	inc	dptr
+      000013 E5 F0            [ 8]  147 	mov	a,b
+      000015 F0               [ 8]  148 	movx	@dptr,a
+      000016 75 86 00         [12]  149 	mov	dps,#0
+                                    150 ;	wcstombs.c:35: size_t m = 0;
+                                    151 ;	genAssign: resultIsFar = TRUE
+      000019 90s00r00r0A      [12]  152 	mov	dptr,#_wcstombs_m_65536_37
+      00001D E4               [ 4]  153 	clr	a
+      00001E F0               [ 8]  154 	movx	@dptr,a
+      00001F A3               [12]  155 	inc	dptr
+      000020 F0               [ 8]  156 	movx	@dptr,a
+                                    157 ;	wcstombs.c:38: while(n > MB_LEN_MAX || n >= wctomb(buffer, *pwcs))
+      000021 90s00r00r00      [12]  158 	mov	dptr,#_wcstombs_PARM_2
+                                    159 ;	genAssign: resultIsFar = FALSE
+      000025 E0               [ 8]  160 	movx	a,@dptr
+      000026 F8               [ 4]  161 	mov	r0,a
+      000027 A3               [12]  162 	inc	dptr
+      000028 E0               [ 8]  163 	movx	a,@dptr
+      000029 F9               [ 4]  164 	mov	r1,a
+      00002A A3               [12]  165 	inc	dptr
+      00002B E0               [ 8]  166 	movx	a,@dptr
+      00002C FE               [ 4]  167 	mov	r6,a
+      00002D A3               [12]  168 	inc	dptr
+      00002E E0               [ 8]  169 	movx	a,@dptr
+      00002F FF               [ 4]  170 	mov	r7,a
+      000030                        171 00107$:
+      000030 90s00r00r04      [12]  172 	mov	dptr,#_wcstombs_PARM_3
+      000034 C3               [ 4]  173 	clr	c
+      000035 74 04            [ 8]  174 	mov	a,#0x04
+      000037 C5 F0            [ 8]  175 	xch	a, b
+      000039 E0               [ 8]  176 	movx	a,@dptr
+      00003A C5 F0            [ 8]  177 	xch	a, b
+      00003C 95 F0            [ 8]  178 	subb	a,b
+      00003E E4               [ 4]  179 	clr	a
+      00003F C5 F0            [ 8]  180 	xch	a, b
+      000041 A3               [12]  181 	inc	dptr
+      000042 E0               [ 8]  182 	movx	a,@dptr
+      000043 C5 F0            [ 8]  183 	xch	a, b
+      000045 95 F0            [ 8]  184 	subb	a,b
+      000047 40 55            [12]  185 	jc   00108$
+      000049                        186 00128$:
+      000049 88 82            [ 8]  187 	mov	dpl,r0
+      00004B 89 83            [ 8]  188 	mov	dph,r1
+      00004D 8E 93            [ 8]  189 	mov	dpx,r6
+      00004F 8F F0            [ 8]  190 	mov	b,r7
+      000051 12s00r00r00      [16]  191 	lcall	__gptrgetWord
+      000055 FA               [ 4]  192 	mov	r2,a
+      000056 AB 9C            [ 8]  193 	mov	r3,acc1
+      000058 A3               [12]  194 	inc	dptr
+      000059 12s00r00r00      [16]  195 	lcall	__gptrgetWord
+      00005D FC               [ 4]  196 	mov	r4,a
+      00005E AD 9C            [ 8]  197 	mov	r5,acc1
+                                    198 ;	genAssign: resultIsFar = TRUE
+      000060 90s00r00r00      [12]  199 	mov	dptr,#_wctomb_PARM_2
+      000064 EA               [ 4]  200 	mov	a,r2
+      000065 F0               [ 8]  201 	movx	@dptr,a
+      000066 A3               [12]  202 	inc	dptr
+      000067 EB               [ 4]  203 	mov	a,r3
+      000068 F0               [ 8]  204 	movx	@dptr,a
+      000069 A3               [12]  205 	inc	dptr
+      00006A EC               [ 4]  206 	mov	a,r4
+      00006B F0               [ 8]  207 	movx	@dptr,a
+      00006C A3               [12]  208 	inc	dptr
+      00006D ED               [ 4]  209 	mov	a,r5
+      00006E F0               [ 8]  210 	movx	@dptr,a
+      00006F C0 06            [ 8]  211 	push	ar6
+      000071 C0 07            [ 8]  212 	push	ar7
+      000073 C0 00            [ 8]  213 	push	ar0
+      000075 C0 01            [ 8]  214 	push	ar1
+      000077 90s00r00r0C      [12]  215 	mov dptr,#_wcstombs_buffer_65536_37
+      00007B 75 F0 00         [12]  216 	mov	b,#0x00
+      00007E 12s00r00r00      [16]  217 	lcall	_wctomb
+      000082 AA 82            [ 8]  218 	mov	r2,dpl
+      000084 AB 83            [ 8]  219 	mov	r3,dph
+      000086 D0 01            [ 8]  220 	pop	ar1
+      000088 D0 00            [ 8]  221 	pop	ar0
+      00008A D0 07            [ 8]  222 	pop	ar7
+      00008C D0 06            [ 8]  223 	pop	ar6
+      00008E 90s00r00r04      [12]  224 	mov	dptr,#_wcstombs_PARM_3
+      000092 C3               [ 4]  225 	clr	c
+      000093 E0               [ 8]  226 	movx	a,@dptr
+      000094 9A               [ 4]  227 	subb	a,r2
+      000095 A3               [12]  228 	inc	dptr
+      000096 E0               [ 8]  229 	movx	a,@dptr
+      000097 9B               [ 4]  230 	subb	a,r3
+      000098 50 04            [12]  231 	jnc	00129$
+      00009A 02s00r01r65      [16]  232 	ljmp	00109$
+      00009E                        233 00129$:
+      00009E                        234 00108$:
+                                    235 ;	wcstombs.c:40: int b = wctomb(s, *pwcs);
+      00009E 88 82            [ 8]  236 	mov	dpl,r0
+      0000A0 89 83            [ 8]  237 	mov	dph,r1
+      0000A2 8E 93            [ 8]  238 	mov	dpx,r6
+      0000A4 8F F0            [ 8]  239 	mov	b,r7
+      0000A6 12s00r00r00      [16]  240 	lcall	__gptrgetWord
+      0000AA FA               [ 4]  241 	mov	r2,a
+      0000AB AB 9C            [ 8]  242 	mov	r3,acc1
+      0000AD A3               [12]  243 	inc	dptr
+      0000AE 12s00r00r00      [16]  244 	lcall	__gptrgetWord
+      0000B2 FC               [ 4]  245 	mov	r4,a
+      0000B3 AD 9C            [ 8]  246 	mov	r5,acc1
+                                    247 ;	genAssign: resultIsFar = TRUE
+      0000B5 90s00r00r00      [12]  248 	mov	dptr,#_wctomb_PARM_2
+      0000B9 EA               [ 4]  249 	mov	a,r2
+      0000BA F0               [ 8]  250 	movx	@dptr,a
+      0000BB A3               [12]  251 	inc	dptr
+      0000BC EB               [ 4]  252 	mov	a,r3
+      0000BD F0               [ 8]  253 	movx	@dptr,a
+      0000BE A3               [12]  254 	inc	dptr
+      0000BF EC               [ 4]  255 	mov	a,r4
+      0000C0 F0               [ 8]  256 	movx	@dptr,a
+      0000C1 A3               [12]  257 	inc	dptr
+      0000C2 ED               [ 4]  258 	mov	a,r5
+      0000C3 F0               [ 8]  259 	movx	@dptr,a
+      0000C4 C0 06            [ 8]  260 	push	ar6
+      0000C6 C0 07            [ 8]  261 	push	ar7
+      0000C8 C0 00            [ 8]  262 	push	ar0
+      0000CA C0 01            [ 8]  263 	push	ar1
+      0000CC 05 86            [ 8]  264 	inc	dps
+      0000CE 90s00r00r06      [12]  265 	mov	dptr,#_wcstombs_s_65536_36
+      0000D2 E0               [ 8]  266 	movx	a,@dptr
+      0000D3 F5 82            [ 8]  267 	mov	dpl,a
+      0000D5 A3               [12]  268 	inc	dptr
+      0000D6 E0               [ 8]  269 	movx	a,@dptr
+      0000D7 F5 83            [ 8]  270 	mov	dph,a
+      0000D9 A3               [12]  271 	inc	dptr
+      0000DA E0               [ 8]  272 	movx	a,@dptr
+      0000DB F5 93            [ 8]  273 	mov	dpx,a
+      0000DD A3               [12]  274 	inc	dptr
+      0000DE E0               [ 8]  275 	movx	a,@dptr
+      0000DF F5 F0            [ 8]  276 	mov	b,a
+      0000E1 75 86 00         [12]  277 	mov	dps,#0
+      0000E4 12s00r00r00      [16]  278 	lcall	_wctomb
+      0000E8 AA 82            [ 8]  279 	mov	r2,dpl
+      0000EA AB 83            [ 8]  280 	mov	r3,dph
+      0000EC D0 01            [ 8]  281 	pop	ar1
+      0000EE D0 00            [ 8]  282 	pop	ar0
+      0000F0 D0 07            [ 8]  283 	pop	ar7
+      0000F2 D0 06            [ 8]  284 	pop	ar6
+                                    285 ;	genAssign: resultIsFar = TRUE
+                                    286 ;	wcstombs.c:42: if(b == 1 && !*s)
+      0000F4 BA 01 23         [16]  287 	cjne r2,#0x01,00102$
+      0000F7 BB 00 20         [16]  288 	cjne r3,#0x00,00102$
+      0000FA                        289 00131$:
+      0000FA 90s00r00r06      [12]  290 	mov	dptr,#_wcstombs_s_65536_36
+      0000FE E0               [ 8]  291 	movx	a,@dptr
+      0000FF C0 E0            [ 8]  292 	push	acc
+      000101 A3               [12]  293 	inc	dptr
+      000102 E0               [ 8]  294 	movx	a,@dptr
+      000103 C0 E0            [ 8]  295 	push	acc
+      000105 A3               [12]  296 	inc	dptr
+      000106 E0               [ 8]  297 	movx	a,@dptr
+      000107 C0 E0            [ 8]  298 	push	acc
+      000109 A3               [12]  299 	inc	dptr
+      00010A E0               [ 8]  300 	movx	a,@dptr
+      00010B F5 F0            [ 8]  301 	mov	b,a
+      00010D D0 93            [ 8]  302 	pop	dpx
+      00010F D0 83            [ 8]  303 	pop	dph
+      000111 D0 82            [ 8]  304 	pop	dpl
+      000113 12s00r00r00      [16]  305 	lcall	__gptrget
+      000117 FC               [ 4]  306 	mov  r4,a
+      000118 60 4B            [12]  307 	jz  00109$
+      00011A                        308 00132$:
+                                    309 ;	wcstombs.c:43: break;
+      00011A                        310 00102$:
+                                    311 ;	wcstombs.c:44: if(b < 0)
+      00011A EB               [ 4]  312 	mov	a,r3
+      00011B 30 E7 06         [12]  313 	jnb  acc[7],00105$
+      00011E                        314 00133$:
+                                    315 ;	wcstombs.c:45: return(-1);
+      00011E 90 00 FF FF      [12]  316 	mov  dptr,#0xffff
+      000122 80 52            [12]  317 	sjmp 00110$
+      000124                        318 00105$:
+                                    319 ;	wcstombs.c:47: n -= b;
+      000124 8A 04            [ 8]  320 	mov	ar4,r2
+      000126 8B 05            [ 8]  321 	mov	ar5,r3
+      000128 90s00r00r04      [12]  322 	mov	dptr,#_wcstombs_PARM_3
+      00012C C3               [ 4]  323 	clr	c
+      00012D E0               [ 8]  324 	movx	a,@dptr
+      00012E 9C               [ 4]  325 	subb	a,r4
+      00012F F0               [ 8]  326 	movx	@dptr,a
+      000130 A3               [12]  327 	inc	dptr
+      000131 E0               [ 8]  328 	movx	a,@dptr
+      000132 9D               [ 4]  329 	subb	a,r5
+      000133 F0               [ 8]  330 	movx	@dptr,a
+                                    331 ;	wcstombs.c:48: m += b;
+      000134 90s00r00r0A      [12]  332 	mov	dptr,#_wcstombs_m_65536_37
+      000138 E0               [ 8]  333 	movx	a,@dptr
+      000139 2C               [ 4]  334 	add	a,r4
+      00013A F0               [ 8]  335 	movx	@dptr,a
+      00013B A3               [12]  336 	inc	dptr
+      00013C E0               [ 8]  337 	movx	a,@dptr
+      00013D 3D               [ 4]  338 	addc	a,r5
+      00013E F0               [ 8]  339 	movx	@dptr,a
+                                    340 ;	wcstombs.c:49: s += b;
+      00013F EB               [ 4]  341 	mov	a,r3
+      000140 33               [ 4]  342 	rlc	a
+      000141 95 E0            [ 8]  343 	subb	a,acc
+      000143 FC               [ 4]  344 	mov	r4,a
+      000144 FD               [ 4]  345 	mov	r5,a
+      000145 90s00r00r06      [12]  346 	mov	dptr,#_wcstombs_s_65536_36
+      000149 E0               [ 8]  347 	movx	a,@dptr
+      00014A 2A               [ 4]  348 	add	a,r2
+      00014B F0               [ 8]  349 	movx	@dptr,a
+      00014C A3               [12]  350 	inc	dptr
+      00014D E0               [ 8]  351 	movx	a,@dptr
+      00014E 3B               [ 4]  352 	addc	a,r3
+      00014F F0               [ 8]  353 	movx	@dptr,a
+      000150 A3               [12]  354 	inc	dptr
+      000151 E0               [ 8]  355 	movx	a,@dptr
+      000152 3C               [ 4]  356 	addc	a,r4
+      000153 F0               [ 8]  357 	movx	@dptr,a
+      000154 A3               [12]  358 	inc	dptr
+      000155 E0               [ 8]  359 	movx	a,@dptr
+      000156 F0               [ 8]  360 	movx	@dptr,a
+                                    361 ;	wcstombs.c:50: pwcs++;
+      000157 74 04            [ 8]  362 	mov	a,#0x04
+      000159 28               [ 4]  363 	add	a,r0
+      00015A F8               [ 4]  364 	mov	r0,a
+      00015B E4               [ 4]  365 	clr	a
+      00015C 39               [ 4]  366 	addc	a,r1
+      00015D F9               [ 4]  367 	mov	r1,a
+      00015E E4               [ 4]  368 	clr	a
+      00015F 3E               [ 4]  369 	addc	a,r6
+      000160 FE               [ 4]  370 	mov	r6,a
+      000161 02s00r00r30      [16]  371 	ljmp	00107$
+      000165                        372 00109$:
+                                    373 ;	wcstombs.c:53: return(m);
+      000165 75 86 01         [12]  374 	mov     dps, #1
+      000168 90s00r00r0A      [12]  375 	mov     dptr, #_wcstombs_m_65536_37
+      00016C E0               [ 8]  376 	movx	a,@dptr
+      00016D F5 82            [ 8]  377 	mov	dpl,a
+      00016F A3               [12]  378 	inc	dptr
+      000170 E0               [ 8]  379 	movx	a,@dptr
+      000171 F5 83            [ 8]  380 	mov	dph,a
+      000173 75 86 00         [12]  381 	mov	dps,#0
+      000176                        382 00110$:
+                                    383 ;	wcstombs.c:54: }
+      000176 22               [16]  384 	ret
+                                    385 	.area CSEG    (CODE)
+                                    386 	.area CONST   (CODE)
+                                    387 	.area XINIT   (CODE)
+                                    388 	.area CABS    (ABS,CODE)

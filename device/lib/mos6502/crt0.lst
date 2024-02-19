@@ -1,0 +1,96 @@
+                              1 ;--------------------------------------------------------------------------
+                              2 ;  crt0.s - Generic crt0.s for a bare metal 6502
+                              3 ;
+                              4 ;  Copyright (C) 2021-2022, Gabriele Gorla
+                              5 ;
+                              6 ;  This library is free software; you can redistribute it and/or modify it
+                              7 ;  under the terms of the GNU General Public License as published by the
+                              8 ;  Free Software Foundation; either version 2, or (at your option) any
+                              9 ;  later version.
+                             10 ;
+                             11 ;  This library is distributed in the hope that it will be useful,
+                             12 ;  but WITHOUT ANY WARRANTY; without even the implied warranty of
+                             13 ;  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+                             14 ;  GNU General Public License for more details.
+                             15 ;
+                             16 ;  You should have received a copy of the GNU General Public License
+                             17 ;  along with this library; see the file COPYING. If not, write to the
+                             18 ;  Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
+                             19 ;   MA 02110-1301, USA.
+                             20 ;
+                             21 ;  As a special exception, if you link this library with other files,
+                             22 ;  some of which are compiled with SDCC, to produce an executable,
+                             23 ;  this library does not by itself cause the resulting executable to
+                             24 ;  be covered by the GNU General Public License. This exception does
+                             25 ;  not however invalidate any other reasons why the executable file
+                             26 ;   might be covered by the GNU General Public License.
+                             27 ;--------------------------------------------------------------------------
+                             28 
+                             29 	.module crt0
+                             30 
+                             31 	;; Ordering of segments for the linker.
+                             32         .area _CODE
+                             33         .area GSINIT
+                             34         .area GSFINAL
+                             35         .area CODE
+                             36         .area RODATA
+                             37         .area XINIT
+                             38 
+                             39 	.area _DATA
+                             40         .area DATA
+                             41         .area BSS
+                             42 
+                             43         .area ZP      (PAG)
+                             44         .area OSEG    (PAG, OVR)
+                             45 
+                             46 	;; Reset/interrupt vectors
+                             47         .area   CODEIVT (ABS)
+   FFFFFFFA                      48         .org    0xfffa
+   FFFFFFFAr00r00                49 	.dw	__sdcc_gs_init_startup ; NMI
+   FFFFFFFCr00r00                50 	.dw	__sdcc_gs_init_startup ; RESET
+   FFFFFFFEr00r00                51 	.dw	__sdcc_gs_init_startup ; IRQ/BRK
+                             52 
+                             53         .area GSINIT
+   0000                      54 __sdcc_gs_init_startup:
+   0000 A2 FF         [ 2]   55         ldx     #0xff
+   0002 9A            [ 2]   56         txs
+                             57 ;        ldx     #0x01         ; MSB of stack ptr
+                             58 ;        stx     __BASEPTR+1
+                             59 
+                             60 ;; Skip initialisation of global variables if __sdcc_external_startup
+                             61 ;; returned non-zero value.
+   0003 20r00r00      [ 6]   62         jsr	___sdcc_external_startup
+   0006 09 00         [ 2]   63         ora #0
+   0008 F0 03         [ 4]   64         beq __sdcc_init_data
+   000A 4Cr00r00      [ 3]   65         jmp __sdcc_program_startup
+                             66 
+   000D                      67 __sdcc_init_data:
+                             68 ;; initialize DATA
+   000D A9r00         [ 2]   69         lda #<s_XINIT
+   000F 85*00         [ 3]   70         sta *___memcpy_PARM_2
+   0011 A9s00         [ 2]   71         lda #>s_XINIT
+   0013 85*01         [ 3]   72         sta *___memcpy_PARM_2+1
+   0015 A9r00         [ 2]   73         lda #<l_XINIT
+   0017 85*00         [ 3]   74         sta *___memcpy_PARM_3
+   0019 A9s00         [ 2]   75         lda #>l_XINIT
+   001B 85*01         [ 3]   76         sta *___memcpy_PARM_3+1
+   001D A9r00         [ 2]   77         lda #<s_DATA
+   001F A2s00         [ 2]   78         ldx #>s_DATA
+   0021 20r00r00      [ 6]   79         jsr ___memcpy
+                             80 
+                             81 ;; clear BSS
+   0024 A9 00         [ 2]   82         lda #0x00
+   0026 85*00         [ 3]   83         sta *_memset_PARM_2
+   0028 A9r00         [ 2]   84         lda #<l_BSS
+   002A 85*00         [ 3]   85         sta *_memset_PARM_3
+   002C A9s00         [ 2]   86         lda #>l_BSS
+   002E 85*01         [ 3]   87         sta *_memset_PARM_3+1
+   0030 A9r00         [ 2]   88         lda #<s_BSS
+   0032 A2s00         [ 2]   89         ldx #>s_BSS
+   0034 20r00r00      [ 6]   90         jsr _memset
+                             91 
+                             92         .area GSFINAL
+   0000                      93 __sdcc_program_startup:
+   0000 20r00r00      [ 6]   94         jsr     _main
+   0003 4Cr03r00      [ 3]   95         jmp     .
+                             96 

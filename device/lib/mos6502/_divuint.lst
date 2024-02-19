@@ -1,0 +1,123 @@
+                              1 ;-------------------------------------------------------------------------
+                              2 ;   _divuint.s - routine for division of 16 bit unsigned int
+                              3 ;
+                              4 ;   Copyright (C) 1998, Ullrich von Bassewitz
+                              5 ;   Copyright (C) 2022, Gabriele Gorla
+                              6 ;
+                              7 ;   This library is free software; you can redistribute it and/or modify it
+                              8 ;   under the terms of the GNU General Public License as published by the
+                              9 ;   Free Software Foundation; either version 2, or (at your option) any
+                             10 ;   later version.
+                             11 ;
+                             12 ;   This library is distributed in the hope that it will be useful,
+                             13 ;   but WITHOUT ANY WARRANTY; without even the implied warranty of
+                             14 ;   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+                             15 ;   GNU General Public License for more details.
+                             16 ;
+                             17 ;   You should have received a copy of the GNU General Public License
+                             18 ;   along with this library; see the file COPYING. If not, write to the
+                             19 ;   Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
+                             20 ;   MA 02110-1301, USA.
+                             21 ;
+                             22 ;   As a special exception, if you link this library with other files,
+                             23 ;   some of which are compiled with SDCC, to produce an executable,
+                             24 ;   this library does not by itself cause the resulting executable to
+                             25 ;   be covered by the GNU General Public License. This exception does
+                             26 ;   not however invalidate any other reasons why the executable file
+                             27 ;   might be covered by the GNU General Public License.
+                             28 ;-------------------------------------------------------------------------
+                             29 
+                             30 	.module _divuint
+                             31 
+                             32 ;--------------------------------------------------------
+                             33 ; exported symbols
+                             34 ;--------------------------------------------------------
+                             35 	.globl __divuint_PARM_2
+                             36 	.globl __divsint_PARM_2
+                             37 	.globl __moduint_PARM_2
+                             38 	.globl __modsint_PARM_2
+                             39 	.globl __divuint
+                             40 	.globl ___udivmod16
+                             41 
+                             42 ;--------------------------------------------------------
+                             43 ; overlayable function paramters in zero page
+                             44 ;--------------------------------------------------------
+                             45 	.area	OSEG    (PAG, OVR)
+   0000                      46 __divuint_PARM_2:
+   0000                      47 __divsint_PARM_2:
+   0000                      48 __moduint_PARM_2:
+   0000                      49 __modsint_PARM_2:
+   0000                      50 	.ds 2
+                             51 
+                             52 ;--------------------------------------------------------
+                             53 ; local aliases
+                             54 ;--------------------------------------------------------
+                             55 	.define res "___SDCC_m6502_ret0"
+                             56 	.define den "__divuint_PARM_2"
+                             57 	.define rem "___SDCC_m6502_ret2"
+                             58 	.define s1  "___SDCC_m6502_ret4"
+                             59 	.define s2  "___SDCC_m6502_ret5"
+                             60 
+                             61 ;--------------------------------------------------------
+                             62 ; code
+                             63 ;--------------------------------------------------------
+                             64 	.area CODE
+                             65 
+   0000                      66 __divuint:
+   0000 20r08r00      [ 6]   67 	jsr	___udivmod16
+   0003 A5*00         [ 3]   68 	lda	*res+0
+   0005 A6*01         [ 3]   69 	ldx	*res+1
+   0007 60            [ 6]   70 	rts
+                             71 
+   0008                      72 ___udivmod16:
+   0008 85*00         [ 3]   73 	sta	*res+0
+   000A 86*01         [ 3]   74 	stx	*res+1
+                             75 
+   000C A9 00         [ 2]   76 	lda	#0
+   000E 85*01         [ 3]   77 	sta	*rem+1
+   0010 A0 10         [ 2]   78 	ldy	#16
+                             79 ;	ldx	__divuint_PARM_2+1
+                             80 ;	beq	div16x8
+   0012                      81 next_bit:
+   0012 06*00         [ 5]   82 	asl	*res+0
+   0014 26*01         [ 5]   83 	rol	*res+1
+   0016 2A            [ 2]   84 	rol	a
+   0017 26*01         [ 5]   85 	rol	*rem+1
+                             86 
+   0019 AA            [ 2]   87 	tax
+   001A C5*00         [ 3]   88 	cmp	*den+0
+   001C A5*01         [ 3]   89 	lda	*rem+1
+   001E E5*01         [ 3]   90 	sbc	*den+1
+   0020 90 08         [ 4]   91 	bcc	L1
+   0022 85*01         [ 3]   92 	sta	*rem+1
+   0024 8A            [ 2]   93 	txa
+   0025 E5*00         [ 3]   94 	sbc	*den+0
+   0027 AA            [ 2]   95 	tax
+   0028 E6*00         [ 5]   96 	inc	*res+0
+   002A                      97 L1:
+   002A 8A            [ 2]   98 	txa
+   002B 88            [ 2]   99 	dey
+   002C D0 E4         [ 4]  100 	bne	next_bit
+   002E 85*00         [ 3]  101 	sta	*rem+0
+   0030 60            [ 6]  102 	rts
+                            103 
+                            104 ;div16x8:
+                            105 ;LL0:
+                            106 ;	asl	*___SDCC_m6502_ret0+0
+                            107 ;	rol	*___SDCC_m6502_ret0+1
+                            108 ;	rol	a
+                            109 ;	bcs	LL1
+                            110 ;	cmp	__divuint_PARM_2+0
+                            111 ;	bcc	LL2
+                            112 ;LL1:
+                            113 ;	sbc	__divuint_PARM_2+0
+                            114 ;	inc	*___SDCC_m6502_ret0+0
+                            115 ;LL2:
+                            116 ;	dey
+                            117 ;	bne	LL0
+                            118 ;	sta	*___SDCC_m6502_ret2+0
+                            119 ;
+                            120 ;	lda	*___SDCC_m6502_ret0+0
+                            121 ;	ldx	*___SDCC_m6502_ret0+1
+                            122 ;	rts
+                            123 

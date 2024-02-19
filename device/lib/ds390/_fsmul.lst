@@ -1,0 +1,863 @@
+                                      1 ;--------------------------------------------------------
+                                      2 ; File Created by SDCC : free open source ISO C Compiler 
+                                      3 ; Version 4.2.14 #0 (Linux)
+                                      4 ;--------------------------------------------------------
+                                      5 	.module _fsmul
+                                      6 	.optsdcc -mds390 --model-flat24
+                                      7 	
+                                      8 ;--------------------------------------------------------
+                                      9 ; CPU specific extensions
+                                     10 ;--------------------------------------------------------
+                                     11 	.DS80C390
+                                     12 	.amode	2	; 24 bit flat addressing
+                           000082    13 dpl	=	0x82
+                           000083    14 dph	=	0x83
+                           000084    15 dpl1	=	0x84
+                           000085    16 dph1	=	0x85
+                           000086    17 dps	=	0x86
+                           000093    18 dpx	=	0x93
+                           000095    19 dpx1	=	0x95
+                           00009B    20 esp	=	0x9B
+                           00009C    21 ap	=	0x9C
+                           00009C    22 acc1	=	0x9C
+                           0000D1    23 mcnt0	=	0xD1
+                           0000D2    24 mcnt1	=	0xD2
+                           0000D3    25 ma	=	0xD3
+                           0000D4    26 mb	=	0xD4
+                           0000D5    27 mc	=	0xD5
+                           00009D    28 acon	=	0x9D
+                           0000C6    29 mcon	=	0xC6
+                           0000D1    30 F1	=	0xD1	; user flag
+                                     31 ;--------------------------------------------------------
+                                     32 ; Public variables in this module
+                                     33 ;--------------------------------------------------------
+                                     34 	.globl ___fsmul_PARM_2
+                                     35 	.globl ___fsmul
+                                     36 ;--------------------------------------------------------
+                                     37 ; special function registers
+                                     38 ;--------------------------------------------------------
+                                     39 ;--------------------------------------------------------
+                                     40 ; special function bits
+                                     41 ;--------------------------------------------------------
+                                     42 ;--------------------------------------------------------
+                                     43 ; overlayable register banks
+                                     44 ;--------------------------------------------------------
+                                     45 	.area REG_BANK_0	(REL,OVR,DATA)
+      000000                         46 	.ds 8
+                                     47 ;--------------------------------------------------------
+                                     48 ; internal ram data
+                                     49 ;--------------------------------------------------------
+                                     50 	.area DSEG    (DATA)
+                                     51 ;--------------------------------------------------------
+                                     52 ; overlayable items in internal ram
+                                     53 ;--------------------------------------------------------
+                                     54 ;--------------------------------------------------------
+                                     55 ; indirectly addressable internal ram data
+                                     56 ;--------------------------------------------------------
+                                     57 	.area ISEG    (DATA)
+                                     58 ;--------------------------------------------------------
+                                     59 ; absolute internal ram data
+                                     60 ;--------------------------------------------------------
+                                     61 	.area IABS    (ABS,DATA)
+                                     62 	.area IABS    (ABS,DATA)
+                                     63 ;--------------------------------------------------------
+                                     64 ; bit data
+                                     65 ;--------------------------------------------------------
+                                     66 	.area BSEG    (BIT)
+                                     67 ;--------------------------------------------------------
+                                     68 ; paged external ram data
+                                     69 ;--------------------------------------------------------
+                                     70 	.area PSEG    (PAG,XDATA)
+                                     71 ;--------------------------------------------------------
+                                     72 ; uninitialized external ram data
+                                     73 ;--------------------------------------------------------
+                                     74 	.area XSEG    (XDATA)
+      000000                         75 ___fsmul_PARM_2:
+      000000                         76 	.ds 4
+      000004                         77 ___fsmul_fl1_65536_21:
+      000004                         78 	.ds 4
+      000008                         79 ___fsmul_fl2_65536_21:
+      000008                         80 	.ds 4
+      00000C                         81 ___fsmul_exp_65536_21:
+      00000C                         82 	.ds 2
+      00000E                         83 ___fsmul_sign_65536_21:
+      00000E                         84 	.ds 1
+      00000F                         85 ___fsmul_sloc0_1_0:
+      00000F                         86 	.ds 4
+                                     87 ;--------------------------------------------------------
+                                     88 ; absolute external ram data
+                                     89 ;--------------------------------------------------------
+                                     90 	.area XABS    (ABS,XDATA)
+                                     91 ;--------------------------------------------------------
+                                     92 ; initialized external ram data
+                                     93 ;--------------------------------------------------------
+                                     94 	.area XISEG   (XDATA)
+                                     95 ;--------------------------------------------------------
+                                     96 ; global & static initialisations
+                                     97 ;--------------------------------------------------------
+                                     98 	.area HOME    (CODE)
+                                     99 	.area GSINIT  (CODE)
+                                    100 	.area GSFINAL (CODE)
+                                    101 	.area GSINIT  (CODE)
+                                    102 ;--------------------------------------------------------
+                                    103 ; Home
+                                    104 ;--------------------------------------------------------
+                                    105 	.area HOME    (CODE)
+                                    106 	.area HOME    (CODE)
+                                    107 ;--------------------------------------------------------
+                                    108 ; code
+                                    109 ;--------------------------------------------------------
+                                    110 	.area CSEG    (CODE)
+                                    111 ;------------------------------------------------------------
+                                    112 ;Allocation info for local variables in function '__fsmul'
+                                    113 ;------------------------------------------------------------
+                                    114 ;a2                        Allocated with name '___fsmul_PARM_2'
+                                    115 ;a1                        Allocated to registers r2 r3 r4 r5 
+                                    116 ;fl1                       Allocated with name '___fsmul_fl1_65536_21'
+                                    117 ;fl2                       Allocated with name '___fsmul_fl2_65536_21'
+                                    118 ;result                    Allocated to registers r6 r7 r0 r1 
+                                    119 ;exp                       Allocated with name '___fsmul_exp_65536_21'
+                                    120 ;sign                      Allocated with name '___fsmul_sign_65536_21'
+                                    121 ;sloc0                     Allocated with name '___fsmul_sloc0_1_0'
+                                    122 ;------------------------------------------------------------
+                                    123 ;	_fsmul.c:241: float __fsmul (float a1, float a2) {
+                                    124 ;	-----------------------------------------
+                                    125 ;	 function __fsmul
+                                    126 ;	-----------------------------------------
+      000000                        127 ___fsmul:
+                           000002   128 	ar2 = 0x02
+                           000003   129 	ar3 = 0x03
+                           000004   130 	ar4 = 0x04
+                           000005   131 	ar5 = 0x05
+                           000006   132 	ar6 = 0x06
+                           000007   133 	ar7 = 0x07
+                           000000   134 	ar0 = 0x00
+                           000001   135 	ar1 = 0x01
+      000000 AA 82            [ 8]  136 	mov	r2,dpl
+      000002 AB 83            [ 8]  137 	mov	r3,dph
+      000004 AC 93            [ 8]  138 	mov	r4,dpx
+      000006 AD F0            [ 8]  139 	mov	r5,b
+                                    140 ;	_fsmul.c:247: fl1.f = a1;
+      000008 90s00r00r04      [12]  141 	mov	dptr,#___fsmul_fl1_65536_21
+      00000C EA               [ 4]  142 	mov	a,r2
+      00000D F0               [ 8]  143 	movx	@dptr,a
+      00000E A3               [12]  144 	inc	dptr
+      00000F EB               [ 4]  145 	mov	a,r3
+      000010 F0               [ 8]  146 	movx	@dptr,a
+      000011 A3               [12]  147 	inc	dptr
+      000012 EC               [ 4]  148 	mov	a,r4
+      000013 F0               [ 8]  149 	movx	@dptr,a
+      000014 A3               [12]  150 	inc	dptr
+      000015 ED               [ 4]  151 	mov	a,r5
+      000016 F0               [ 8]  152 	movx	@dptr,a
+                                    153 ;	_fsmul.c:248: fl2.f = a2;
+      000017 90s00r00r08      [12]  154 	mov	dptr,#___fsmul_fl2_65536_21
+      00001B 75 86 01         [12]  155 	mov     dps, #1
+      00001E 90s00r00r00      [12]  156 	mov     dptr, #___fsmul_PARM_2
+      000022 E0               [ 8]  157 	movx	a,@dptr
+      000023 15 86            [ 8]  158 	dec	dps
+      000025 F0               [ 8]  159 	movx	@dptr,a
+      000026 A3               [12]  160 	inc	dptr
+      000027 05 86            [ 8]  161 	inc	dps
+      000029 A3               [12]  162 	inc	dptr
+      00002A E0               [ 8]  163 	movx	a,@dptr
+      00002B 15 86            [ 8]  164 	dec	dps
+      00002D F0               [ 8]  165 	movx	@dptr,a
+      00002E A3               [12]  166 	inc	dptr
+      00002F 05 86            [ 8]  167 	inc	dps
+      000031 A3               [12]  168 	inc	dptr
+      000032 E0               [ 8]  169 	movx	a,@dptr
+      000033 15 86            [ 8]  170 	dec	dps
+      000035 F0               [ 8]  171 	movx	@dptr,a
+      000036 A3               [12]  172 	inc	dptr
+      000037 05 86            [ 8]  173 	inc	dps
+      000039 A3               [12]  174 	inc	dptr
+      00003A E0               [ 8]  175 	movx	a,@dptr
+      00003B 15 86            [ 8]  176 	dec	dps
+      00003D F0               [ 8]  177 	movx	@dptr,a
+                                    178 ;	_fsmul.c:250: if (!fl1.l || !fl2.l)
+      00003E 90s00r00r04      [12]  179 	mov	dptr,#___fsmul_fl1_65536_21
+      000042 E0               [ 8]  180 	movx	a,@dptr
+      000043 A3               [12]  181 	inc	dptr
+      000044 FA               [ 4]  182 	mov	r2,a
+      000045 E0               [ 8]  183 	movx	a,@dptr
+      000046 A3               [12]  184 	inc	dptr
+      000047 FB               [ 4]  185 	mov	r3,a
+      000048 E0               [ 8]  186 	movx	a,@dptr
+      000049 A3               [12]  187 	inc	dptr
+      00004A FC               [ 4]  188 	mov	r4,a
+      00004B E0               [ 8]  189 	movx	a,@dptr
+      00004C FD               [ 4]  190 	mov	r5,a
+      00004D EA               [ 4]  191 	mov	a,r2
+      00004E 4B               [ 4]  192 	orl	a,r3
+      00004F 4C               [ 4]  193 	orl	a,r4
+      000050 4D               [ 4]  194 	orl	a,r5
+      000051 60 15            [12]  195 	jz  00101$
+      000053                        196 00155$:
+      000053 90s00r00r08      [12]  197 	mov	dptr,#___fsmul_fl2_65536_21
+      000057 E0               [ 8]  198 	movx	a,@dptr
+      000058 A3               [12]  199 	inc	dptr
+      000059 FA               [ 4]  200 	mov	r2,a
+      00005A E0               [ 8]  201 	movx	a,@dptr
+      00005B A3               [12]  202 	inc	dptr
+      00005C FB               [ 4]  203 	mov	r3,a
+      00005D E0               [ 8]  204 	movx	a,@dptr
+      00005E A3               [12]  205 	inc	dptr
+      00005F FC               [ 4]  206 	mov	r4,a
+      000060 E0               [ 8]  207 	movx	a,@dptr
+      000061 FD               [ 4]  208 	mov	r5,a
+      000062 EA               [ 4]  209 	mov	a,r2
+      000063 4B               [ 4]  210 	orl	a,r3
+      000064 4C               [ 4]  211 	orl	a,r4
+      000065 4D               [ 4]  212 	orl	a,r5
+      000066 70 0B            [12]  213 	jnz  00102$
+      000068                        214 00156$:
+      000068                        215 00101$:
+                                    216 ;	_fsmul.c:251: return (0);
+      000068 90 00 00 00      [12]  217 	mov  dptr,#0x0000
+      00006C 75 F0 00         [12]  218 	mov	b,#0x00
+      00006F 02s00r03rD5      [16]  219 	ljmp	00113$
+      000073                        220 00102$:
+                                    221 ;	_fsmul.c:254: sign = SIGN (fl1.l) ^ SIGN (fl2.l);
+      000073 90s00r00r04      [12]  222 	mov	dptr,#___fsmul_fl1_65536_21
+      000077 E0               [ 8]  223 	movx	a,@dptr
+      000078 A3               [12]  224 	inc	dptr
+      000079 FA               [ 4]  225 	mov	r2,a
+      00007A E0               [ 8]  226 	movx	a,@dptr
+      00007B A3               [12]  227 	inc	dptr
+      00007C FB               [ 4]  228 	mov	r3,a
+      00007D E0               [ 8]  229 	movx	a,@dptr
+      00007E A3               [12]  230 	inc	dptr
+      00007F FC               [ 4]  231 	mov	r4,a
+      000080 E0               [ 8]  232 	movx	a,@dptr
+      000081 FD               [ 4]  233 	mov  r5,a
+      000082 23               [ 4]  234 	rl	a
+      000083 54 01            [ 8]  235 	anl	a,#0x01
+      000085 FA               [ 4]  236 	mov	r2,a
+      000086 90s00r00r08      [12]  237 	mov	dptr,#___fsmul_fl2_65536_21
+      00008A E0               [ 8]  238 	movx	a,@dptr
+      00008B A3               [12]  239 	inc	dptr
+      00008C FB               [ 4]  240 	mov	r3,a
+      00008D E0               [ 8]  241 	movx	a,@dptr
+      00008E A3               [12]  242 	inc	dptr
+      00008F FC               [ 4]  243 	mov	r4,a
+      000090 E0               [ 8]  244 	movx	a,@dptr
+      000091 A3               [12]  245 	inc	dptr
+      000092 FD               [ 4]  246 	mov	r5,a
+      000093 E0               [ 8]  247 	movx	a,@dptr
+      000094 FE               [ 4]  248 	mov  r6,a
+      000095 23               [ 4]  249 	rl	a
+      000096 54 01            [ 8]  250 	anl	a,#0x01
+      000098 FB               [ 4]  251 	mov	r3,a
+      000099 90s00r00r0E      [12]  252 	mov	dptr,#___fsmul_sign_65536_21
+      00009D EA               [ 4]  253 	mov	a,r2
+      00009E 6B               [ 4]  254 	xrl	a,r3
+      00009F F0               [ 8]  255 	movx	@dptr,a
+                                    256 ;	_fsmul.c:255: exp = EXP (fl1.l) - EXCESS;
+      0000A0 90s00r00r04      [12]  257 	mov	dptr,#___fsmul_fl1_65536_21
+      0000A4 E0               [ 8]  258 	movx	a,@dptr
+      0000A5 A3               [12]  259 	inc	dptr
+      0000A6 FB               [ 4]  260 	mov	r3,a
+      0000A7 E0               [ 8]  261 	movx	a,@dptr
+      0000A8 A3               [12]  262 	inc	dptr
+      0000A9 FC               [ 4]  263 	mov	r4,a
+      0000AA E0               [ 8]  264 	movx	a,@dptr
+      0000AB A3               [12]  265 	inc	dptr
+      0000AC FD               [ 4]  266 	mov	r5,a
+      0000AD E0               [ 8]  267 	movx	a,@dptr
+      0000AE FE               [ 4]  268 	mov	r6,a
+      0000AF 8D 03            [ 8]  269 	mov	ar3,r5
+      0000B1 EE               [ 4]  270 	mov	a,r6
+      0000B2 A2 E7            [ 8]  271 	mov	c,acc[7]
+      0000B4 CB               [ 4]  272 	xch	a,r3
+      0000B5 33               [ 4]  273 	rlc	a
+      0000B6 CB               [ 4]  274 	xch	a,r3
+      0000B7 33               [ 4]  275 	rlc	a
+      0000B8 CB               [ 4]  276 	xch	a,r3
+      0000B9 54 01            [ 8]  277 	anl	a,#0x01
+      0000BB FC               [ 4]  278 	mov	r4,a
+      0000BC E4               [ 4]  279 	clr  a
+      0000BD FD               [ 4]  280 	mov  r5,a
+      0000BE FE               [ 4]  281 	mov  r6,a
+      0000BF FC               [ 4]  282 	mov  r4,a
+      0000C0 EB               [ 4]  283 	mov  a,r3
+      0000C1 24 82            [ 8]  284 	add	a,#0x82
+      0000C3 FB               [ 4]  285 	mov	r3,a
+      0000C4 EC               [ 4]  286 	mov	a,r4
+      0000C5 34 FF            [ 8]  287 	addc	a,#0xff
+      0000C7 FC               [ 4]  288 	mov	r4,a
+                                    289 ;	_fsmul.c:256: exp += EXP (fl2.l);
+      0000C8 90s00r00r08      [12]  290 	mov	dptr,#___fsmul_fl2_65536_21
+      0000CC E0               [ 8]  291 	movx	a,@dptr
+      0000CD A3               [12]  292 	inc	dptr
+      0000CE FD               [ 4]  293 	mov	r5,a
+      0000CF E0               [ 8]  294 	movx	a,@dptr
+      0000D0 A3               [12]  295 	inc	dptr
+      0000D1 FE               [ 4]  296 	mov	r6,a
+      0000D2 E0               [ 8]  297 	movx	a,@dptr
+      0000D3 A3               [12]  298 	inc	dptr
+      0000D4 FF               [ 4]  299 	mov	r7,a
+      0000D5 E0               [ 8]  300 	movx	a,@dptr
+      0000D6 F8               [ 4]  301 	mov	r0,a
+      0000D7 8F 05            [ 8]  302 	mov	ar5,r7
+      0000D9 E8               [ 4]  303 	mov	a,r0
+      0000DA A2 E7            [ 8]  304 	mov	c,acc[7]
+      0000DC CD               [ 4]  305 	xch	a,r5
+      0000DD 33               [ 4]  306 	rlc	a
+      0000DE CD               [ 4]  307 	xch	a,r5
+      0000DF 33               [ 4]  308 	rlc	a
+      0000E0 CD               [ 4]  309 	xch	a,r5
+      0000E1 54 01            [ 8]  310 	anl	a,#0x01
+      0000E3 FE               [ 4]  311 	mov	r6,a
+      0000E4 7F 00            [ 8]  312 	mov	r7,#0x00
+      0000E6 78 00            [ 8]  313 	mov	r0,#0x00
+      0000E8 7E 00            [ 8]  314 	mov	r6,#0x00
+      0000EA 90s00r00r0C      [12]  315 	mov	dptr,#___fsmul_exp_65536_21
+      0000EE ED               [ 4]  316 	mov	a,r5
+      0000EF 2B               [ 4]  317 	add	a,r3
+      0000F0 F0               [ 8]  318 	movx	@dptr,a
+      0000F1 EE               [ 4]  319 	mov	a,r6
+      0000F2 3C               [ 4]  320 	addc	a,r4
+      0000F3 A3               [12]  321 	inc	dptr
+      0000F4 F0               [ 8]  322 	movx	@dptr,a
+                                    323 ;	_fsmul.c:258: fl1.l = MANT (fl1.l);
+      0000F5 90s00r00r04      [12]  324 	mov	dptr,#___fsmul_fl1_65536_21
+      0000F9 E0               [ 8]  325 	movx	a,@dptr
+      0000FA A3               [12]  326 	inc	dptr
+      0000FB FD               [ 4]  327 	mov	r5,a
+      0000FC E0               [ 8]  328 	movx	a,@dptr
+      0000FD A3               [12]  329 	inc	dptr
+      0000FE FE               [ 4]  330 	mov	r6,a
+      0000FF E0               [ 8]  331 	movx	a,@dptr
+      000100 A3               [12]  332 	inc	dptr
+      000101 FF               [ 4]  333 	mov	r7,a
+      000102 E0               [ 8]  334 	movx	a,@dptr
+      000103 F8               [ 4]  335 	mov	r0,a
+      000104 78 00            [ 8]  336 	mov	r0,#0x00
+      000106 43 07 80         [12]  337 	orl	ar7,#0x80
+      000109 90s00r00r04      [12]  338 	mov	dptr,#___fsmul_fl1_65536_21
+      00010D ED               [ 4]  339 	mov	a,r5
+      00010E F0               [ 8]  340 	movx	@dptr,a
+      00010F A3               [12]  341 	inc	dptr
+      000110 EE               [ 4]  342 	mov	a,r6
+      000111 F0               [ 8]  343 	movx	@dptr,a
+      000112 A3               [12]  344 	inc	dptr
+      000113 EF               [ 4]  345 	mov	a,r7
+      000114 F0               [ 8]  346 	movx	@dptr,a
+      000115 A3               [12]  347 	inc	dptr
+      000116 E8               [ 4]  348 	mov	a,r0
+      000117 F0               [ 8]  349 	movx	@dptr,a
+                                    350 ;	_fsmul.c:259: fl2.l = MANT (fl2.l);
+      000118 90s00r00r08      [12]  351 	mov	dptr,#___fsmul_fl2_65536_21
+      00011C E0               [ 8]  352 	movx	a,@dptr
+      00011D A3               [12]  353 	inc	dptr
+      00011E FD               [ 4]  354 	mov	r5,a
+      00011F E0               [ 8]  355 	movx	a,@dptr
+      000120 A3               [12]  356 	inc	dptr
+      000121 FE               [ 4]  357 	mov	r6,a
+      000122 E0               [ 8]  358 	movx	a,@dptr
+      000123 A3               [12]  359 	inc	dptr
+      000124 FF               [ 4]  360 	mov	r7,a
+      000125 E0               [ 8]  361 	movx	a,@dptr
+      000126 F8               [ 4]  362 	mov	r0,a
+      000127 78 00            [ 8]  363 	mov	r0,#0x00
+      000129 43 07 80         [12]  364 	orl	ar7,#0x80
+      00012C 90s00r00r08      [12]  365 	mov	dptr,#___fsmul_fl2_65536_21
+      000130 ED               [ 4]  366 	mov	a,r5
+      000131 F0               [ 8]  367 	movx	@dptr,a
+      000132 A3               [12]  368 	inc	dptr
+      000133 EE               [ 4]  369 	mov	a,r6
+      000134 F0               [ 8]  370 	movx	@dptr,a
+      000135 A3               [12]  371 	inc	dptr
+      000136 EF               [ 4]  372 	mov	a,r7
+      000137 F0               [ 8]  373 	movx	@dptr,a
+      000138 A3               [12]  374 	inc	dptr
+      000139 E8               [ 4]  375 	mov	a,r0
+      00013A F0               [ 8]  376 	movx	@dptr,a
+                                    377 ;	_fsmul.c:262: result = (unsigned long)((unsigned short)(fl1.l >> 8)) * (unsigned short)(fl2.l >> 8);
+      00013B 90s00r00r04      [12]  378 	mov	dptr,#___fsmul_fl1_65536_21
+      00013F E0               [ 8]  379 	movx	a,@dptr
+      000140 A3               [12]  380 	inc	dptr
+      000141 FD               [ 4]  381 	mov	r5,a
+      000142 E0               [ 8]  382 	movx	a,@dptr
+      000143 A3               [12]  383 	inc	dptr
+      000144 FE               [ 4]  384 	mov	r6,a
+      000145 E0               [ 8]  385 	movx	a,@dptr
+      000146 A3               [12]  386 	inc	dptr
+      000147 FF               [ 4]  387 	mov	r7,a
+      000148 E0               [ 8]  388 	movx	a,@dptr
+      000149 F8               [ 4]  389 	mov	r0,a
+      00014A 8E 05            [ 8]  390 	mov	ar5,r6
+      00014C 8F 06            [ 8]  391 	mov	ar6,r7
+      00014E 88 07            [ 8]  392 	mov	ar7,r0
+      000150 78 00            [ 8]  393 	mov	r0,#0x00
+      000152 7F 00            [ 8]  394 	mov	r7,#0x00
+      000154 78 00            [ 8]  395 	mov	r0,#0x00
+      000156 90s00r00r08      [12]  396 	mov	dptr,#___fsmul_fl2_65536_21
+      00015A E0               [ 8]  397 	movx	a,@dptr
+      00015B A3               [12]  398 	inc	dptr
+      00015C F9               [ 4]  399 	mov	r1,a
+      00015D E0               [ 8]  400 	movx	a,@dptr
+      00015E A3               [12]  401 	inc	dptr
+      00015F FA               [ 4]  402 	mov	r2,a
+      000160 E0               [ 8]  403 	movx	a,@dptr
+      000161 A3               [12]  404 	inc	dptr
+      000162 FB               [ 4]  405 	mov	r3,a
+      000163 E0               [ 8]  406 	movx	a,@dptr
+      000164 FC               [ 4]  407 	mov	r4,a
+      000165 8A 01            [ 8]  408 	mov	ar1,r2
+      000167 8B 02            [ 8]  409 	mov	ar2,r3
+      000169 8C 03            [ 8]  410 	mov	ar3,r4
+      00016B 7C 00            [ 8]  411 	mov	r4,#0x00
+      00016D 90s00r00r00      [12]  412 	mov	dptr,#__mullong_PARM_2
+      000171 E9               [ 4]  413 	mov	a,r1
+      000172 F0               [ 8]  414 	movx	@dptr,a
+      000173 A3               [12]  415 	inc	dptr
+      000174 EA               [ 4]  416 	mov	a,r2
+      000175 F0               [ 8]  417 	movx	@dptr,a
+      000176 A3               [12]  418 	inc	dptr
+      000177 E4               [ 4]  419 	clr	a
+      000178 F0               [ 8]  420 	movx	@dptr,a
+      000179 A3               [12]  421 	inc	dptr
+      00017A E4               [ 4]  422 	clr	a
+      00017B F0               [ 8]  423 	movx	@dptr,a
+      00017C 8D 82            [ 8]  424 	mov	dpl,r5
+      00017E 8E 83            [ 8]  425 	mov	dph,r6
+      000180 8F 93            [ 8]  426 	mov	dpx,r7
+      000182 88 F0            [ 8]  427 	mov	b,r0
+      000184 12s00r00r00      [16]  428 	lcall	__mullong
+      000188 AA 82            [ 8]  429 	mov	r2,dpl
+      00018A AB 83            [ 8]  430 	mov	r3,dph
+      00018C AC 93            [ 8]  431 	mov	r4,dpx
+      00018E AD F0            [ 8]  432 	mov	r5,b
+                                    433 ;	_fsmul.c:263: result += ((unsigned long)((unsigned short)(fl1.l & 0xff)) * (unsigned short)(fl2.l >> 8)) >> 8;
+      000190 90s00r00r04      [12]  434 	mov	dptr,#___fsmul_fl1_65536_21
+      000194 E0               [ 8]  435 	movx	a,@dptr
+      000195 A3               [12]  436 	inc	dptr
+      000196 FE               [ 4]  437 	mov	r6,a
+      000197 E0               [ 8]  438 	movx	a,@dptr
+      000198 A3               [12]  439 	inc	dptr
+      000199 FF               [ 4]  440 	mov	r7,a
+      00019A E0               [ 8]  441 	movx	a,@dptr
+      00019B A3               [12]  442 	inc	dptr
+      00019C F8               [ 4]  443 	mov	r0,a
+      00019D E0               [ 8]  444 	movx	a,@dptr
+      00019E F9               [ 4]  445 	mov	r1,a
+      00019F 7F 00            [ 8]  446 	mov	r7,#0x00
+      0001A1 90s00r00r0F      [12]  447 	mov	dptr,#___fsmul_sloc0_1_0
+      0001A5 EE               [ 4]  448 	mov	a,r6
+      0001A6 F0               [ 8]  449 	movx	@dptr,a
+      0001A7 A3               [12]  450 	inc	dptr
+      0001A8 EF               [ 4]  451 	mov	a,r7
+      0001A9 F0               [ 8]  452 	movx	@dptr,a
+      0001AA A3               [12]  453 	inc	dptr
+      0001AB E4               [ 4]  454 	clr	a
+      0001AC F0               [ 8]  455 	movx	@dptr,a
+      0001AD A3               [12]  456 	inc	dptr
+      0001AE E4               [ 4]  457 	clr	a
+      0001AF F0               [ 8]  458 	movx	@dptr,a
+      0001B0 90s00r00r08      [12]  459 	mov	dptr,#___fsmul_fl2_65536_21
+      0001B4 E0               [ 8]  460 	movx	a,@dptr
+      0001B5 A3               [12]  461 	inc	dptr
+      0001B6 FE               [ 4]  462 	mov	r6,a
+      0001B7 E0               [ 8]  463 	movx	a,@dptr
+      0001B8 A3               [12]  464 	inc	dptr
+      0001B9 FF               [ 4]  465 	mov	r7,a
+      0001BA E0               [ 8]  466 	movx	a,@dptr
+      0001BB A3               [12]  467 	inc	dptr
+      0001BC F8               [ 4]  468 	mov	r0,a
+      0001BD E0               [ 8]  469 	movx	a,@dptr
+      0001BE F9               [ 4]  470 	mov	r1,a
+      0001BF 8F 06            [ 8]  471 	mov	ar6,r7
+      0001C1 88 07            [ 8]  472 	mov	ar7,r0
+      0001C3 89 00            [ 8]  473 	mov	ar0,r1
+      0001C5 79 00            [ 8]  474 	mov	r1,#0x00
+      0001C7 90s00r00r00      [12]  475 	mov	dptr,#__mullong_PARM_2
+      0001CB EE               [ 4]  476 	mov	a,r6
+      0001CC F0               [ 8]  477 	movx	@dptr,a
+      0001CD A3               [12]  478 	inc	dptr
+      0001CE EF               [ 4]  479 	mov	a,r7
+      0001CF F0               [ 8]  480 	movx	@dptr,a
+      0001D0 A3               [12]  481 	inc	dptr
+      0001D1 E4               [ 4]  482 	clr	a
+      0001D2 F0               [ 8]  483 	movx	@dptr,a
+      0001D3 A3               [12]  484 	inc	dptr
+      0001D4 E4               [ 4]  485 	clr	a
+      0001D5 F0               [ 8]  486 	movx	@dptr,a
+      0001D6 C0 02            [ 8]  487 	push	ar2
+      0001D8 C0 03            [ 8]  488 	push	ar3
+      0001DA C0 04            [ 8]  489 	push	ar4
+      0001DC C0 05            [ 8]  490 	push	ar5
+      0001DE 05 86            [ 8]  491 	inc	dps
+      0001E0 90s00r00r0F      [12]  492 	mov	dptr,#___fsmul_sloc0_1_0
+      0001E4 E0               [ 8]  493 	movx	a,@dptr
+      0001E5 F5 82            [ 8]  494 	mov	dpl,a
+      0001E7 A3               [12]  495 	inc	dptr
+      0001E8 E0               [ 8]  496 	movx	a,@dptr
+      0001E9 F5 83            [ 8]  497 	mov	dph,a
+      0001EB A3               [12]  498 	inc	dptr
+      0001EC E0               [ 8]  499 	movx	a,@dptr
+      0001ED F5 93            [ 8]  500 	mov	dpx,a
+      0001EF A3               [12]  501 	inc	dptr
+      0001F0 E0               [ 8]  502 	movx	a,@dptr
+      0001F1 F5 F0            [ 8]  503 	mov	b,a
+      0001F3 75 86 00         [12]  504 	mov	dps,#0
+      0001F6 12s00r00r00      [16]  505 	lcall	__mullong
+      0001FA AE 82            [ 8]  506 	mov	r6,dpl
+      0001FC AF 83            [ 8]  507 	mov	r7,dph
+      0001FE A8 93            [ 8]  508 	mov	r0,dpx
+      000200 A9 F0            [ 8]  509 	mov	r1,b
+      000202 D0 05            [ 8]  510 	pop	ar5
+      000204 D0 04            [ 8]  511 	pop	ar4
+      000206 D0 03            [ 8]  512 	pop	ar3
+      000208 D0 02            [ 8]  513 	pop	ar2
+      00020A 8F 06            [ 8]  514 	mov	ar6,r7
+      00020C 88 07            [ 8]  515 	mov	ar7,r0
+      00020E 89 00            [ 8]  516 	mov	ar0,r1
+      000210 79 00            [ 8]  517 	mov	r1,#0x00
+      000212 90s00r00r0F      [12]  518 	mov	dptr,#___fsmul_sloc0_1_0
+      000216 EE               [ 4]  519 	mov	a,r6
+      000217 2A               [ 4]  520 	add	a,r2
+      000218 F0               [ 8]  521 	movx	@dptr,a
+      000219 EF               [ 4]  522 	mov	a,r7
+      00021A 3B               [ 4]  523 	addc	a,r3
+      00021B A3               [12]  524 	inc	dptr
+      00021C F0               [ 8]  525 	movx	@dptr,a
+      00021D E8               [ 4]  526 	mov	a,r0
+      00021E 3C               [ 4]  527 	addc	a,r4
+      00021F A3               [12]  528 	inc	dptr
+      000220 F0               [ 8]  529 	movx	@dptr,a
+      000221 E9               [ 4]  530 	mov	a,r1
+      000222 3D               [ 4]  531 	addc	a,r5
+      000223 A3               [12]  532 	inc	dptr
+      000224 F0               [ 8]  533 	movx	@dptr,a
+                                    534 ;	_fsmul.c:264: result += ((unsigned long)((unsigned short)(fl2.l & 0xff)) * (unsigned short)(fl1.l >> 8)) >> 8;
+      000225 90s00r00r08      [12]  535 	mov	dptr,#___fsmul_fl2_65536_21
+      000229 E0               [ 8]  536 	movx	a,@dptr
+      00022A A3               [12]  537 	inc	dptr
+      00022B FE               [ 4]  538 	mov	r6,a
+      00022C E0               [ 8]  539 	movx	a,@dptr
+      00022D A3               [12]  540 	inc	dptr
+      00022E FF               [ 4]  541 	mov	r7,a
+      00022F E0               [ 8]  542 	movx	a,@dptr
+      000230 A3               [12]  543 	inc	dptr
+      000231 F8               [ 4]  544 	mov	r0,a
+      000232 E0               [ 8]  545 	movx	a,@dptr
+      000233 F9               [ 4]  546 	mov	r1,a
+      000234 7F 00            [ 8]  547 	mov	r7,#0x00
+      000236 78 00            [ 8]  548 	mov	r0,#0x00
+      000238 79 00            [ 8]  549 	mov	r1,#0x00
+      00023A 90s00r00r04      [12]  550 	mov	dptr,#___fsmul_fl1_65536_21
+      00023E E0               [ 8]  551 	movx	a,@dptr
+      00023F A3               [12]  552 	inc	dptr
+      000240 FA               [ 4]  553 	mov	r2,a
+      000241 E0               [ 8]  554 	movx	a,@dptr
+      000242 A3               [12]  555 	inc	dptr
+      000243 FB               [ 4]  556 	mov	r3,a
+      000244 E0               [ 8]  557 	movx	a,@dptr
+      000245 A3               [12]  558 	inc	dptr
+      000246 FC               [ 4]  559 	mov	r4,a
+      000247 E0               [ 8]  560 	movx	a,@dptr
+      000248 FD               [ 4]  561 	mov	r5,a
+      000249 8B 02            [ 8]  562 	mov	ar2,r3
+      00024B 8C 03            [ 8]  563 	mov	ar3,r4
+      00024D 8D 04            [ 8]  564 	mov	ar4,r5
+      00024F 7D 00            [ 8]  565 	mov	r5,#0x00
+      000251 90s00r00r00      [12]  566 	mov	dptr,#__mullong_PARM_2
+      000255 EA               [ 4]  567 	mov	a,r2
+      000256 F0               [ 8]  568 	movx	@dptr,a
+      000257 A3               [12]  569 	inc	dptr
+      000258 EB               [ 4]  570 	mov	a,r3
+      000259 F0               [ 8]  571 	movx	@dptr,a
+      00025A A3               [12]  572 	inc	dptr
+      00025B E4               [ 4]  573 	clr	a
+      00025C F0               [ 8]  574 	movx	@dptr,a
+      00025D A3               [12]  575 	inc	dptr
+      00025E E4               [ 4]  576 	clr	a
+      00025F F0               [ 8]  577 	movx	@dptr,a
+      000260 8E 82            [ 8]  578 	mov	dpl,r6
+      000262 8F 83            [ 8]  579 	mov	dph,r7
+      000264 88 93            [ 8]  580 	mov	dpx,r0
+      000266 89 F0            [ 8]  581 	mov	b,r1
+      000268 12s00r00r00      [16]  582 	lcall	__mullong
+      00026C AA 82            [ 8]  583 	mov	r2,dpl
+      00026E AB 83            [ 8]  584 	mov	r3,dph
+      000270 AC 93            [ 8]  585 	mov	r4,dpx
+      000272 AD F0            [ 8]  586 	mov	r5,b
+      000274 8B 02            [ 8]  587 	mov	ar2,r3
+      000276 8C 03            [ 8]  588 	mov	ar3,r4
+      000278 8D 04            [ 8]  589 	mov	ar4,r5
+      00027A 7D 00            [ 8]  590 	mov	r5,#0x00
+      00027C 90s00r00r0F      [12]  591 	mov	dptr,#___fsmul_sloc0_1_0
+      000280 E0               [ 8]  592 	movx	a,@dptr
+      000281 2A               [ 4]  593 	add	a,r2
+      000282 FA               [ 4]  594 	mov	r2,a
+      000283 A3               [12]  595 	inc	dptr
+      000284 E0               [ 8]  596 	movx	a,@dptr
+      000285 3B               [ 4]  597 	addc	a,r3
+      000286 FB               [ 4]  598 	mov	r3,a
+      000287 A3               [12]  599 	inc	dptr
+      000288 E0               [ 8]  600 	movx	a,@dptr
+      000289 3C               [ 4]  601 	addc	a,r4
+      00028A FC               [ 4]  602 	mov	r4,a
+      00028B A3               [12]  603 	inc	dptr
+      00028C E0               [ 8]  604 	movx	a,@dptr
+      00028D 3D               [ 4]  605 	addc	a,r5
+      00028E FD               [ 4]  606 	mov	r5,a
+                                    607 ;	_fsmul.c:267: result += 0x40;
+      00028F 74 40            [ 8]  608 	mov	a,#0x40
+      000291 2A               [ 4]  609 	add	a,r2
+      000292 FA               [ 4]  610 	mov	r2,a
+      000293 E4               [ 4]  611 	clr	a
+      000294 3B               [ 4]  612 	addc	a,r3
+      000295 FB               [ 4]  613 	mov	r3,a
+      000296 E4               [ 4]  614 	clr	a
+      000297 3C               [ 4]  615 	addc	a,r4
+      000298 FC               [ 4]  616 	mov	r4,a
+      000299 E4               [ 4]  617 	clr	a
+      00029A 3D               [ 4]  618 	addc	a,r5
+                                    619 ;	_fsmul.c:269: if (result & SIGNBIT)
+      00029B FD               [ 4]  620 	mov  r5,a
+      00029C 30 E7 17         [12]  621 	jnb  acc[7],00105$
+      00029F                        622 00157$:
+                                    623 ;	_fsmul.c:272: result += 0x40;
+      00029F 74 40            [ 8]  624 	mov	a,#0x40
+      0002A1 2A               [ 4]  625 	add	a,r2
+      0002A2 FE               [ 4]  626 	mov	r6,a
+      0002A3 E4               [ 4]  627 	clr	a
+      0002A4 3B               [ 4]  628 	addc	a,r3
+      0002A5 FF               [ 4]  629 	mov	r7,a
+      0002A6 E4               [ 4]  630 	clr	a
+      0002A7 3C               [ 4]  631 	addc	a,r4
+      0002A8 F8               [ 4]  632 	mov	r0,a
+      0002A9 E4               [ 4]  633 	clr	a
+      0002AA 3D               [ 4]  634 	addc	a,r5
+      0002AB F9               [ 4]  635 	mov	r1,a
+                                    636 ;	_fsmul.c:273: result >>= 8;
+      0002AC 8F 06            [ 8]  637 	mov	ar6,r7
+      0002AE 88 07            [ 8]  638 	mov	ar7,r0
+      0002B0 89 00            [ 8]  639 	mov	ar0,r1
+      0002B2 79 00            [ 8]  640 	mov	r1,#0x00
+      0002B4 80 35            [12]  641 	sjmp 00106$
+      0002B6                        642 00105$:
+                                    643 ;	_fsmul.c:277: result >>= 7;
+      0002B6 8A 06            [ 8]  644 	mov	ar6,r2
+      0002B8 EB               [ 4]  645 	mov	a,r3
+      0002B9 A2 E7            [ 8]  646 	mov	c,acc[7]
+      0002BB CE               [ 4]  647 	xch	a,r6
+      0002BC 33               [ 4]  648 	rlc	a
+      0002BD CE               [ 4]  649 	xch	a,r6
+      0002BE 33               [ 4]  650 	rlc	a
+      0002BF CE               [ 4]  651 	xch	a,r6
+      0002C0 54 01            [ 8]  652 	anl	a,#0x01
+      0002C2 FF               [ 4]  653 	mov	r7,a
+      0002C3 EC               [ 4]  654 	mov	a,r4
+      0002C4 25 E0            [ 8]  655 	add	a,acc
+      0002C6 4F               [ 4]  656 	orl	a,r7
+      0002C7 FF               [ 4]  657 	mov	r7,a
+      0002C8 8C 00            [ 8]  658 	mov	ar0,r4
+      0002CA ED               [ 4]  659 	mov	a,r5
+      0002CB A2 E7            [ 8]  660 	mov	c,acc[7]
+      0002CD C8               [ 4]  661 	xch	a,r0
+      0002CE 33               [ 4]  662 	rlc	a
+      0002CF C8               [ 4]  663 	xch	a,r0
+      0002D0 33               [ 4]  664 	rlc	a
+      0002D1 C8               [ 4]  665 	xch	a,r0
+      0002D2 54 01            [ 8]  666 	anl	a,#0x01
+      0002D4 F9               [ 4]  667 	mov	r1,a
+                                    668 ;	_fsmul.c:278: exp--;
+      0002D5 90s00r00r0C      [12]  669 	mov	dptr,#___fsmul_exp_65536_21
+      0002D9 E0               [ 8]  670 	movx	a,@dptr
+      0002DA 24 FF            [ 8]  671 	add	a,#0xff
+      0002DC FA               [ 4]  672 	mov	r2,a
+      0002DD A3               [12]  673 	inc	dptr
+      0002DE E0               [ 8]  674 	movx	a,@dptr
+      0002DF 34 FF            [ 8]  675 	addc	a,#0xff
+      0002E1 FB               [ 4]  676 	mov	r3,a
+                                    677 ;	genAssign: resultIsFar = TRUE
+      0002E2 90s00r00r0C      [12]  678 	mov	dptr,#___fsmul_exp_65536_21
+      0002E6 EA               [ 4]  679 	mov	a,r2
+      0002E7 F0               [ 8]  680 	movx	@dptr,a
+      0002E8 A3               [12]  681 	inc	dptr
+      0002E9 EB               [ 4]  682 	mov	a,r3
+      0002EA F0               [ 8]  683 	movx	@dptr,a
+      0002EB                        684 00106$:
+                                    685 ;	_fsmul.c:281: result &= ~HIDDEN;
+      0002EB 90s00r00r0F      [12]  686 	mov	dptr,#___fsmul_sloc0_1_0
+      0002EF EE               [ 4]  687 	mov	a,r6
+      0002F0 F0               [ 8]  688 	movx	@dptr,a
+      0002F1 A3               [12]  689 	inc	dptr
+      0002F2 EF               [ 4]  690 	mov	a,r7
+      0002F3 F0               [ 8]  691 	movx	@dptr,a
+      0002F4 74 7F            [ 8]  692 	mov	a,#0x7f
+      0002F6 58               [ 4]  693 	anl	a,r0
+      0002F7 A3               [12]  694 	inc	dptr
+      0002F8 F0               [ 8]  695 	movx	@dptr,a
+      0002F9 A3               [12]  696 	inc	dptr
+      0002FA E9               [ 4]  697 	mov	a,r1
+      0002FB F0               [ 8]  698 	movx	@dptr,a
+                                    699 ;	_fsmul.c:284: if (exp >= 0x100)
+      0002FC 90s00r00r0C      [12]  700 	mov	dptr,#___fsmul_exp_65536_21
+      000300 C3               [ 4]  701 	clr	c
+      000301 E0               [ 8]  702 	movx	a,@dptr
+      000302 94 00            [ 8]  703 	subb	a,#0x00
+      000304 A3               [12]  704 	inc	dptr
+      000305 E0               [ 8]  705 	movx	a,@dptr
+      000306 64 80            [ 8]  706 	xrl	a,#0x80
+      000308 94 81            [ 8]  707 	subb	a,#0x81
+      00030A 40 32            [12]  708 	jc   00111$
+      00030C                        709 00158$:
+                                    710 ;	_fsmul.c:285: fl1.l = (sign ? SIGNBIT : 0) | __INFINITY;
+      00030C 90s00r00r0E      [12]  711 	mov	dptr,#___fsmul_sign_65536_21
+      000310 E0               [ 8]  712 	movx	a,@dptr
+      000311 60 0A            [12]  713 	jz  00115$
+      000313                        714 00159$:
+                                    715 ;	genAssign: resultIsFar = FALSE
+      000313 7E 00            [ 8]  716 	mov	r6,#0x00
+      000315 7F 00            [ 8]  717 	mov	r7,#0x00
+      000317 78 00            [ 8]  718 	mov	r0,#0x00
+      000319 79 80            [ 8]  719 	mov	r1,#0x80
+      00031B 80 08            [12]  720 	sjmp 00116$
+      00031D                        721 00115$:
+                                    722 ;	genAssign: resultIsFar = FALSE
+      00031D 7E 00            [ 8]  723 	mov	r6,#0x00
+      00031F 7F 00            [ 8]  724 	mov	r7,#0x00
+      000321 78 00            [ 8]  725 	mov	r0,#0x00
+      000323 79 00            [ 8]  726 	mov	r1,#0x00
+      000325                        727 00116$:
+      000325 43 00 80         [12]  728 	orl	ar0,#0x80
+      000328 43 01 7F         [12]  729 	orl	ar1,#0x7f
+      00032B 90s00r00r04      [12]  730 	mov	dptr,#___fsmul_fl1_65536_21
+      00032F EE               [ 4]  731 	mov	a,r6
+      000330 F0               [ 8]  732 	movx	@dptr,a
+      000331 A3               [12]  733 	inc	dptr
+      000332 EF               [ 4]  734 	mov	a,r7
+      000333 F0               [ 8]  735 	movx	@dptr,a
+      000334 A3               [12]  736 	inc	dptr
+      000335 E8               [ 4]  737 	mov	a,r0
+      000336 F0               [ 8]  738 	movx	@dptr,a
+      000337 A3               [12]  739 	inc	dptr
+      000338 E9               [ 4]  740 	mov	a,r1
+      000339 F0               [ 8]  741 	movx	@dptr,a
+      00033A 02s00r03rBE      [16]  742 	ljmp	00112$
+      00033E                        743 00111$:
+                                    744 ;	_fsmul.c:286: else if (exp < 0)
+      00033E 90s00r00r0C      [12]  745 	mov	dptr,#___fsmul_exp_65536_21
+      000342 A3               [12]  746 	inc	dptr
+      000343 E0               [ 8]  747 	movx	a,@dptr
+      000344 30 E7 11         [12]  748 	jnb  acc[7],00108$
+      000347                        749 00160$:
+                                    750 ;	_fsmul.c:287: fl1.l = 0;
+      000347 90s00r00r04      [12]  751 	mov	dptr,#___fsmul_fl1_65536_21
+      00034B E4               [ 4]  752 	clr	a
+      00034C F0               [ 8]  753 	movx	@dptr,a
+      00034D A3               [12]  754 	inc	dptr
+      00034E E4               [ 4]  755 	clr	a
+      00034F F0               [ 8]  756 	movx	@dptr,a
+      000350 A3               [12]  757 	inc	dptr
+      000351 E4               [ 4]  758 	clr	a
+      000352 F0               [ 8]  759 	movx	@dptr,a
+      000353 A3               [12]  760 	inc	dptr
+      000354 E4               [ 4]  761 	clr	a
+      000355 F0               [ 8]  762 	movx	@dptr,a
+      000356 80 66            [12]  763 	sjmp 00112$
+      000358                        764 00108$:
+                                    765 ;	_fsmul.c:289: fl1.l = PACK (sign ? SIGNBIT : 0 , exp, result);
+      000358 90s00r00r0E      [12]  766 	mov	dptr,#___fsmul_sign_65536_21
+      00035C E0               [ 8]  767 	movx	a,@dptr
+      00035D 60 0A            [12]  768 	jz  00117$
+      00035F                        769 00161$:
+                                    770 ;	genAssign: resultIsFar = FALSE
+      00035F 7E 00            [ 8]  771 	mov	r6,#0x00
+      000361 7F 00            [ 8]  772 	mov	r7,#0x00
+      000363 78 00            [ 8]  773 	mov	r0,#0x00
+      000365 79 80            [ 8]  774 	mov	r1,#0x80
+      000367 80 08            [12]  775 	sjmp 00118$
+      000369                        776 00117$:
+                                    777 ;	genAssign: resultIsFar = FALSE
+      000369 7E 00            [ 8]  778 	mov	r6,#0x00
+      00036B 7F 00            [ 8]  779 	mov	r7,#0x00
+      00036D 78 00            [ 8]  780 	mov	r0,#0x00
+      00036F 79 00            [ 8]  781 	mov	r1,#0x00
+      000371                        782 00118$:
+      000371 90s00r00r0C      [12]  783 	mov	dptr,#___fsmul_exp_65536_21
+      000375 E0               [ 8]  784 	movx	a,@dptr
+      000376 FA               [ 4]  785 	mov	r2,a
+      000377 A3               [12]  786 	inc	dptr
+      000378 E0               [ 8]  787 	movx	a,@dptr
+      000379 FB               [ 4]  788 	mov	r3,a
+      00037A E0               [ 8]  789 	movx	a,@dptr
+      00037B 33               [ 4]  790 	rlc	a
+      00037C 95 E0            [ 8]  791 	subb	a,acc
+      00037E FC               [ 4]  792 	mov	r4,a
+      00037F FD               [ 4]  793 	mov	r5,a
+      000380 8A 04            [ 8]  794 	mov	ar4,r2
+      000382 EB               [ 4]  795 	mov	a,r3
+      000383 54 01            [ 8]  796 	anl	a,#0x01
+      000385 A2 E0            [ 8]  797 	mov	c,acc[0]
+      000387 CC               [ 4]  798 	xch	a,r4
+      000388 13               [ 4]  799 	rrc	a
+      000389 CC               [ 4]  800 	xch	a,r4
+      00038A 13               [ 4]  801 	rrc	a
+      00038B CC               [ 4]  802 	xch	a,r4
+      00038C FD               [ 4]  803 	mov	r5,a
+      00038D E4               [ 4]  804 	clr  a
+      00038E FA               [ 4]  805 	mov  r2,a
+      00038F FB               [ 4]  806 	mov  r3,a
+      000390 EA               [ 4]  807 	mov  a,r2
+      000391 42 06            [ 8]  808 	orl	ar6,a
+      000393 EB               [ 4]  809 	mov	a,r3
+      000394 42 07            [ 8]  810 	orl	ar7,a
+      000396 EC               [ 4]  811 	mov	a,r4
+      000397 42 00            [ 8]  812 	orl	ar0,a
+      000399 ED               [ 4]  813 	mov	a,r5
+      00039A 42 01            [ 8]  814 	orl	ar1,a
+      00039C 90s00r00r0F      [12]  815 	mov	dptr,#___fsmul_sloc0_1_0
+      0003A0 E0               [ 8]  816 	movx	a,@dptr
+      0003A1 42 06            [ 8]  817 	orl	ar6,a
+      0003A3 A3               [12]  818 	inc	dptr
+      0003A4 E0               [ 8]  819 	movx	a,@dptr
+      0003A5 42 07            [ 8]  820 	orl	ar7,a
+      0003A7 A3               [12]  821 	inc	dptr
+      0003A8 E0               [ 8]  822 	movx	a,@dptr
+      0003A9 42 00            [ 8]  823 	orl	ar0,a
+      0003AB A3               [12]  824 	inc	dptr
+      0003AC E0               [ 8]  825 	movx	a,@dptr
+      0003AD 42 01            [ 8]  826 	orl	ar1,a
+      0003AF 90s00r00r04      [12]  827 	mov	dptr,#___fsmul_fl1_65536_21
+      0003B3 EE               [ 4]  828 	mov	a,r6
+      0003B4 F0               [ 8]  829 	movx	@dptr,a
+      0003B5 A3               [12]  830 	inc	dptr
+      0003B6 EF               [ 4]  831 	mov	a,r7
+      0003B7 F0               [ 8]  832 	movx	@dptr,a
+      0003B8 A3               [12]  833 	inc	dptr
+      0003B9 E8               [ 4]  834 	mov	a,r0
+      0003BA F0               [ 8]  835 	movx	@dptr,a
+      0003BB A3               [12]  836 	inc	dptr
+      0003BC E9               [ 4]  837 	mov	a,r1
+      0003BD F0               [ 8]  838 	movx	@dptr,a
+      0003BE                        839 00112$:
+                                    840 ;	_fsmul.c:290: return (fl1.f);
+      0003BE 90s00r00r04      [12]  841 	mov	dptr,#___fsmul_fl1_65536_21
+      0003C2 E0               [ 8]  842 	movx	a,@dptr
+      0003C3 A3               [12]  843 	inc	dptr
+      0003C4 FA               [ 4]  844 	mov	r2,a
+      0003C5 E0               [ 8]  845 	movx	a,@dptr
+      0003C6 A3               [12]  846 	inc	dptr
+      0003C7 FB               [ 4]  847 	mov	r3,a
+      0003C8 E0               [ 8]  848 	movx	a,@dptr
+      0003C9 A3               [12]  849 	inc	dptr
+      0003CA FC               [ 4]  850 	mov	r4,a
+      0003CB E0               [ 8]  851 	movx	a,@dptr
+      0003CC FD               [ 4]  852 	mov	r5,a
+      0003CD 8A 82            [ 8]  853 	mov	dpl,r2
+      0003CF 8B 83            [ 8]  854 	mov	dph,r3
+      0003D1 8C 93            [ 8]  855 	mov	dpx,r4
+      0003D3 8D F0            [ 8]  856 	mov	b,r5
+      0003D5                        857 00113$:
+                                    858 ;	_fsmul.c:291: }
+      0003D5 22               [16]  859 	ret
+                                    860 	.area CSEG    (CODE)
+                                    861 	.area CONST   (CODE)
+                                    862 	.area XINIT   (CODE)
+                                    863 	.area CABS    (ABS,CODE)

@@ -1,0 +1,274 @@
+                                      1 ;--------------------------------------------------------
+                                      2 ; File Created by SDCC : free open source ISO C Compiler 
+                                      3 ; Version 4.2.14 #0 (Linux)
+                                      4 ;--------------------------------------------------------
+                                      5 	.module frexpf
+                                      6 	.optsdcc -mds390 --model-flat24
+                                      7 	
+                                      8 ;--------------------------------------------------------
+                                      9 ; CPU specific extensions
+                                     10 ;--------------------------------------------------------
+                                     11 	.DS80C390
+                                     12 	.amode	2	; 24 bit flat addressing
+                           000082    13 dpl	=	0x82
+                           000083    14 dph	=	0x83
+                           000084    15 dpl1	=	0x84
+                           000085    16 dph1	=	0x85
+                           000086    17 dps	=	0x86
+                           000093    18 dpx	=	0x93
+                           000095    19 dpx1	=	0x95
+                           00009B    20 esp	=	0x9B
+                           00009C    21 ap	=	0x9C
+                           00009C    22 acc1	=	0x9C
+                           0000D1    23 mcnt0	=	0xD1
+                           0000D2    24 mcnt1	=	0xD2
+                           0000D3    25 ma	=	0xD3
+                           0000D4    26 mb	=	0xD4
+                           0000D5    27 mc	=	0xD5
+                           00009D    28 acon	=	0x9D
+                           0000C6    29 mcon	=	0xC6
+                           0000D1    30 F1	=	0xD1	; user flag
+                                     31 ;--------------------------------------------------------
+                                     32 ; Public variables in this module
+                                     33 ;--------------------------------------------------------
+                                     34 	.globl _frexpf_PARM_2
+                                     35 	.globl _frexpf
+                                     36 ;--------------------------------------------------------
+                                     37 ; special function registers
+                                     38 ;--------------------------------------------------------
+                                     39 ;--------------------------------------------------------
+                                     40 ; special function bits
+                                     41 ;--------------------------------------------------------
+                                     42 ;--------------------------------------------------------
+                                     43 ; overlayable register banks
+                                     44 ;--------------------------------------------------------
+                                     45 	.area REG_BANK_0	(REL,OVR,DATA)
+      000000                         46 	.ds 8
+                                     47 ;--------------------------------------------------------
+                                     48 ; internal ram data
+                                     49 ;--------------------------------------------------------
+                                     50 	.area DSEG    (DATA)
+                                     51 ;--------------------------------------------------------
+                                     52 ; overlayable items in internal ram
+                                     53 ;--------------------------------------------------------
+                                     54 ;--------------------------------------------------------
+                                     55 ; indirectly addressable internal ram data
+                                     56 ;--------------------------------------------------------
+                                     57 	.area ISEG    (DATA)
+                                     58 ;--------------------------------------------------------
+                                     59 ; absolute internal ram data
+                                     60 ;--------------------------------------------------------
+                                     61 	.area IABS    (ABS,DATA)
+                                     62 	.area IABS    (ABS,DATA)
+                                     63 ;--------------------------------------------------------
+                                     64 ; bit data
+                                     65 ;--------------------------------------------------------
+                                     66 	.area BSEG    (BIT)
+                                     67 ;--------------------------------------------------------
+                                     68 ; paged external ram data
+                                     69 ;--------------------------------------------------------
+                                     70 	.area PSEG    (PAG,XDATA)
+                                     71 ;--------------------------------------------------------
+                                     72 ; uninitialized external ram data
+                                     73 ;--------------------------------------------------------
+                                     74 	.area XSEG    (XDATA)
+      000000                         75 _frexpf_PARM_2:
+      000000                         76 	.ds 4
+      000004                         77 _frexpf_fl_65536_26:
+      000004                         78 	.ds 4
+                                     79 ;--------------------------------------------------------
+                                     80 ; absolute external ram data
+                                     81 ;--------------------------------------------------------
+                                     82 	.area XABS    (ABS,XDATA)
+                                     83 ;--------------------------------------------------------
+                                     84 ; initialized external ram data
+                                     85 ;--------------------------------------------------------
+                                     86 	.area XISEG   (XDATA)
+                                     87 ;--------------------------------------------------------
+                                     88 ; global & static initialisations
+                                     89 ;--------------------------------------------------------
+                                     90 	.area HOME    (CODE)
+                                     91 	.area GSINIT  (CODE)
+                                     92 	.area GSFINAL (CODE)
+                                     93 	.area GSINIT  (CODE)
+                                     94 ;--------------------------------------------------------
+                                     95 ; Home
+                                     96 ;--------------------------------------------------------
+                                     97 	.area HOME    (CODE)
+                                     98 	.area HOME    (CODE)
+                                     99 ;--------------------------------------------------------
+                                    100 ; code
+                                    101 ;--------------------------------------------------------
+                                    102 	.area CSEG    (CODE)
+                                    103 ;------------------------------------------------------------
+                                    104 ;Allocation info for local variables in function 'frexpf'
+                                    105 ;------------------------------------------------------------
+                                    106 ;pw2                       Allocated with name '_frexpf_PARM_2'
+                                    107 ;x                         Allocated to registers r2 r3 r4 r5 
+                                    108 ;fl                        Allocated with name '_frexpf_fl_65536_26'
+                                    109 ;i                         Allocated to registers r2 r3 r4 r5 
+                                    110 ;------------------------------------------------------------
+                                    111 ;	frexpf.c:34: float frexpf(float x, int *pw2)
+                                    112 ;	-----------------------------------------
+                                    113 ;	 function frexpf
+                                    114 ;	-----------------------------------------
+      000000                        115 _frexpf:
+                           000002   116 	ar2 = 0x02
+                           000003   117 	ar3 = 0x03
+                           000004   118 	ar4 = 0x04
+                           000005   119 	ar5 = 0x05
+                           000006   120 	ar6 = 0x06
+                           000007   121 	ar7 = 0x07
+                           000000   122 	ar0 = 0x00
+                           000001   123 	ar1 = 0x01
+      000000 AA 82            [ 8]  124 	mov	r2,dpl
+      000002 AB 83            [ 8]  125 	mov	r3,dph
+      000004 AC 93            [ 8]  126 	mov	r4,dpx
+      000006 AD F0            [ 8]  127 	mov	r5,b
+                                    128 ;	frexpf.c:39: fl.f=x;
+      000008 90s00r00r04      [12]  129 	mov	dptr,#_frexpf_fl_65536_26
+      00000C EA               [ 4]  130 	mov	a,r2
+      00000D F0               [ 8]  131 	movx	@dptr,a
+      00000E A3               [12]  132 	inc	dptr
+      00000F EB               [ 4]  133 	mov	a,r3
+      000010 F0               [ 8]  134 	movx	@dptr,a
+      000011 A3               [12]  135 	inc	dptr
+      000012 EC               [ 4]  136 	mov	a,r4
+      000013 F0               [ 8]  137 	movx	@dptr,a
+      000014 A3               [12]  138 	inc	dptr
+      000015 ED               [ 4]  139 	mov	a,r5
+      000016 F0               [ 8]  140 	movx	@dptr,a
+                                    141 ;	frexpf.c:41: i  = ( fl.l >> 23) & 0x000000ff;
+      000017 90s00r00r04      [12]  142 	mov	dptr,#_frexpf_fl_65536_26
+      00001B E0               [ 8]  143 	movx	a,@dptr
+      00001C A3               [12]  144 	inc	dptr
+      00001D FA               [ 4]  145 	mov	r2,a
+      00001E E0               [ 8]  146 	movx	a,@dptr
+      00001F A3               [12]  147 	inc	dptr
+      000020 FB               [ 4]  148 	mov	r3,a
+      000021 E0               [ 8]  149 	movx	a,@dptr
+      000022 A3               [12]  150 	inc	dptr
+      000023 FC               [ 4]  151 	mov	r4,a
+      000024 E0               [ 8]  152 	movx	a,@dptr
+      000025 FD               [ 4]  153 	mov	r5,a
+      000026 8C 02            [ 8]  154 	mov	ar2,r4
+      000028 ED               [ 4]  155 	mov	a,r5
+      000029 A2 E7            [ 8]  156 	mov	c,acc[7]
+      00002B CA               [ 4]  157 	xch	a,r2
+      00002C 33               [ 4]  158 	rlc	a
+      00002D CA               [ 4]  159 	xch	a,r2
+      00002E 33               [ 4]  160 	rlc	a
+      00002F CA               [ 4]  161 	xch	a,r2
+      000030 54 01            [ 8]  162 	anl	a,#0x01
+      000032 30 E0 02         [12]  163 	jnb	acc[0],00103$
+      000035 44 FE            [ 8]  164 	orl	a,#0xfffffffe
+      000037                        165 00103$:
+      000037 FB               [ 4]  166 	mov	r3,a
+      000038 33               [ 4]  167 	rlc	a
+      000039 95 E0            [ 8]  168 	subb	a,acc
+      00003B FC               [ 4]  169 	mov	r4,a
+      00003C FD               [ 4]  170 	mov	r5,a
+                                    171 ;	frexpf.c:42: i -= 0x7e;
+      00003D E4               [ 4]  172 	clr  a
+      00003E FB               [ 4]  173 	mov  r3,a
+      00003F FC               [ 4]  174 	mov  r4,a
+      000040 FD               [ 4]  175 	mov  r5,a
+      000041 EA               [ 4]  176 	mov  a,r2
+      000042 24 82            [ 8]  177 	add	a,#0x82
+      000044 FA               [ 4]  178 	mov	r2,a
+      000045 EB               [ 4]  179 	mov	a,r3
+      000046 34 FF            [ 8]  180 	addc	a,#0xff
+      000048 FB               [ 4]  181 	mov	r3,a
+      000049 EC               [ 4]  182 	mov	a,r4
+      00004A 34 FF            [ 8]  183 	addc	a,#0xff
+      00004C FC               [ 4]  184 	mov	r4,a
+      00004D ED               [ 4]  185 	mov	a,r5
+      00004E 34 FF            [ 8]  186 	addc	a,#0xff
+      000050 FD               [ 4]  187 	mov	r5,a
+                                    188 ;	genAssign: resultIsFar = TRUE
+                                    189 ;	frexpf.c:43: *pw2 = i;
+      000051 90s00r00r00      [12]  190 	mov	dptr,#_frexpf_PARM_2
+                                    191 ;	genAssign: resultIsFar = FALSE
+      000055 E0               [ 8]  192 	movx	a,@dptr
+      000056 FE               [ 4]  193 	mov	r6,a
+      000057 A3               [12]  194 	inc	dptr
+      000058 E0               [ 8]  195 	movx	a,@dptr
+      000059 FF               [ 4]  196 	mov	r7,a
+      00005A A3               [12]  197 	inc	dptr
+      00005B E0               [ 8]  198 	movx	a,@dptr
+      00005C F8               [ 4]  199 	mov	r0,a
+      00005D A3               [12]  200 	inc	dptr
+      00005E E0               [ 8]  201 	movx	a,@dptr
+      00005F F9               [ 4]  202 	mov	r1,a
+      000060 8E 82            [ 8]  203 	mov	dpl,r6
+      000062 8F 83            [ 8]  204 	mov	dph,r7
+      000064 88 93            [ 8]  205 	mov	dpx,r0
+      000066 89 F0            [ 8]  206 	mov	b,r1
+      000068 8A 9C            [ 8]  207 	mov	acc1, r2
+      00006A EB               [ 4]  208 	mov	a,r3
+      00006B 12s00r00r00      [16]  209 	lcall	__gptrputWord
+                                    210 ;	frexpf.c:44: fl.l &= 0x807fffff; /* strip all exponent bits */
+      00006F 90s00r00r04      [12]  211 	mov	dptr,#_frexpf_fl_65536_26
+      000073 E0               [ 8]  212 	movx	a,@dptr
+      000074 A3               [12]  213 	inc	dptr
+      000075 FA               [ 4]  214 	mov	r2,a
+      000076 E0               [ 8]  215 	movx	a,@dptr
+      000077 A3               [12]  216 	inc	dptr
+      000078 FB               [ 4]  217 	mov	r3,a
+      000079 E0               [ 8]  218 	movx	a,@dptr
+      00007A A3               [12]  219 	inc	dptr
+      00007B FC               [ 4]  220 	mov	r4,a
+      00007C E0               [ 8]  221 	movx	a,@dptr
+      00007D FD               [ 4]  222 	mov	r5,a
+      00007E 53 04 7F         [12]  223 	anl	ar4,#0x7f
+      000081 53 05 80         [12]  224 	anl	ar5,#0x80
+      000084 90s00r00r04      [12]  225 	mov	dptr,#_frexpf_fl_65536_26
+      000088 EA               [ 4]  226 	mov	a,r2
+      000089 F0               [ 8]  227 	movx	@dptr,a
+      00008A A3               [12]  228 	inc	dptr
+      00008B EB               [ 4]  229 	mov	a,r3
+      00008C F0               [ 8]  230 	movx	@dptr,a
+      00008D A3               [12]  231 	inc	dptr
+      00008E EC               [ 4]  232 	mov	a,r4
+      00008F F0               [ 8]  233 	movx	@dptr,a
+      000090 A3               [12]  234 	inc	dptr
+      000091 ED               [ 4]  235 	mov	a,r5
+      000092 F0               [ 8]  236 	movx	@dptr,a
+                                    237 ;	frexpf.c:45: fl.l |= 0x3f000000; /* mantissa between 0.5 and 1 */
+      000093 43 05 3F         [12]  238 	orl	ar5,#0x3f
+      000096 90s00r00r04      [12]  239 	mov	dptr,#_frexpf_fl_65536_26
+      00009A EA               [ 4]  240 	mov	a,r2
+      00009B F0               [ 8]  241 	movx	@dptr,a
+      00009C A3               [12]  242 	inc	dptr
+      00009D EB               [ 4]  243 	mov	a,r3
+      00009E F0               [ 8]  244 	movx	@dptr,a
+      00009F A3               [12]  245 	inc	dptr
+      0000A0 EC               [ 4]  246 	mov	a,r4
+      0000A1 F0               [ 8]  247 	movx	@dptr,a
+      0000A2 A3               [12]  248 	inc	dptr
+      0000A3 ED               [ 4]  249 	mov	a,r5
+      0000A4 F0               [ 8]  250 	movx	@dptr,a
+                                    251 ;	frexpf.c:46: return(fl.f);
+      0000A5 90s00r00r04      [12]  252 	mov	dptr,#_frexpf_fl_65536_26
+      0000A9 E0               [ 8]  253 	movx	a,@dptr
+      0000AA A3               [12]  254 	inc	dptr
+      0000AB FA               [ 4]  255 	mov	r2,a
+      0000AC E0               [ 8]  256 	movx	a,@dptr
+      0000AD A3               [12]  257 	inc	dptr
+      0000AE FB               [ 4]  258 	mov	r3,a
+      0000AF E0               [ 8]  259 	movx	a,@dptr
+      0000B0 A3               [12]  260 	inc	dptr
+      0000B1 FC               [ 4]  261 	mov	r4,a
+      0000B2 E0               [ 8]  262 	movx	a,@dptr
+      0000B3 FD               [ 4]  263 	mov	r5,a
+      0000B4 8A 82            [ 8]  264 	mov	dpl,r2
+      0000B6 8B 83            [ 8]  265 	mov	dph,r3
+      0000B8 8C 93            [ 8]  266 	mov	dpx,r4
+      0000BA 8D F0            [ 8]  267 	mov	b,r5
+      0000BC                        268 00101$:
+                                    269 ;	frexpf.c:47: }
+      0000BC 22               [16]  270 	ret
+                                    271 	.area CSEG    (CODE)
+                                    272 	.area CONST   (CODE)
+                                    273 	.area XINIT   (CODE)
+                                    274 	.area CABS    (ABS,CODE)

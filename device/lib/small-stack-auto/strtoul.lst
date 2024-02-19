@@ -1,0 +1,994 @@
+                                      1 ;--------------------------------------------------------
+                                      2 ; File Created by SDCC : free open source ISO C Compiler 
+                                      3 ; Version 4.2.14 #0 (Linux)
+                                      4 ;--------------------------------------------------------
+                                      5 	.module strtoul
+                                      6 	.optsdcc -mmcs51 --model-small
+                                      7 	
+                                      8 ;--------------------------------------------------------
+                                      9 ; Public variables in this module
+                                     10 ;--------------------------------------------------------
+                                     11 	.globl _strncmp
+                                     12 	.globl _strtoul
+                                     13 ;--------------------------------------------------------
+                                     14 ; special function registers
+                                     15 ;--------------------------------------------------------
+                                     16 	.area RSEG    (ABS,DATA)
+      000000                         17 	.org 0x0000
+                                     18 ;--------------------------------------------------------
+                                     19 ; special function bits
+                                     20 ;--------------------------------------------------------
+                                     21 	.area RSEG    (ABS,DATA)
+      000000                         22 	.org 0x0000
+                                     23 ;--------------------------------------------------------
+                                     24 ; overlayable register banks
+                                     25 ;--------------------------------------------------------
+                                     26 	.area REG_BANK_0	(REL,OVR,DATA)
+      000000                         27 	.ds 8
+                                     28 ;--------------------------------------------------------
+                                     29 ; overlayable bit register bank
+                                     30 ;--------------------------------------------------------
+                                     31 	.area BIT_BANK	(REL,OVR,DATA)
+      000000                         32 bits:
+      000000                         33 	.ds 1
+                           008000    34 	b0 = bits[0]
+                           008100    35 	b1 = bits[1]
+                           008200    36 	b2 = bits[2]
+                           008300    37 	b3 = bits[3]
+                           008400    38 	b4 = bits[4]
+                           008500    39 	b5 = bits[5]
+                           008600    40 	b6 = bits[6]
+                           008700    41 	b7 = bits[7]
+                                     42 ;--------------------------------------------------------
+                                     43 ; internal ram data
+                                     44 ;--------------------------------------------------------
+                                     45 	.area DSEG    (DATA)
+                                     46 ;--------------------------------------------------------
+                                     47 ; overlayable items in internal ram
+                                     48 ;--------------------------------------------------------
+                                     49 ;--------------------------------------------------------
+                                     50 ; indirectly addressable internal ram data
+                                     51 ;--------------------------------------------------------
+                                     52 	.area ISEG    (DATA)
+                                     53 ;--------------------------------------------------------
+                                     54 ; absolute internal ram data
+                                     55 ;--------------------------------------------------------
+                                     56 	.area IABS    (ABS,DATA)
+                                     57 	.area IABS    (ABS,DATA)
+                                     58 ;--------------------------------------------------------
+                                     59 ; bit data
+                                     60 ;--------------------------------------------------------
+                                     61 	.area BSEG    (BIT)
+                                     62 ;--------------------------------------------------------
+                                     63 ; paged external ram data
+                                     64 ;--------------------------------------------------------
+                                     65 	.area PSEG    (PAG,XDATA)
+                                     66 ;--------------------------------------------------------
+                                     67 ; uninitialized external ram data
+                                     68 ;--------------------------------------------------------
+                                     69 	.area XSEG    (XDATA)
+                                     70 ;--------------------------------------------------------
+                                     71 ; absolute external ram data
+                                     72 ;--------------------------------------------------------
+                                     73 	.area XABS    (ABS,XDATA)
+                                     74 ;--------------------------------------------------------
+                                     75 ; initialized external ram data
+                                     76 ;--------------------------------------------------------
+                                     77 	.area XISEG   (XDATA)
+                                     78 	.area HOME    (CODE)
+                                     79 	.area GSINIT0 (CODE)
+                                     80 	.area GSINIT1 (CODE)
+                                     81 	.area GSINIT2 (CODE)
+                                     82 	.area GSINIT3 (CODE)
+                                     83 	.area GSINIT4 (CODE)
+                                     84 	.area GSINIT5 (CODE)
+                                     85 	.area GSINIT  (CODE)
+                                     86 	.area GSFINAL (CODE)
+                                     87 	.area CSEG    (CODE)
+                                     88 ;--------------------------------------------------------
+                                     89 ; global & static initialisations
+                                     90 ;--------------------------------------------------------
+                                     91 	.area HOME    (CODE)
+                                     92 	.area GSINIT  (CODE)
+                                     93 	.area GSFINAL (CODE)
+                                     94 	.area GSINIT  (CODE)
+                                     95 ;--------------------------------------------------------
+                                     96 ; Home
+                                     97 ;--------------------------------------------------------
+                                     98 	.area HOME    (CODE)
+                                     99 	.area HOME    (CODE)
+                                    100 ;--------------------------------------------------------
+                                    101 ; code
+                                    102 ;--------------------------------------------------------
+                                    103 	.area CSEG    (CODE)
+                                    104 ;------------------------------------------------------------
+                                    105 ;Allocation info for local variables in function '_isdigit'
+                                    106 ;------------------------------------------------------------
+                                    107 ;base                      Allocated to stack - _bp -3
+                                    108 ;c                         Allocated to registers r7 
+                                    109 ;v                         Allocated to registers r6 
+                                    110 ;------------------------------------------------------------
+                                    111 ;	strtoul.c:40: static signed char _isdigit(const char c, unsigned char base)
+                                    112 ;	-----------------------------------------
+                                    113 ;	 function _isdigit
+                                    114 ;	-----------------------------------------
+      000000                        115 __isdigit:
+                           000007   116 	ar7 = 0x07
+                           000006   117 	ar6 = 0x06
+                           000005   118 	ar5 = 0x05
+                           000004   119 	ar4 = 0x04
+                           000003   120 	ar3 = 0x03
+                           000002   121 	ar2 = 0x02
+                           000001   122 	ar1 = 0x01
+                           000000   123 	ar0 = 0x00
+      000000 C0*00            [24]  124 	push	_bp
+      000002 85 81*00         [24]  125 	mov	_bp,sp
+      000005 AF 82            [24]  126 	mov	r7,dpl
+                                    127 ;	strtoul.c:44: if (c >= '0' && c <= '9')
+      000007 BF 30 00         [24]  128 	cjne	r7,#0x30,00145$
+      00000A                        129 00145$:
+      00000A 40 0D            [24]  130 	jc	00110$
+      00000C EF               [12]  131 	mov	a,r7
+      00000D 24 C6            [12]  132 	add	a,#0xff - 0x39
+      00000F 40 08            [24]  133 	jc	00110$
+                                    134 ;	strtoul.c:45: v = c - '0';
+      000011 8F 06            [24]  135 	mov	ar6,r7
+      000013 EE               [12]  136 	mov	a,r6
+      000014 24 D0            [12]  137 	add	a,#0xd0
+      000016 FE               [12]  138 	mov	r6,a
+      000017 80 27            [24]  139 	sjmp	00111$
+      000019                        140 00110$:
+                                    141 ;	strtoul.c:46: else if (c >= 'a' && c <='z')
+      000019 BF 61 00         [24]  142 	cjne	r7,#0x61,00148$
+      00001C                        143 00148$:
+      00001C 40 0D            [24]  144 	jc	00106$
+      00001E EF               [12]  145 	mov	a,r7
+      00001F 24 85            [12]  146 	add	a,#0xff - 0x7a
+      000021 40 08            [24]  147 	jc	00106$
+                                    148 ;	strtoul.c:47: v = c - 'a' + 10;
+      000023 8F 05            [24]  149 	mov	ar5,r7
+      000025 74 A9            [12]  150 	mov	a,#0xa9
+      000027 2D               [12]  151 	add	a,r5
+      000028 FE               [12]  152 	mov	r6,a
+      000029 80 15            [24]  153 	sjmp	00111$
+      00002B                        154 00106$:
+                                    155 ;	strtoul.c:48: else if (c >= 'A' && c <='Z')
+      00002B BF 41 00         [24]  156 	cjne	r7,#0x41,00151$
+      00002E                        157 00151$:
+      00002E 40 0B            [24]  158 	jc	00102$
+      000030 EF               [12]  159 	mov	a,r7
+      000031 24 A5            [12]  160 	add	a,#0xff - 0x5a
+      000033 40 06            [24]  161 	jc	00102$
+                                    162 ;	strtoul.c:49: v = c - 'A' + 10;
+      000035 74 C9            [12]  163 	mov	a,#0xc9
+      000037 2F               [12]  164 	add	a,r7
+      000038 FE               [12]  165 	mov	r6,a
+      000039 80 05            [24]  166 	sjmp	00111$
+      00003B                        167 00102$:
+                                    168 ;	strtoul.c:51: return (-1);
+      00003B 75 82 FF         [24]  169 	mov	dpl,#0xff
+      00003E 80 11            [24]  170 	sjmp	00115$
+      000040                        171 00111$:
+                                    172 ;	strtoul.c:53: if (v >= base)
+      000040 E5*00            [12]  173 	mov	a,_bp
+      000042 24 FD            [12]  174 	add	a,#0xfd
+      000044 F8               [12]  175 	mov	r0,a
+      000045 C3               [12]  176 	clr	c
+      000046 EE               [12]  177 	mov	a,r6
+      000047 96               [12]  178 	subb	a,@r0
+      000048 40 05            [24]  179 	jc	00114$
+                                    180 ;	strtoul.c:54: return (-1);
+      00004A 75 82 FF         [24]  181 	mov	dpl,#0xff
+      00004D 80 02            [24]  182 	sjmp	00115$
+      00004F                        183 00114$:
+                                    184 ;	strtoul.c:56: return (v);
+      00004F 8E 82            [24]  185 	mov	dpl,r6
+      000051                        186 00115$:
+                                    187 ;	strtoul.c:57: }
+      000051 D0*00            [24]  188 	pop	_bp
+      000053 22               [24]  189 	ret
+                                    190 ;------------------------------------------------------------
+                                    191 ;Allocation info for local variables in function 'strtoul'
+                                    192 ;------------------------------------------------------------
+                                    193 ;endptr                    Allocated to stack - _bp -5
+                                    194 ;base                      Allocated to stack - _bp -7
+                                    195 ;nptr                      Allocated to stack - _bp +1
+                                    196 ;__1310720004              Allocated to registers 
+                                    197 ;ptr                       Allocated to registers r5 r6 r7 
+                                    198 ;ret                       Allocated to stack - _bp +15
+                                    199 ;range_error               Allocated to registers b0 
+                                    200 ;neg                       Allocated to registers b1 
+                                    201 ;__1310720005              Allocated to registers 
+                                    202 ;c                         Allocated to registers 
+                                    203 ;__2621440017              Allocated to stack - _bp +19
+                                    204 ;__2621440012              Allocated to registers b2 
+                                    205 ;__2621440007              Allocated to stack - _bp +21
+                                    206 ;oldret                    Allocated to registers 
+                                    207 ;digit                     Allocated to registers r3 
+                                    208 ;__2621440008              Allocated to stack - _bp +27
+                                    209 ;__2621440009              Allocated to stack - _bp +30
+                                    210 ;__2621440010              Allocated to stack - _bp +38
+                                    211 ;r                         Allocated to stack - _bp +46
+                                    212 ;a                         Allocated to stack - _bp +49
+                                    213 ;b                         Allocated to stack - _bp +57
+                                    214 ;result                    Allocated to stack - _bp +65
+                                    215 ;__2621440013              Allocated to stack - _bp +19
+                                    216 ;__2621440014              Allocated to stack - _bp +22
+                                    217 ;__2621440015              Allocated to stack - _bp +30
+                                    218 ;r                         Allocated to registers 
+                                    219 ;a                         Allocated to registers 
+                                    220 ;b                         Allocated to registers 
+                                    221 ;result                    Allocated to stack - _bp +38
+                                    222 ;__2621440018              Allocated to stack - _bp +119
+                                    223 ;__2621440019              Allocated to stack - _bp +122
+                                    224 ;__2621440020              Allocated to stack - _bp +130
+                                    225 ;r                         Allocated to stack - _bp +138
+                                    226 ;a                         Allocated to stack - _bp +141
+                                    227 ;b                         Allocated to stack - _bp +149
+                                    228 ;result                    Allocated to stack - _bp +157
+                                    229 ;sloc0                     Allocated to stack - _bp +165
+                                    230 ;sloc1                     Allocated to stack - _bp +4
+                                    231 ;sloc2                     Allocated to stack - _bp +7
+                                    232 ;------------------------------------------------------------
+                                    233 ;	strtoul.c:59: unsigned long int strtoul(const char *nptr, char **endptr, int base)
+                                    234 ;	-----------------------------------------
+                                    235 ;	 function strtoul
+                                    236 ;	-----------------------------------------
+      000054                        237 _strtoul:
+      000054 C0*00            [24]  238 	push	_bp
+      000056 85 81*00         [24]  239 	mov	_bp,sp
+      000059 C0 82            [24]  240 	push	dpl
+      00005B C0 83            [24]  241 	push	dph
+      00005D C0 F0            [24]  242 	push	b
+      00005F E5 81            [12]  243 	mov	a,sp
+      000061 24 2A            [12]  244 	add	a,#0x2a
+      000063 F5 81            [12]  245 	mov	sp,a
+                                    246 ;	strtoul.c:63: bool range_error = false;
+                                    247 ;	assignBit
+      000065 C2*00            [12]  248 	clr	b0
+                                    249 ;	strtoul.c:64: bool neg = false;
+                                    250 ;	assignBit
+      000067 C2*00            [12]  251 	clr	b1
+                                    252 ;	strtoul.c:66: while (isblank (*ptr))
+      000069 A8*00            [24]  253 	mov	r0,_bp
+      00006B 08               [12]  254 	inc	r0
+      00006C 86 02            [24]  255 	mov	ar2,@r0
+      00006E 08               [12]  256 	inc	r0
+      00006F 86 03            [24]  257 	mov	ar3,@r0
+      000071 08               [12]  258 	inc	r0
+      000072 86 04            [24]  259 	mov	ar4,@r0
+      000074                        260 00101$:
+      000074 8A 82            [24]  261 	mov	dpl,r2
+      000076 8B 83            [24]  262 	mov	dph,r3
+      000078 8C F0            [24]  263 	mov	b,r4
+      00007A 12r00r00         [24]  264 	lcall	__gptrget
+      00007D FF               [12]  265 	mov	r7,a
+                                    266 ;	../../device/include/ctype.h:53: return ((unsigned char)c == ' ' || (unsigned char)c == '\t');
+      00007E BF 20 02         [24]  267 	cjne	r7,#0x20,00214$
+      000081 80 03            [24]  268 	sjmp	00141$
+      000083                        269 00214$:
+      000083 BF 09 07         [24]  270 	cjne	r7,#0x09,00163$
+      000086                        271 00141$:
+                                    272 ;	strtoul.c:67: ptr++;
+      000086 0A               [12]  273 	inc	r2
+      000087 BA 00 EA         [24]  274 	cjne	r2,#0x00,00101$
+      00008A 0B               [12]  275 	inc	r3
+      00008B 80 E7            [24]  276 	sjmp	00101$
+      00008D                        277 00163$:
+      00008D 8A 05            [24]  278 	mov	ar5,r2
+      00008F 8B 06            [24]  279 	mov	ar6,r3
+      000091 8C 07            [24]  280 	mov	ar7,r4
+                                    281 ;	strtoul.c:70: switch(*ptr)
+      000093 8A 82            [24]  282 	mov	dpl,r2
+      000095 8B 83            [24]  283 	mov	dph,r3
+      000097 8C F0            [24]  284 	mov	b,r4
+      000099 12r00r00         [24]  285 	lcall	__gptrget
+      00009C FC               [12]  286 	mov	r4,a
+      00009D BC 2B 02         [24]  287 	cjne	r4,#0x2b,00218$
+      0000A0 80 05            [24]  288 	sjmp	00105$
+      0000A2                        289 00218$:
+      0000A2 BC 2D 07         [24]  290 	cjne	r4,#0x2d,00106$
+                                    291 ;	strtoul.c:73: neg = true;
+                                    292 ;	assignBit
+      0000A5 D2*00            [12]  293 	setb	b1
+                                    294 ;	strtoul.c:74: case '+':
+      0000A7                        295 00105$:
+                                    296 ;	strtoul.c:75: ptr++;
+      0000A7 0D               [12]  297 	inc	r5
+      0000A8 BD 00 01         [24]  298 	cjne	r5,#0x00,00221$
+      0000AB 0E               [12]  299 	inc	r6
+      0000AC                        300 00221$:
+                                    301 ;	strtoul.c:76: }
+      0000AC                        302 00106$:
+                                    303 ;	strtoul.c:79: if (!base)
+      0000AC E5*00            [12]  304 	mov	a,_bp
+      0000AE 24 F9            [12]  305 	add	a,#0xf9
+      0000B0 F8               [12]  306 	mov	r0,a
+      0000B1 E6               [12]  307 	mov	a,@r0
+      0000B2 08               [12]  308 	inc	r0
+      0000B3 46               [12]  309 	orl	a,@r0
+      0000B4 60 03            [24]  310 	jz	00222$
+      0000B6 02r01r6D         [24]  311 	ljmp	00119$
+      0000B9                        312 00222$:
+                                    313 ;	strtoul.c:81: if (!strncmp (ptr, "0x", 2) || !strncmp (ptr, "0X", 2))
+      0000B9 C0 07            [24]  314 	push	ar7
+      0000BB C0 06            [24]  315 	push	ar6
+      0000BD C0 05            [24]  316 	push	ar5
+      0000BF C0*00            [24]  317 	push	bits
+      0000C1 74 02            [12]  318 	mov	a,#0x02
+      0000C3 C0 E0            [24]  319 	push	acc
+      0000C5 E4               [12]  320 	clr	a
+      0000C6 C0 E0            [24]  321 	push	acc
+      0000C8 74r00            [12]  322 	mov	a,#___str_0
+      0000CA C0 E0            [24]  323 	push	acc
+      0000CC 74s00            [12]  324 	mov	a,#(___str_0 >> 8)
+      0000CE C0 E0            [24]  325 	push	acc
+      0000D0 74 80            [12]  326 	mov	a,#0x80
+      0000D2 C0 E0            [24]  327 	push	acc
+      0000D4 8D 82            [24]  328 	mov	dpl,r5
+      0000D6 8E 83            [24]  329 	mov	dph,r6
+      0000D8 8F F0            [24]  330 	mov	b,r7
+      0000DA 12r00r00         [24]  331 	lcall	_strncmp
+      0000DD AB 82            [24]  332 	mov	r3,dpl
+      0000DF AC 83            [24]  333 	mov	r4,dph
+      0000E1 E5 81            [12]  334 	mov	a,sp
+      0000E3 24 FB            [12]  335 	add	a,#0xfb
+      0000E5 F5 81            [12]  336 	mov	sp,a
+      0000E7 D0*00            [24]  337 	pop	bits
+      0000E9 D0 05            [24]  338 	pop	ar5
+      0000EB D0 06            [24]  339 	pop	ar6
+      0000ED D0 07            [24]  340 	pop	ar7
+      0000EF EB               [12]  341 	mov	a,r3
+      0000F0 4C               [12]  342 	orl	a,r4
+      0000F1 60 3A            [24]  343 	jz	00110$
+      0000F3 C0 07            [24]  344 	push	ar7
+      0000F5 C0 06            [24]  345 	push	ar6
+      0000F7 C0 05            [24]  346 	push	ar5
+      0000F9 C0*00            [24]  347 	push	bits
+      0000FB 74 02            [12]  348 	mov	a,#0x02
+      0000FD C0 E0            [24]  349 	push	acc
+      0000FF E4               [12]  350 	clr	a
+      000100 C0 E0            [24]  351 	push	acc
+      000102 74r03            [12]  352 	mov	a,#___str_1
+      000104 C0 E0            [24]  353 	push	acc
+      000106 74s00            [12]  354 	mov	a,#(___str_1 >> 8)
+      000108 C0 E0            [24]  355 	push	acc
+      00010A 74 80            [12]  356 	mov	a,#0x80
+      00010C C0 E0            [24]  357 	push	acc
+      00010E 8D 82            [24]  358 	mov	dpl,r5
+      000110 8E 83            [24]  359 	mov	dph,r6
+      000112 8F F0            [24]  360 	mov	b,r7
+      000114 12r00r00         [24]  361 	lcall	_strncmp
+      000117 AB 82            [24]  362 	mov	r3,dpl
+      000119 AC 83            [24]  363 	mov	r4,dph
+      00011B E5 81            [12]  364 	mov	a,sp
+      00011D 24 FB            [12]  365 	add	a,#0xfb
+      00011F F5 81            [12]  366 	mov	sp,a
+      000121 D0*00            [24]  367 	pop	bits
+      000123 D0 05            [24]  368 	pop	ar5
+      000125 D0 06            [24]  369 	pop	ar6
+      000127 D0 07            [24]  370 	pop	ar7
+      000129 EB               [12]  371 	mov	a,r3
+      00012A 4C               [12]  372 	orl	a,r4
+      00012B 70 14            [24]  373 	jnz	00111$
+      00012D                        374 00110$:
+                                    375 ;	strtoul.c:83: base = 16;
+      00012D E5*00            [12]  376 	mov	a,_bp
+      00012F 24 F9            [12]  377 	add	a,#0xf9
+      000131 F8               [12]  378 	mov	r0,a
+      000132 76 10            [12]  379 	mov	@r0,#0x10
+      000134 08               [12]  380 	inc	r0
+      000135 76 00            [12]  381 	mov	@r0,#0x00
+                                    382 ;	strtoul.c:84: ptr += 2;
+      000137 74 02            [12]  383 	mov	a,#0x02
+      000139 2D               [12]  384 	add	a,r5
+      00013A FD               [12]  385 	mov	r5,a
+      00013B E4               [12]  386 	clr	a
+      00013C 3E               [12]  387 	addc	a,r6
+      00013D FE               [12]  388 	mov	r6,a
+      00013E 02r01rF8         [24]  389 	ljmp	00120$
+      000141                        390 00111$:
+                                    391 ;	strtoul.c:86: else if (*ptr == '0')
+      000141 8D 82            [24]  392 	mov	dpl,r5
+      000143 8E 83            [24]  393 	mov	dph,r6
+      000145 8F F0            [24]  394 	mov	b,r7
+      000147 12r00r00         [24]  395 	lcall	__gptrget
+      00014A FC               [12]  396 	mov	r4,a
+      00014B BC 30 12         [24]  397 	cjne	r4,#0x30,00108$
+                                    398 ;	strtoul.c:88: base = 8;
+      00014E E5*00            [12]  399 	mov	a,_bp
+      000150 24 F9            [12]  400 	add	a,#0xf9
+      000152 F8               [12]  401 	mov	r0,a
+      000153 76 08            [12]  402 	mov	@r0,#0x08
+      000155 08               [12]  403 	inc	r0
+      000156 76 00            [12]  404 	mov	@r0,#0x00
+                                    405 ;	strtoul.c:89: ptr++;
+      000158 0D               [12]  406 	inc	r5
+      000159 BD 00 01         [24]  407 	cjne	r5,#0x00,00227$
+      00015C 0E               [12]  408 	inc	r6
+      00015D                        409 00227$:
+      00015D 02r01rF8         [24]  410 	ljmp	00120$
+      000160                        411 00108$:
+                                    412 ;	strtoul.c:92: base = 10;
+      000160 E5*00            [12]  413 	mov	a,_bp
+      000162 24 F9            [12]  414 	add	a,#0xf9
+      000164 F8               [12]  415 	mov	r0,a
+      000165 76 0A            [12]  416 	mov	@r0,#0x0a
+      000167 08               [12]  417 	inc	r0
+      000168 76 00            [12]  418 	mov	@r0,#0x00
+      00016A 02r01rF8         [24]  419 	ljmp	00120$
+      00016D                        420 00119$:
+                                    421 ;	strtoul.c:95: else if (base == 16 && (!strncmp (ptr, "0x", 2) || !strncmp (ptr, "0X", 2)))
+      00016D E5*00            [12]  422 	mov	a,_bp
+      00016F 24 F9            [12]  423 	add	a,#0xf9
+      000171 F8               [12]  424 	mov	r0,a
+      000172 B6 10 06         [24]  425 	cjne	@r0,#0x10,00228$
+      000175 08               [12]  426 	inc	r0
+      000176 B6 00 02         [24]  427 	cjne	@r0,#0x00,00228$
+      000179 80 02            [24]  428 	sjmp	00229$
+      00017B                        429 00228$:
+      00017B 80 7B            [24]  430 	sjmp	00120$
+      00017D                        431 00229$:
+      00017D C0 07            [24]  432 	push	ar7
+      00017F C0 06            [24]  433 	push	ar6
+      000181 C0 05            [24]  434 	push	ar5
+      000183 C0*00            [24]  435 	push	bits
+      000185 74 02            [12]  436 	mov	a,#0x02
+      000187 C0 E0            [24]  437 	push	acc
+      000189 E4               [12]  438 	clr	a
+      00018A C0 E0            [24]  439 	push	acc
+      00018C 74r00            [12]  440 	mov	a,#___str_0
+      00018E C0 E0            [24]  441 	push	acc
+      000190 74s00            [12]  442 	mov	a,#(___str_0 >> 8)
+      000192 C0 E0            [24]  443 	push	acc
+      000194 74 80            [12]  444 	mov	a,#0x80
+      000196 C0 E0            [24]  445 	push	acc
+      000198 8D 82            [24]  446 	mov	dpl,r5
+      00019A 8E 83            [24]  447 	mov	dph,r6
+      00019C 8F F0            [24]  448 	mov	b,r7
+      00019E 12r00r00         [24]  449 	lcall	_strncmp
+      0001A1 AB 82            [24]  450 	mov	r3,dpl
+      0001A3 AC 83            [24]  451 	mov	r4,dph
+      0001A5 E5 81            [12]  452 	mov	a,sp
+      0001A7 24 FB            [12]  453 	add	a,#0xfb
+      0001A9 F5 81            [12]  454 	mov	sp,a
+      0001AB D0*00            [24]  455 	pop	bits
+      0001AD D0 05            [24]  456 	pop	ar5
+      0001AF D0 06            [24]  457 	pop	ar6
+      0001B1 D0 07            [24]  458 	pop	ar7
+      0001B3 EB               [12]  459 	mov	a,r3
+      0001B4 4C               [12]  460 	orl	a,r4
+      0001B5 60 3A            [24]  461 	jz	00114$
+      0001B7 C0 07            [24]  462 	push	ar7
+      0001B9 C0 06            [24]  463 	push	ar6
+      0001BB C0 05            [24]  464 	push	ar5
+      0001BD C0*00            [24]  465 	push	bits
+      0001BF 74 02            [12]  466 	mov	a,#0x02
+      0001C1 C0 E0            [24]  467 	push	acc
+      0001C3 E4               [12]  468 	clr	a
+      0001C4 C0 E0            [24]  469 	push	acc
+      0001C6 74r03            [12]  470 	mov	a,#___str_1
+      0001C8 C0 E0            [24]  471 	push	acc
+      0001CA 74s00            [12]  472 	mov	a,#(___str_1 >> 8)
+      0001CC C0 E0            [24]  473 	push	acc
+      0001CE 74 80            [12]  474 	mov	a,#0x80
+      0001D0 C0 E0            [24]  475 	push	acc
+      0001D2 8D 82            [24]  476 	mov	dpl,r5
+      0001D4 8E 83            [24]  477 	mov	dph,r6
+      0001D6 8F F0            [24]  478 	mov	b,r7
+      0001D8 12r00r00         [24]  479 	lcall	_strncmp
+      0001DB AB 82            [24]  480 	mov	r3,dpl
+      0001DD AC 83            [24]  481 	mov	r4,dph
+      0001DF E5 81            [12]  482 	mov	a,sp
+      0001E1 24 FB            [12]  483 	add	a,#0xfb
+      0001E3 F5 81            [12]  484 	mov	sp,a
+      0001E5 D0*00            [24]  485 	pop	bits
+      0001E7 D0 05            [24]  486 	pop	ar5
+      0001E9 D0 06            [24]  487 	pop	ar6
+      0001EB D0 07            [24]  488 	pop	ar7
+      0001ED EB               [12]  489 	mov	a,r3
+      0001EE 4C               [12]  490 	orl	a,r4
+      0001EF 70 07            [24]  491 	jnz	00120$
+      0001F1                        492 00114$:
+                                    493 ;	strtoul.c:96: ptr += 2;
+      0001F1 74 02            [12]  494 	mov	a,#0x02
+      0001F3 2D               [12]  495 	add	a,r5
+      0001F4 FD               [12]  496 	mov	r5,a
+      0001F5 E4               [12]  497 	clr	a
+      0001F6 3E               [12]  498 	addc	a,r6
+      0001F7 FE               [12]  499 	mov	r6,a
+      0001F8                        500 00120$:
+                                    501 ;	strtoul.c:100: if (_isdigit (*ptr, base) < 0)
+      0001F8 E5*00            [12]  502 	mov	a,_bp
+      0001FA 24 F9            [12]  503 	add	a,#0xf9
+      0001FC F8               [12]  504 	mov	r0,a
+      0001FD 86 04            [24]  505 	mov	ar4,@r0
+      0001FF 8D 82            [24]  506 	mov	dpl,r5
+      000201 8E 83            [24]  507 	mov	dph,r6
+      000203 8F F0            [24]  508 	mov	b,r7
+      000205 12r00r00         [24]  509 	lcall	__gptrget
+      000208 FB               [12]  510 	mov	r3,a
+      000209 C0 07            [24]  511 	push	ar7
+      00020B C0 06            [24]  512 	push	ar6
+      00020D C0 05            [24]  513 	push	ar5
+      00020F C0 04            [24]  514 	push	ar4
+      000211 C0*00            [24]  515 	push	bits
+      000213 C0 04            [24]  516 	push	ar4
+      000215 8B 82            [24]  517 	mov	dpl,r3
+      000217 12r00r00         [24]  518 	lcall	__isdigit
+      00021A AB 82            [24]  519 	mov	r3,dpl
+      00021C 15 81            [12]  520 	dec	sp
+      00021E D0*00            [24]  521 	pop	bits
+      000220 D0 04            [24]  522 	pop	ar4
+      000222 D0 05            [24]  523 	pop	ar5
+      000224 D0 06            [24]  524 	pop	ar6
+      000226 D0 07            [24]  525 	pop	ar7
+      000228 EB               [12]  526 	mov	a,r3
+      000229 30 E7 39         [24]  527 	jnb	acc.7,00124$
+                                    528 ;	strtoul.c:102: if (endptr)
+      00022C E5*00            [12]  529 	mov	a,_bp
+      00022E 24 FB            [12]  530 	add	a,#0xfb
+      000230 F8               [12]  531 	mov	r0,a
+      000231 E6               [12]  532 	mov	a,@r0
+      000232 08               [12]  533 	inc	r0
+      000233 46               [12]  534 	orl	a,@r0
+      000234 60 26            [24]  535 	jz	00122$
+                                    536 ;	strtoul.c:103: *endptr = (char*)nptr;
+      000236 E5*00            [12]  537 	mov	a,_bp
+      000238 24 FB            [12]  538 	add	a,#0xfb
+      00023A F8               [12]  539 	mov	r0,a
+      00023B 86 07            [24]  540 	mov	ar7,@r0
+      00023D 08               [12]  541 	inc	r0
+      00023E 86 06            [24]  542 	mov	ar6,@r0
+      000240 08               [12]  543 	inc	r0
+      000241 86 05            [24]  544 	mov	ar5,@r0
+      000243 8F 82            [24]  545 	mov	dpl,r7
+      000245 8E 83            [24]  546 	mov	dph,r6
+      000247 8D F0            [24]  547 	mov	b,r5
+      000249 A8*00            [24]  548 	mov	r0,_bp
+      00024B 08               [12]  549 	inc	r0
+      00024C E6               [12]  550 	mov	a,@r0
+      00024D 12r00r00         [24]  551 	lcall	__gptrput
+      000250 A3               [24]  552 	inc	dptr
+      000251 08               [12]  553 	inc	r0
+      000252 E6               [12]  554 	mov	a,@r0
+      000253 12r00r00         [24]  555 	lcall	__gptrput
+      000256 A3               [24]  556 	inc	dptr
+      000257 08               [12]  557 	inc	r0
+      000258 E6               [12]  558 	mov	a,@r0
+      000259 12r00r00         [24]  559 	lcall	__gptrput
+      00025C                        560 00122$:
+                                    561 ;	strtoul.c:104: return (0);
+      00025C 90 00 00         [24]  562 	mov	dptr,#(0x00&0x00ff)
+      00025F E4               [12]  563 	clr	a
+      000260 F5 F0            [12]  564 	mov	b,a
+      000262 02r04rB2         [24]  565 	ljmp	00138$
+      000265                        566 00124$:
+                                    567 ;	strtoul.c:107: for (ret = 0;; ptr++)
+      000265 E5*00            [12]  568 	mov	a,_bp
+      000267 24 0F            [12]  569 	add	a,#0x0f
+      000269 F8               [12]  570 	mov	r0,a
+      00026A E4               [12]  571 	clr	a
+      00026B F6               [12]  572 	mov	@r0,a
+      00026C 08               [12]  573 	inc	r0
+      00026D F6               [12]  574 	mov	@r0,a
+      00026E 08               [12]  575 	inc	r0
+      00026F F6               [12]  576 	mov	@r0,a
+      000270 08               [12]  577 	inc	r0
+      000271 F6               [12]  578 	mov	@r0,a
+      000272 E5*00            [12]  579 	mov	a,_bp
+      000274 24 04            [12]  580 	add	a,#0x04
+      000276 F8               [12]  581 	mov	r0,a
+      000277 A6 05            [24]  582 	mov	@r0,ar5
+      000279 08               [12]  583 	inc	r0
+      00027A A6 06            [24]  584 	mov	@r0,ar6
+      00027C 08               [12]  585 	inc	r0
+      00027D A6 07            [24]  586 	mov	@r0,ar7
+      00027F                        587 00136$:
+                                    588 ;	strtoul.c:110: signed char digit = _isdigit (*ptr, base);
+      00027F E5*00            [12]  589 	mov	a,_bp
+      000281 24 04            [12]  590 	add	a,#0x04
+      000283 F8               [12]  591 	mov	r0,a
+      000284 86 82            [24]  592 	mov	dpl,@r0
+      000286 08               [12]  593 	inc	r0
+      000287 86 83            [24]  594 	mov	dph,@r0
+      000289 08               [12]  595 	inc	r0
+      00028A 86 F0            [24]  596 	mov	b,@r0
+      00028C 12r00r00         [24]  597 	lcall	__gptrget
+      00028F FB               [12]  598 	mov	r3,a
+      000290 C0 04            [24]  599 	push	ar4
+      000292 C0*00            [24]  600 	push	bits
+      000294 C0 04            [24]  601 	push	ar4
+      000296 8B 82            [24]  602 	mov	dpl,r3
+      000298 12r00r00         [24]  603 	lcall	__isdigit
+      00029B AB 82            [24]  604 	mov	r3,dpl
+      00029D 15 81            [12]  605 	dec	sp
+      00029F D0*00            [24]  606 	pop	bits
+      0002A1 D0 04            [24]  607 	pop	ar4
+                                    608 ;	strtoul.c:112: if (digit < 0)
+      0002A3 EB               [12]  609 	mov	a,r3
+      0002A4 30 E7 03         [24]  610 	jnb	acc.7,00234$
+      0002A7 02r04r3D         [24]  611 	ljmp	00127$
+      0002AA                        612 00234$:
+                                    613 ;	strtoul.c:117: range_error |= ckd_mul(&ret, ret, base);
+      0002AA C0 04            [24]  614 	push	ar4
+      0002AC E5*00            [12]  615 	mov	a,_bp
+      0002AE 24 F9            [12]  616 	add	a,#0xf9
+      0002B0 F8               [12]  617 	mov	r0,a
+      0002B1 E5*00            [12]  618 	mov	a,_bp
+      0002B3 24 1E            [12]  619 	add	a,#0x1e
+      0002B5 F9               [12]  620 	mov	r1,a
+      0002B6 E6               [12]  621 	mov	a,@r0
+      0002B7 F7               [12]  622 	mov	@r1,a
+      0002B8 08               [12]  623 	inc	r0
+      0002B9 E6               [12]  624 	mov	a,@r0
+      0002BA 09               [12]  625 	inc	r1
+      0002BB F7               [12]  626 	mov	@r1,a
+      0002BC E6               [12]  627 	mov	a,@r0
+      0002BD 33               [12]  628 	rlc	a
+      0002BE 95 E0            [12]  629 	subb	a,acc
+      0002C0 09               [12]  630 	inc	r1
+      0002C1 F7               [12]  631 	mov	@r1,a
+      0002C2 09               [12]  632 	inc	r1
+      0002C3 F7               [12]  633 	mov	@r1,a
+      0002C4 09               [12]  634 	inc	r1
+      0002C5 F7               [12]  635 	mov	@r1,a
+      0002C6 09               [12]  636 	inc	r1
+      0002C7 F7               [12]  637 	mov	@r1,a
+      0002C8 09               [12]  638 	inc	r1
+      0002C9 F7               [12]  639 	mov	@r1,a
+      0002CA 09               [12]  640 	inc	r1
+      0002CB F7               [12]  641 	mov	@r1,a
+      0002CC E5*00            [12]  642 	mov	a,_bp
+      0002CE 24 0F            [12]  643 	add	a,#0x0f
+      0002D0 F8               [12]  644 	mov	r0,a
+      0002D1 E5*00            [12]  645 	mov	a,_bp
+      0002D3 24 16            [12]  646 	add	a,#0x16
+      0002D5 F9               [12]  647 	mov	r1,a
+      0002D6 E6               [12]  648 	mov	a,@r0
+      0002D7 F7               [12]  649 	mov	@r1,a
+      0002D8 08               [12]  650 	inc	r0
+      0002D9 E6               [12]  651 	mov	a,@r0
+      0002DA 09               [12]  652 	inc	r1
+      0002DB F7               [12]  653 	mov	@r1,a
+      0002DC 08               [12]  654 	inc	r0
+      0002DD E6               [12]  655 	mov	a,@r0
+      0002DE 09               [12]  656 	inc	r1
+      0002DF F7               [12]  657 	mov	@r1,a
+      0002E0 08               [12]  658 	inc	r0
+      0002E1 E6               [12]  659 	mov	a,@r0
+      0002E2 09               [12]  660 	inc	r1
+      0002E3 F7               [12]  661 	mov	@r1,a
+      0002E4 09               [12]  662 	inc	r1
+      0002E5 77 00            [12]  663 	mov	@r1,#0x00
+      0002E7 09               [12]  664 	inc	r1
+      0002E8 77 00            [12]  665 	mov	@r1,#0x00
+      0002EA 09               [12]  666 	inc	r1
+      0002EB 77 00            [12]  667 	mov	@r1,#0x00
+      0002ED 09               [12]  668 	inc	r1
+      0002EE 77 00            [12]  669 	mov	@r1,#0x00
+      0002F0 E5*00            [12]  670 	mov	a,_bp
+      0002F2 24 0F            [12]  671 	add	a,#0x0f
+      0002F4 FF               [12]  672 	mov	r7,a
+      0002F5 E5*00            [12]  673 	mov	a,_bp
+      0002F7 24 13            [12]  674 	add	a,#0x13
+      0002F9 F8               [12]  675 	mov	r0,a
+      0002FA A6 07            [24]  676 	mov	@r0,ar7
+      0002FC 08               [12]  677 	inc	r0
+      0002FD 76 00            [12]  678 	mov	@r0,#0x00
+      0002FF 08               [12]  679 	inc	r0
+      000300 76 40            [12]  680 	mov	@r0,#0x40
+                                    681 ;	../../device/include/stdckdint.h:76: inline _Bool __ckd_mul_ulong __CKD_DEFAULT_IMPL(unsigned long, *)
+      000302 C0 04            [24]  682 	push	ar4
+      000304 C0 03            [24]  683 	push	ar3
+      000306 C0*00            [24]  684 	push	bits
+      000308 E5*00            [12]  685 	mov	a,_bp
+      00030A 24 1E            [12]  686 	add	a,#0x1e
+      00030C F8               [12]  687 	mov	r0,a
+      00030D E6               [12]  688 	mov	a,@r0
+      00030E C0 E0            [24]  689 	push	acc
+      000310 08               [12]  690 	inc	r0
+      000311 E6               [12]  691 	mov	a,@r0
+      000312 C0 E0            [24]  692 	push	acc
+      000314 08               [12]  693 	inc	r0
+      000315 E6               [12]  694 	mov	a,@r0
+      000316 C0 E0            [24]  695 	push	acc
+      000318 08               [12]  696 	inc	r0
+      000319 E6               [12]  697 	mov	a,@r0
+      00031A C0 E0            [24]  698 	push	acc
+      00031C 08               [12]  699 	inc	r0
+      00031D E6               [12]  700 	mov	a,@r0
+      00031E C0 E0            [24]  701 	push	acc
+      000320 08               [12]  702 	inc	r0
+      000321 E6               [12]  703 	mov	a,@r0
+      000322 C0 E0            [24]  704 	push	acc
+      000324 08               [12]  705 	inc	r0
+      000325 E6               [12]  706 	mov	a,@r0
+      000326 C0 E0            [24]  707 	push	acc
+      000328 08               [12]  708 	inc	r0
+      000329 E6               [12]  709 	mov	a,@r0
+      00032A C0 E0            [24]  710 	push	acc
+      00032C E5*00            [12]  711 	mov	a,_bp
+      00032E 24 16            [12]  712 	add	a,#0x16
+      000330 F8               [12]  713 	mov	r0,a
+      000331 86 82            [24]  714 	mov	dpl,@r0
+      000333 08               [12]  715 	inc	r0
+      000334 86 83            [24]  716 	mov	dph,@r0
+      000336 08               [12]  717 	inc	r0
+      000337 86 F0            [24]  718 	mov	b,@r0
+      000339 08               [12]  719 	inc	r0
+      00033A E6               [12]  720 	mov	a,@r0
+      00033B 08               [12]  721 	inc	r0
+      00033C 86 04            [24]  722 	mov	ar4,@r0
+      00033E 08               [12]  723 	inc	r0
+      00033F 86 05            [24]  724 	mov	ar5,@r0
+      000341 08               [12]  725 	inc	r0
+      000342 86 06            [24]  726 	mov	ar6,@r0
+      000344 08               [12]  727 	inc	r0
+      000345 86 07            [24]  728 	mov	ar7,@r0
+      000347 12r00r00         [24]  729 	lcall	__mullonglong
+      00034A C8               [12]  730 	xch	a,r0
+      00034B E5*00            [12]  731 	mov	a,_bp
+      00034D 24 26            [12]  732 	add	a,#0x26
+      00034F C8               [12]  733 	xch	a,r0
+      000350 A6 82            [24]  734 	mov	@r0,dpl
+      000352 08               [12]  735 	inc	r0
+      000353 A6 83            [24]  736 	mov	@r0,dph
+      000355 08               [12]  737 	inc	r0
+      000356 A6 F0            [24]  738 	mov	@r0,b
+      000358 08               [12]  739 	inc	r0
+      000359 F6               [12]  740 	mov	@r0,a
+      00035A 08               [12]  741 	inc	r0
+      00035B A6 04            [24]  742 	mov	@r0,ar4
+      00035D 08               [12]  743 	inc	r0
+      00035E A6 05            [24]  744 	mov	@r0,ar5
+      000360 08               [12]  745 	inc	r0
+      000361 A6 06            [24]  746 	mov	@r0,ar6
+      000363 08               [12]  747 	inc	r0
+      000364 A6 07            [24]  748 	mov	@r0,ar7
+      000366 E5 81            [12]  749 	mov	a,sp
+      000368 24 F8            [12]  750 	add	a,#0xf8
+      00036A F5 81            [12]  751 	mov	sp,a
+      00036C D0*00            [24]  752 	pop	bits
+      00036E D0 03            [24]  753 	pop	ar3
+      000370 D0 04            [24]  754 	pop	ar4
+      000372 E5*00            [12]  755 	mov	a,_bp
+      000374 24 26            [12]  756 	add	a,#0x26
+      000376 E5*00            [12]  757 	mov	a,_bp
+      000378 24 26            [12]  758 	add	a,#0x26
+      00037A F8               [12]  759 	mov	r0,a
+      00037B 86 04            [24]  760 	mov	ar4,@r0
+      00037D 08               [12]  761 	inc	r0
+      00037E 86 06            [24]  762 	mov	ar6,@r0
+      000380 08               [12]  763 	inc	r0
+      000381 86 05            [24]  764 	mov	ar5,@r0
+      000383 08               [12]  765 	inc	r0
+      000384 86 07            [24]  766 	mov	ar7,@r0
+      000386 E5*00            [12]  767 	mov	a,_bp
+      000388 24 13            [12]  768 	add	a,#0x13
+      00038A F8               [12]  769 	mov	r0,a
+      00038B 86 82            [24]  770 	mov	dpl,@r0
+      00038D 08               [12]  771 	inc	r0
+      00038E 86 83            [24]  772 	mov	dph,@r0
+      000390 08               [12]  773 	inc	r0
+      000391 86 F0            [24]  774 	mov	b,@r0
+      000393 EC               [12]  775 	mov	a,r4
+      000394 12r00r00         [24]  776 	lcall	__gptrput
+      000397 A3               [24]  777 	inc	dptr
+      000398 EE               [12]  778 	mov	a,r6
+      000399 12r00r00         [24]  779 	lcall	__gptrput
+      00039C A3               [24]  780 	inc	dptr
+      00039D ED               [12]  781 	mov	a,r5
+      00039E 12r00r00         [24]  782 	lcall	__gptrput
+      0003A1 A3               [24]  783 	inc	dptr
+      0003A2 EF               [12]  784 	mov	a,r7
+      0003A3 12r00r00         [24]  785 	lcall	__gptrput
+      0003A6 E5*00            [12]  786 	mov	a,_bp
+      0003A8 24 07            [12]  787 	add	a,#0x07
+      0003AA F8               [12]  788 	mov	r0,a
+      0003AB A6 04            [24]  789 	mov	@r0,ar4
+      0003AD 08               [12]  790 	inc	r0
+      0003AE A6 06            [24]  791 	mov	@r0,ar6
+      0003B0 08               [12]  792 	inc	r0
+      0003B1 A6 05            [24]  793 	mov	@r0,ar5
+      0003B3 08               [12]  794 	inc	r0
+      0003B4 A6 07            [24]  795 	mov	@r0,ar7
+      0003B6 08               [12]  796 	inc	r0
+      0003B7 76 00            [12]  797 	mov	@r0,#0x00
+      0003B9 08               [12]  798 	inc	r0
+      0003BA 76 00            [12]  799 	mov	@r0,#0x00
+      0003BC 08               [12]  800 	inc	r0
+      0003BD 76 00            [12]  801 	mov	@r0,#0x00
+      0003BF 08               [12]  802 	inc	r0
+      0003C0 76 00            [12]  803 	mov	@r0,#0x00
+      0003C2 E5*00            [12]  804 	mov	a,_bp
+      0003C4 24 07            [12]  805 	add	a,#0x07
+      0003C6 F8               [12]  806 	mov	r0,a
+      0003C7 E5*00            [12]  807 	mov	a,_bp
+      0003C9 24 26            [12]  808 	add	a,#0x26
+      0003CB F9               [12]  809 	mov	r1,a
+      0003CC 86 F0            [24]  810 	mov	b,@r0
+      0003CE E7               [12]  811 	mov	a,@r1
+      0003CF B5 F0 3B         [24]  812 	cjne	a,b,00235$
+      0003D2 08               [12]  813 	inc	r0
+      0003D3 86 F0            [24]  814 	mov	b,@r0
+      0003D5 09               [12]  815 	inc	r1
+      0003D6 E7               [12]  816 	mov	a,@r1
+      0003D7 B5 F0 33         [24]  817 	cjne	a,b,00235$
+      0003DA 08               [12]  818 	inc	r0
+      0003DB 86 F0            [24]  819 	mov	b,@r0
+      0003DD 09               [12]  820 	inc	r1
+      0003DE E7               [12]  821 	mov	a,@r1
+      0003DF B5 F0 2B         [24]  822 	cjne	a,b,00235$
+      0003E2 08               [12]  823 	inc	r0
+      0003E3 86 F0            [24]  824 	mov	b,@r0
+      0003E5 09               [12]  825 	inc	r1
+      0003E6 E7               [12]  826 	mov	a,@r1
+      0003E7 B5 F0 23         [24]  827 	cjne	a,b,00235$
+      0003EA 08               [12]  828 	inc	r0
+      0003EB 86 F0            [24]  829 	mov	b,@r0
+      0003ED 09               [12]  830 	inc	r1
+      0003EE E7               [12]  831 	mov	a,@r1
+      0003EF B5 F0 1B         [24]  832 	cjne	a,b,00235$
+      0003F2 08               [12]  833 	inc	r0
+      0003F3 86 F0            [24]  834 	mov	b,@r0
+      0003F5 09               [12]  835 	inc	r1
+      0003F6 E7               [12]  836 	mov	a,@r1
+      0003F7 B5 F0 13         [24]  837 	cjne	a,b,00235$
+      0003FA 08               [12]  838 	inc	r0
+      0003FB 86 F0            [24]  839 	mov	b,@r0
+      0003FD 09               [12]  840 	inc	r1
+      0003FE E7               [12]  841 	mov	a,@r1
+      0003FF B5 F0 0B         [24]  842 	cjne	a,b,00235$
+      000402 08               [12]  843 	inc	r0
+      000403 86 F0            [24]  844 	mov	b,@r0
+      000405 09               [12]  845 	inc	r1
+      000406 E7               [12]  846 	mov	a,@r1
+      000407 B5 F0 03         [24]  847 	cjne	a,b,00235$
+      00040A D3               [12]  848 	setb	c
+      00040B 80 01            [24]  849 	sjmp	00236$
+      00040D                        850 00235$:
+      00040D C3               [12]  851 	clr	c
+      00040E                        852 00236$:
+      00040E B3               [12]  853 	cpl	c
+                                    854 ;	strtoul.c:117: range_error |= ckd_mul(&ret, ret, base);
+      00040F 92*00            [24]  855 	mov	b2,c
+      000411 72*00            [24]  856 	orl	c,b0
+      000413 92*00            [24]  857 	mov	b0,c
+                                    858 ;	strtoul.c:125: ret += (unsigned char)digit;
+      000415 E4               [12]  859 	clr	a
+      000416 FF               [12]  860 	mov	r7,a
+      000417 FE               [12]  861 	mov	r6,a
+      000418 FD               [12]  862 	mov	r5,a
+      000419 E5*00            [12]  863 	mov	a,_bp
+      00041B 24 0F            [12]  864 	add	a,#0x0f
+      00041D F8               [12]  865 	mov	r0,a
+      00041E EB               [12]  866 	mov	a,r3
+      00041F 26               [12]  867 	add	a,@r0
+      000420 F6               [12]  868 	mov	@r0,a
+      000421 EF               [12]  869 	mov	a,r7
+      000422 08               [12]  870 	inc	r0
+      000423 36               [12]  871 	addc	a,@r0
+      000424 F6               [12]  872 	mov	@r0,a
+      000425 EE               [12]  873 	mov	a,r6
+      000426 08               [12]  874 	inc	r0
+      000427 36               [12]  875 	addc	a,@r0
+      000428 F6               [12]  876 	mov	@r0,a
+      000429 ED               [12]  877 	mov	a,r5
+      00042A 08               [12]  878 	inc	r0
+      00042B 36               [12]  879 	addc	a,@r0
+      00042C F6               [12]  880 	mov	@r0,a
+                                    881 ;	strtoul.c:107: for (ret = 0;; ptr++)
+      00042D E5*00            [12]  882 	mov	a,_bp
+      00042F 24 04            [12]  883 	add	a,#0x04
+      000431 F8               [12]  884 	mov	r0,a
+      000432 06               [12]  885 	inc	@r0
+      000433 B6 00 02         [24]  886 	cjne	@r0,#0x00,00237$
+      000436 08               [12]  887 	inc	r0
+      000437 06               [12]  888 	inc	@r0
+      000438                        889 00237$:
+      000438 D0 04            [24]  890 	pop	ar4
+      00043A 02r02r7F         [24]  891 	ljmp	00136$
+      00043D                        892 00127$:
+                                    893 ;	strtoul.c:128: if (endptr)
+      00043D E5*00            [12]  894 	mov	a,_bp
+      00043F 24 FB            [12]  895 	add	a,#0xfb
+      000441 F8               [12]  896 	mov	r0,a
+      000442 E6               [12]  897 	mov	a,@r0
+      000443 08               [12]  898 	inc	r0
+      000444 46               [12]  899 	orl	a,@r0
+      000445 60 28            [24]  900 	jz	00129$
+                                    901 ;	strtoul.c:129: *endptr = (char*)ptr;
+      000447 E5*00            [12]  902 	mov	a,_bp
+      000449 24 FB            [12]  903 	add	a,#0xfb
+      00044B F8               [12]  904 	mov	r0,a
+      00044C 86 05            [24]  905 	mov	ar5,@r0
+      00044E 08               [12]  906 	inc	r0
+      00044F 86 06            [24]  907 	mov	ar6,@r0
+      000451 08               [12]  908 	inc	r0
+      000452 86 07            [24]  909 	mov	ar7,@r0
+      000454 8D 82            [24]  910 	mov	dpl,r5
+      000456 8E 83            [24]  911 	mov	dph,r6
+      000458 8F F0            [24]  912 	mov	b,r7
+      00045A E5*00            [12]  913 	mov	a,_bp
+      00045C 24 04            [12]  914 	add	a,#0x04
+      00045E F8               [12]  915 	mov	r0,a
+      00045F E6               [12]  916 	mov	a,@r0
+      000460 12r00r00         [24]  917 	lcall	__gptrput
+      000463 A3               [24]  918 	inc	dptr
+      000464 08               [12]  919 	inc	r0
+      000465 E6               [12]  920 	mov	a,@r0
+      000466 12r00r00         [24]  921 	lcall	__gptrput
+      000469 A3               [24]  922 	inc	dptr
+      00046A 08               [12]  923 	inc	r0
+      00046B E6               [12]  924 	mov	a,@r0
+      00046C 12r00r00         [24]  925 	lcall	__gptrput
+      00046F                        926 00129$:
+                                    927 ;	strtoul.c:131: if (range_error)
+      00046F 30*00 0F         [24]  928 	jnb	b0,00131$
+                                    929 ;	strtoul.c:133: errno = ERANGE;
+      000472 75*00 22         [24]  930 	mov	_errno,#0x22
+      000475 75*01 00         [24]  931 	mov	(_errno + 1),#0x00
+                                    932 ;	strtoul.c:134: return (ULONG_MAX);
+      000478 90 FF FF         [24]  933 	mov	dptr,#0xffff
+      00047B 74 FF            [12]  934 	mov	a,#0xff
+      00047D F5 F0            [12]  935 	mov	b,a
+      00047F 80 31            [24]  936 	sjmp	00138$
+      000481                        937 00131$:
+                                    938 ;	strtoul.c:137: return (neg ? -ret : ret);
+      000481 30*00 17         [24]  939 	jnb	b1,00143$
+      000484 E5*00            [12]  940 	mov	a,_bp
+      000486 24 0F            [12]  941 	add	a,#0x0f
+      000488 F8               [12]  942 	mov	r0,a
+      000489 C3               [12]  943 	clr	c
+      00048A E4               [12]  944 	clr	a
+      00048B 96               [12]  945 	subb	a,@r0
+      00048C FC               [12]  946 	mov	r4,a
+      00048D 08               [12]  947 	inc	r0
+      00048E E4               [12]  948 	clr	a
+      00048F 96               [12]  949 	subb	a,@r0
+      000490 FD               [12]  950 	mov	r5,a
+      000491 08               [12]  951 	inc	r0
+      000492 E4               [12]  952 	clr	a
+      000493 96               [12]  953 	subb	a,@r0
+      000494 FE               [12]  954 	mov	r6,a
+      000495 08               [12]  955 	inc	r0
+      000496 E4               [12]  956 	clr	a
+      000497 96               [12]  957 	subb	a,@r0
+      000498 FF               [12]  958 	mov	r7,a
+      000499 80 10            [24]  959 	sjmp	00144$
+      00049B                        960 00143$:
+      00049B E5*00            [12]  961 	mov	a,_bp
+      00049D 24 0F            [12]  962 	add	a,#0x0f
+      00049F F8               [12]  963 	mov	r0,a
+      0004A0 86 04            [24]  964 	mov	ar4,@r0
+      0004A2 08               [12]  965 	inc	r0
+      0004A3 86 05            [24]  966 	mov	ar5,@r0
+      0004A5 08               [12]  967 	inc	r0
+      0004A6 86 06            [24]  968 	mov	ar6,@r0
+      0004A8 08               [12]  969 	inc	r0
+      0004A9 86 07            [24]  970 	mov	ar7,@r0
+      0004AB                        971 00144$:
+      0004AB 8C 82            [24]  972 	mov	dpl,r4
+      0004AD 8D 83            [24]  973 	mov	dph,r5
+      0004AF 8E F0            [24]  974 	mov	b,r6
+      0004B1 EF               [12]  975 	mov	a,r7
+      0004B2                        976 00138$:
+                                    977 ;	strtoul.c:138: }
+      0004B2 85*00 81         [24]  978 	mov	sp,_bp
+      0004B5 D0*00            [24]  979 	pop	_bp
+      0004B7 22               [24]  980 	ret
+                                    981 	.area CSEG    (CODE)
+                                    982 	.area CONST   (CODE)
+                                    983 	.area CONST   (CODE)
+      000000                        984 ___str_0:
+      000000 30 78                  985 	.ascii "0x"
+      000002 00                     986 	.db 0x00
+                                    987 	.area CSEG    (CODE)
+                                    988 	.area CONST   (CODE)
+      000003                        989 ___str_1:
+      000003 30 58                  990 	.ascii "0X"
+      000005 00                     991 	.db 0x00
+                                    992 	.area CSEG    (CODE)
+                                    993 	.area XINIT   (CODE)
+                                    994 	.area CABS    (ABS,CODE)

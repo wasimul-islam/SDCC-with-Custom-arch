@@ -1,0 +1,141 @@
+                              1 ;--------------------------------------------------------
+                              2 ; File Created by SDCC : free open source ISO C Compiler 
+                              3 ; Version 4.2.14 #0 (Linux)
+                              4 ;--------------------------------------------------------
+                              5 	.module vprintf
+                              6 	.optsdcc -mmos6502
+                              7 	
+                              8 ;--------------------------------------------------------
+                              9 ; Public variables in this module
+                             10 ;--------------------------------------------------------
+                             11 	.globl _putchar
+                             12 	.globl __print_format
+                             13 	.globl _vprintf_PARM_2
+                             14 	.globl _vprintf
+                             15 	.globl _printf
+                             16 ;--------------------------------------------------------
+                             17 ; ZP ram data
+                             18 ;--------------------------------------------------------
+                             19 	.area ZP      (PAG)
+                             20 ;--------------------------------------------------------
+                             21 ; overlayable items in ram
+                             22 ;--------------------------------------------------------
+                             23 ;--------------------------------------------------------
+                             24 ; uninitialized external ram data
+                             25 ;--------------------------------------------------------
+                             26 	.area BSS
+   0000                      27 _vprintf_PARM_2:
+   0000                      28 	.ds 2
+                             29 ;--------------------------------------------------------
+                             30 ; absolute external ram data
+                             31 ;--------------------------------------------------------
+                             32 	.area DABS    (ABS)
+                             33 ;--------------------------------------------------------
+                             34 ; initialized external ram data
+                             35 ;--------------------------------------------------------
+                             36 	.area DATA
+                             37 ;--------------------------------------------------------
+                             38 ; global & static initialisations
+                             39 ;--------------------------------------------------------
+                             40 	.area _CODE
+                             41 	.area GSINIT
+                             42 	.area GSFINAL
+                             43 	.area GSINIT
+                             44 ;--------------------------------------------------------
+                             45 ; Home
+                             46 ;--------------------------------------------------------
+                             47 	.area _CODE
+                             48 	.area _CODE
+                             49 ;--------------------------------------------------------
+                             50 ; code
+                             51 ;--------------------------------------------------------
+                             52 	.area CODE
+                             53 ;------------------------------------------------------------
+                             54 ;Allocation info for local variables in function 'put_char_to_stdout'
+                             55 ;------------------------------------------------------------
+                             56 ;p                         Allocated to stack - sp +3
+                             57 ;c                         Allocated to registers a 
+                             58 ;------------------------------------------------------------
+                             59 ;	../vprintf.c: 34: put_char_to_stdout (char c, void* p) _REENTRANT
+                             60 ;	-----------------------------------------
+                             61 ;	 function put_char_to_stdout
+                             62 ;	-----------------------------------------
+                             63 ;	Register assignment is optimal.
+                             64 ;	Stack space usage: 0 bytes.
+   0000                      65 _put_char_to_stdout:
+                             66 ;	../vprintf.c: 37: putchar (c);
+   0000 A2 00         [ 2]   67 	ldx	#0x00
+                             68 ;	../vprintf.c: 38: }
+   0002 4Cr00r00      [ 3]   69 	jmp	_putchar
+                             70 ;------------------------------------------------------------
+                             71 ;Allocation info for local variables in function 'vprintf'
+                             72 ;------------------------------------------------------------
+                             73 ;ap                        Allocated with name '_vprintf_PARM_2'
+                             74 ;format                    Allocated to registers 
+                             75 ;------------------------------------------------------------
+                             76 ;	../vprintf.c: 41: vprintf (const char *format, va_list ap)
+                             77 ;	-----------------------------------------
+                             78 ;	 function vprintf
+                             79 ;	-----------------------------------------
+                             80 ;	Register assignment is optimal.
+                             81 ;	Stack space usage: 0 bytes.
+   0005                      82 _vprintf:
+   0005 8Dr00r00      [ 4]   83 	sta	__print_format_PARM_3
+   0008 8Er01r00      [ 4]   84 	stx	(__print_format_PARM_3 + 1)
+                             85 ;	../vprintf.c: 43: return _print_format (put_char_to_stdout, NULL, format, ap);
+   000B A2 00         [ 2]   86 	ldx	#0x00
+   000D 8Er00r00      [ 4]   87 	stx	__print_format_PARM_2
+   0010 8Er01r00      [ 4]   88 	stx	(__print_format_PARM_2 + 1)
+   0013 ADr00r00      [ 4]   89 	lda	_vprintf_PARM_2
+   0016 8Dr00r00      [ 4]   90 	sta	__print_format_PARM_4
+   0019 ADr01r00      [ 4]   91 	lda	(_vprintf_PARM_2 + 1)
+   001C 8Dr01r00      [ 4]   92 	sta	(__print_format_PARM_4 + 1)
+   001F A2s00         [ 2]   93 	ldx	#>(_put_char_to_stdout)
+   0021 A9r00         [ 2]   94 	lda	#(_put_char_to_stdout)
+                             95 ;	../vprintf.c: 44: }
+   0023 4Cr00r00      [ 3]   96 	jmp	__print_format
+                             97 ;------------------------------------------------------------
+                             98 ;Allocation info for local variables in function 'printf'
+                             99 ;------------------------------------------------------------
+                            100 ;format                    Allocated to stack - sp +3
+                            101 ;arg                       Allocated to registers 
+                            102 ;i                         Allocated to registers a x 
+                            103 ;------------------------------------------------------------
+                            104 ;	../vprintf.c: 47: printf (const char *format, ...)
+                            105 ;	-----------------------------------------
+                            106 ;	 function printf
+                            107 ;	-----------------------------------------
+                            108 ;	Register assignment is optimal.
+                            109 ;	Stack space usage: 0 bytes.
+   0026                     110 _printf:
+                            111 ;	../vprintf.c: 52: va_start (arg, format);
+   0026 BA            [ 2]  112 	tsx
+   0027 E8            [ 2]  113 	inx
+   0028 E8            [ 2]  114 	inx
+   0029 E8            [ 2]  115 	inx
+   002A 8A            [ 2]  116 	txa
+   002B A2 01         [ 2]  117 	ldx	#0x01
+   002D 18            [ 2]  118 	clc
+   002E 69 02         [ 2]  119 	adc	#0x02
+   0030 8Dr00r00      [ 4]  120 	sta	__print_format_PARM_4
+   0033 8A            [ 2]  121 	txa
+   0034 69 00         [ 2]  122 	adc	#0x00
+   0036 8Dr01r00      [ 4]  123 	sta	(__print_format_PARM_4 + 1)
+                            124 ;	../vprintf.c: 53: i = _print_format (put_char_to_stdout, NULL, format, arg);
+   0039 CA            [ 2]  125 	dex
+   003A 8Er00r00      [ 4]  126 	stx	__print_format_PARM_2
+   003D 8Er01r00      [ 4]  127 	stx	(__print_format_PARM_2 + 1)
+   0040 BA            [ 2]  128 	tsx
+   0041 BD 03 01      [ 5]  129 	lda	0x103,x
+   0044 8Dr00r00      [ 4]  130 	sta	__print_format_PARM_3
+   0047 BD 04 01      [ 5]  131 	lda	0x104,x
+   004A 8Dr01r00      [ 4]  132 	sta	(__print_format_PARM_3 + 1)
+   004D A2s00         [ 2]  133 	ldx	#>(_put_char_to_stdout)
+   004F A9r00         [ 2]  134 	lda	#(_put_char_to_stdout)
+                            135 ;	../vprintf.c: 56: return i;
+                            136 ;	../vprintf.c: 57: }
+   0051 4Cr00r00      [ 3]  137 	jmp	__print_format
+                            138 	.area CODE
+                            139 	.area RODATA
+                            140 	.area XINIT
+                            141 	.area CABS    (ABS)

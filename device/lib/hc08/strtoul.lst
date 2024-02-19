@@ -1,0 +1,647 @@
+                              1 ;--------------------------------------------------------
+                              2 ; File Created by SDCC : free open source ISO C Compiler 
+                              3 ; Version 4.2.14 #0 (Linux)
+                              4 ;--------------------------------------------------------
+                              5 	.module strtoul
+                              6 	.optsdcc -mhc08
+                              7 	
+                              8 	.area HOME    (CODE)
+                              9 	.area GSINIT0 (CODE)
+                             10 	.area GSINIT  (CODE)
+                             11 	.area GSFINAL (CODE)
+                             12 	.area CSEG    (CODE)
+                             13 	.area XINIT   (CODE)
+                             14 	.area CONST   (CODE)
+                             15 	.area DSEG    (PAG)
+                             16 	.area OSEG    (PAG, OVR)
+                             17 	.area XSEG
+                             18 	.area XISEG
+                             19 ;--------------------------------------------------------
+                             20 ; Public variables in this module
+                             21 ;--------------------------------------------------------
+                             22 	.globl _strncmp
+                             23 	.globl _strtoul_PARM_3
+                             24 	.globl _strtoul_PARM_2
+                             25 	.globl _strtoul
+                             26 ;--------------------------------------------------------
+                             27 ; ram data
+                             28 ;--------------------------------------------------------
+                             29 	.area DSEG    (PAG)
+   0000                      30 _strtoul_sloc0_1_0:
+   0000                      31 	.ds 1
+   0001                      32 _strtoul_sloc1_1_0:
+   0001                      33 	.ds 2
+   0003                      34 _strtoul_sloc2_1_0:
+   0003                      35 	.ds 2
+   0005                      36 _strtoul_sloc3_1_0:
+   0005                      37 	.ds 2
+   0007                      38 _strtoul_sloc4_1_0:
+   0007                      39 	.ds 8
+                             40 ;--------------------------------------------------------
+                             41 ; overlayable items in ram
+                             42 ;--------------------------------------------------------
+                             43 ;--------------------------------------------------------
+                             44 ; absolute ram data
+                             45 ;--------------------------------------------------------
+                             46 	.area IABS    (ABS)
+                             47 	.area IABS    (ABS)
+                             48 ;--------------------------------------------------------
+                             49 ; absolute external ram data
+                             50 ;--------------------------------------------------------
+                             51 	.area XABS    (ABS)
+                             52 ;--------------------------------------------------------
+                             53 ; initialized external ram data
+                             54 ;--------------------------------------------------------
+                             55 	.area XISEG
+                             56 ;--------------------------------------------------------
+                             57 ; extended address mode data
+                             58 ;--------------------------------------------------------
+                             59 	.area XSEG
+   0000                      60 __isdigit_base_65536_134:
+   0000                      61 	.ds 1
+   0001                      62 _strtoul_PARM_2:
+   0001                      63 	.ds 2
+   0003                      64 _strtoul_PARM_3:
+   0003                      65 	.ds 2
+   0005                      66 _strtoul_nptr_65536_136:
+   0005                      67 	.ds 2
+   0007                      68 _strtoul_ptr_65536_137:
+   0007                      69 	.ds 2
+   0009                      70 _strtoul_ret_65536_137:
+   0009                      71 	.ds 4
+   000D                      72 _strtoul_range_error_65536_137:
+   000D                      73 	.ds 1
+   000E                      74 _strtoul_neg_65536_137:
+   000E                      75 	.ds 1
+   000F                      76 _strtoul_digit_196608_144:
+   000F                      77 	.ds 1
+   0010                      78 _strtoul_result_393216_154:
+   0010                      79 	.ds 8
+                             80 ;--------------------------------------------------------
+                             81 ; global & static initialisations
+                             82 ;--------------------------------------------------------
+                             83 	.area HOME    (CODE)
+                             84 	.area GSINIT  (CODE)
+                             85 	.area GSFINAL (CODE)
+                             86 	.area GSINIT  (CODE)
+                             87 ;--------------------------------------------------------
+                             88 ; Home
+                             89 ;--------------------------------------------------------
+                             90 	.area HOME    (CODE)
+                             91 	.area HOME    (CODE)
+                             92 ;--------------------------------------------------------
+                             93 ; code
+                             94 ;--------------------------------------------------------
+                             95 	.area CSEG    (CODE)
+                             96 ;------------------------------------------------------------
+                             97 ;Allocation info for local variables in function '_isdigit'
+                             98 ;------------------------------------------------------------
+                             99 ;base                      Allocated with name '__isdigit_base_65536_134'
+                            100 ;c                         Allocated to registers a 
+                            101 ;v                         Allocated to registers a 
+                            102 ;------------------------------------------------------------
+                            103 ;../strtoul.c:40: static signed char _isdigit(const char c, unsigned char base)
+                            104 ;	-----------------------------------------
+                            105 ;	 function _isdigit
+                            106 ;	-----------------------------------------
+                            107 ;	Register assignment is optimal.
+                            108 ;	Stack space usage: 0 bytes.
+   0000                     109 __isdigit:
+   0000 CFr00r00      [ 4]  110 	stx	__isdigit_base_65536_134
+                            111 ;../strtoul.c:45: v = c - '0';
+   0003 97            [ 1]  112 	tax
+                            113 ;../strtoul.c:44: if (c >= '0' && c <= '9')
+   0004 A1 30         [ 2]  114 	cmp	#0x30
+   0006 25 09         [ 3]  115 	bcs	00110$
+   0008 A1 39         [ 2]  116 	cmp	#0x39
+   000A 22 05         [ 3]  117 	bhi	00110$
+                            118 ;../strtoul.c:45: v = c - '0';
+   000C 9F            [ 1]  119 	txa
+   000D A0 30         [ 2]  120 	sub	#0x30
+   000F 20 1D         [ 3]  121 	bra	00111$
+   0011                     122 00110$:
+                            123 ;../strtoul.c:46: else if (c >= 'a' && c <='z')
+   0011 A1 61         [ 2]  124 	cmp	#0x61
+   0013 25 09         [ 3]  125 	bcs	00106$
+   0015 A1 7A         [ 2]  126 	cmp	#0x7a
+   0017 22 05         [ 3]  127 	bhi	00106$
+                            128 ;../strtoul.c:47: v = c - 'a' + 10;
+   0019 9F            [ 1]  129 	txa
+   001A AB A9         [ 2]  130 	add	#0xa9
+   001C 20 10         [ 3]  131 	bra	00111$
+   001E                     132 00106$:
+                            133 ;../strtoul.c:48: else if (c >= 'A' && c <='Z')
+   001E A1 41         [ 2]  134 	cmp	#0x41
+   0020 25 09         [ 3]  135 	bcs	00102$
+   0022 A1 5A         [ 2]  136 	cmp	#0x5a
+   0024 22 05         [ 3]  137 	bhi	00102$
+                            138 ;../strtoul.c:49: v = c - 'A' + 10;
+   0026 9F            [ 1]  139 	txa
+   0027 AB C9         [ 2]  140 	add	#0xc9
+   0029 20 03         [ 3]  141 	bra	00111$
+   002B                     142 00102$:
+                            143 ;../strtoul.c:51: return (-1);
+   002B A6 FF         [ 2]  144 	lda	#0xff
+   002D 81            [ 4]  145 	rts
+   002E                     146 00111$:
+                            147 ;../strtoul.c:53: if (v >= base)
+   002E C1r00r00      [ 4]  148 	cmp	__isdigit_base_65536_134
+   0031 25 03         [ 3]  149 	bcs	00114$
+                            150 ;../strtoul.c:54: return (-1);
+   0033 A6 FF         [ 2]  151 	lda	#0xff
+   0035 81            [ 4]  152 	rts
+   0036                     153 00114$:
+                            154 ;../strtoul.c:56: return (v);
+                            155 ;../strtoul.c:57: }
+   0036 81            [ 4]  156 	rts
+                            157 ;------------------------------------------------------------
+                            158 ;Allocation info for local variables in function 'strtoul'
+                            159 ;------------------------------------------------------------
+                            160 ;sloc0                     Allocated with name '_strtoul_sloc0_1_0'
+                            161 ;sloc1                     Allocated with name '_strtoul_sloc1_1_0'
+                            162 ;sloc2                     Allocated with name '_strtoul_sloc2_1_0'
+                            163 ;sloc3                     Allocated with name '_strtoul_sloc3_1_0'
+                            164 ;sloc4                     Allocated with name '_strtoul_sloc4_1_0'
+                            165 ;endptr                    Allocated with name '_strtoul_PARM_2'
+                            166 ;base                      Allocated with name '_strtoul_PARM_3'
+                            167 ;nptr                      Allocated with name '_strtoul_nptr_65536_136'
+                            168 ;__1310720004              Allocated to registers 
+                            169 ;ptr                       Allocated with name '_strtoul_ptr_65536_137'
+                            170 ;ret                       Allocated with name '_strtoul_ret_65536_137'
+                            171 ;range_error               Allocated with name '_strtoul_range_error_65536_137'
+                            172 ;neg                       Allocated with name '_strtoul_neg_65536_137'
+                            173 ;__1310720005              Allocated to registers 
+                            174 ;c                         Allocated to registers 
+                            175 ;__2621440017              Allocated with name '_strtoul___2621440017_262144_144'
+                            176 ;__2621440012              Allocated to registers a 
+                            177 ;__2621440007              Allocated with name '_strtoul___2621440007_262144_144'
+                            178 ;oldret                    Allocated with name '_strtoul_oldret_196608_144'
+                            179 ;digit                     Allocated with name '_strtoul_digit_196608_144'
+                            180 ;__2621440008              Allocated with name '_strtoul___2621440008_262144_149'
+                            181 ;__2621440009              Allocated with name '_strtoul___2621440009_262144_149'
+                            182 ;__2621440010              Allocated with name '_strtoul___2621440010_262144_149'
+                            183 ;r                         Allocated with name '_strtoul_r_327680_150'
+                            184 ;a                         Allocated with name '_strtoul_a_327680_150'
+                            185 ;b                         Allocated with name '_strtoul_b_327680_150'
+                            186 ;result                    Allocated with name '_strtoul_result_393216_151'
+                            187 ;__2621440013              Allocated to registers 
+                            188 ;__2621440014              Allocated with name '_strtoul___2621440014_262144_152'
+                            189 ;__2621440015              Allocated with name '_strtoul___2621440015_262144_152'
+                            190 ;r                         Allocated to registers 
+                            191 ;a                         Allocated with name '_strtoul_a_327680_153'
+                            192 ;b                         Allocated with name '_strtoul_b_327680_153'
+                            193 ;result                    Allocated with name '_strtoul_result_393216_154'
+                            194 ;__2621440018              Allocated with name '_strtoul___2621440018_262144_155'
+                            195 ;__2621440019              Allocated with name '_strtoul___2621440019_262144_155'
+                            196 ;__2621440020              Allocated with name '_strtoul___2621440020_262144_155'
+                            197 ;r                         Allocated with name '_strtoul_r_327680_156'
+                            198 ;a                         Allocated with name '_strtoul_a_327680_156'
+                            199 ;b                         Allocated with name '_strtoul_b_327680_156'
+                            200 ;result                    Allocated with name '_strtoul_result_393216_157'
+                            201 ;------------------------------------------------------------
+                            202 ;../strtoul.c:59: unsigned long int strtoul(const char *nptr, char **endptr, int base)
+                            203 ;	-----------------------------------------
+                            204 ;	 function strtoul
+                            205 ;	-----------------------------------------
+                            206 ;	Register assignment is optimal.
+                            207 ;	Stack space usage: 0 bytes.
+   0037                     208 _strtoul:
+   0037 C7r00r06      [ 4]  209 	sta	(_strtoul_nptr_65536_136 + 1)
+   003A CFr00r05      [ 4]  210 	stx	_strtoul_nptr_65536_136
+                            211 ;../strtoul.c:63: bool range_error = false;
+   003D 4F            [ 1]  212 	clra
+   003E C7r00r0D      [ 4]  213 	sta	_strtoul_range_error_65536_137
+                            214 ;../strtoul.c:64: bool neg = false;
+   0041 C7r00r0E      [ 4]  215 	sta	_strtoul_neg_65536_137
+                            216 ;../strtoul.c:66: while (isblank (*ptr))
+   0044 C6r00r05      [ 4]  217 	lda	_strtoul_nptr_65536_136
+   0047 87            [ 2]  218 	psha
+   0048 8A            [ 2]  219 	pulh
+   0049 CEr00r06      [ 4]  220 	ldx	(_strtoul_nptr_65536_136 + 1)
+   004C                     221 00101$:
+   004C F6            [ 2]  222 	lda	,x
+   004D B7*00         [ 3]  223 	sta	*_strtoul_sloc0_1_0
+   004F B6*00         [ 3]  224 	lda	*_strtoul_sloc0_1_0
+                            225 ;./../../include/ctype.h:53: return ((unsigned char)c == ' ' || (unsigned char)c == '\t');
+   0051 41 20 04      [ 4]  226 	cbeqa	#0x20,00141$
+   0054 A1 09         [ 2]  227 	cmp	#0x09
+   0056 26 04         [ 3]  228 	bne	00163$
+   0058                     229 00141$:
+                            230 ;../strtoul.c:67: ptr++;
+   0058 AF 01         [ 2]  231 	aix	#1
+   005A 20 F0         [ 3]  232 	bra	00101$
+   005C                     233 00163$:
+   005C 8B            [ 2]  234 	pshh
+   005D 86            [ 2]  235 	pula
+   005E C7r00r07      [ 4]  236 	sta	_strtoul_ptr_65536_137
+   0061 CFr00r08      [ 4]  237 	stx	(_strtoul_ptr_65536_137 + 1)
+                            238 ;../strtoul.c:70: switch(*ptr)
+   0064 B6*00         [ 3]  239 	lda	*_strtoul_sloc0_1_0
+   0066 41 2B 0B      [ 4]  240 	cbeqa	#0x2b,00105$
+   0069 B6*00         [ 3]  241 	lda	*_strtoul_sloc0_1_0
+   006B A1 2D         [ 2]  242 	cmp	#0x2d
+   006D 26 0D         [ 3]  243 	bne	00106$
+                            244 ;../strtoul.c:73: neg = true;
+   006F A6 01         [ 2]  245 	lda	#0x01
+   0071 C7r00r0E      [ 4]  246 	sta	_strtoul_neg_65536_137
+                            247 ;../strtoul.c:74: case '+':
+   0074                     248 00105$:
+                            249 ;../strtoul.c:75: ptr++;
+   0074 45r00r07      [ 3]  250 	ldhx	#_strtoul_ptr_65536_137
+   0077 6C 01         [ 4]  251 	inc	1,x
+   0079 26 01         [ 3]  252 	bne	00235$
+   007B 7C            [ 3]  253 	inc	,x
+   007C                     254 00235$:
+                            255 ;../strtoul.c:76: }
+   007C                     256 00106$:
+                            257 ;../strtoul.c:84: ptr += 2;
+   007C 45r00r07      [ 3]  258 	ldhx	#_strtoul_ptr_65536_137
+   007F E6 01         [ 3]  259 	lda	1,x
+   0081 AB 02         [ 2]  260 	add	#0x02
+   0083 B7*02         [ 3]  261 	sta	*(_strtoul_sloc1_1_0 + 1)
+   0085 F6            [ 2]  262 	lda	,x
+   0086 A9 00         [ 2]  263 	adc	#0x00
+   0088 B7*01         [ 3]  264 	sta	*_strtoul_sloc1_1_0
+                            265 ;../strtoul.c:79: if (!base)
+   008A C6r00r03      [ 4]  266 	lda	_strtoul_PARM_3
+   008D CAr00r04      [ 4]  267 	ora	(_strtoul_PARM_3 + 1)
+   0090 27 03         [ 3]  268 	beq	00236$
+   0092 CCr01r1A      [ 3]  269 	jmp	00119$
+   0095                     270 00236$:
+                            271 ;../strtoul.c:81: if (!strncmp (ptr, "0x", 2) || !strncmp (ptr, "0X", 2))
+   0095 A6r00         [ 2]  272 	lda	#___str_0
+   0097 C7r00r01      [ 4]  273 	sta	(_strncmp_PARM_2 + 1)
+   009A A6s00         [ 2]  274 	lda	#>___str_0
+   009C C7r00r00      [ 4]  275 	sta	_strncmp_PARM_2
+   009F 4F            [ 1]  276 	clra
+   00A0 C7r00r00      [ 4]  277 	sta	_strncmp_PARM_3
+   00A3 A6 02         [ 2]  278 	lda	#0x02
+   00A5 C7r00r01      [ 4]  279 	sta	(_strncmp_PARM_3 + 1)
+   00A8 C6r00r08      [ 4]  280 	lda	(_strtoul_ptr_65536_137 + 1)
+   00AB CEr00r07      [ 4]  281 	ldx	_strtoul_ptr_65536_137
+   00AE CDr00r00      [ 5]  282 	jsr	_strncmp
+   00B1 4D            [ 1]  283 	tsta
+   00B2 26 01         [ 3]  284 	bne	00237$
+   00B4 5D            [ 1]  285 	tstx
+   00B5                     286 00237$:
+   00B5 27 22         [ 3]  287 	beq	00110$
+   00B7 A6r03         [ 2]  288 	lda	#___str_1
+   00B9 C7r00r01      [ 4]  289 	sta	(_strncmp_PARM_2 + 1)
+   00BC A6s00         [ 2]  290 	lda	#>___str_1
+   00BE C7r00r00      [ 4]  291 	sta	_strncmp_PARM_2
+   00C1 4F            [ 1]  292 	clra
+   00C2 C7r00r00      [ 4]  293 	sta	_strncmp_PARM_3
+   00C5 A6 02         [ 2]  294 	lda	#0x02
+   00C7 C7r00r01      [ 4]  295 	sta	(_strncmp_PARM_3 + 1)
+   00CA C6r00r08      [ 4]  296 	lda	(_strtoul_ptr_65536_137 + 1)
+   00CD CEr00r07      [ 4]  297 	ldx	_strtoul_ptr_65536_137
+   00D0 CDr00r00      [ 5]  298 	jsr	_strncmp
+   00D3 4D            [ 1]  299 	tsta
+   00D4 26 01         [ 3]  300 	bne	00239$
+   00D6 5D            [ 1]  301 	tstx
+   00D7                     302 00239$:
+   00D7 26 16         [ 3]  303 	bne	00111$
+   00D9                     304 00110$:
+                            305 ;../strtoul.c:83: base = 16;
+   00D9 4F            [ 1]  306 	clra
+   00DA C7r00r03      [ 4]  307 	sta	_strtoul_PARM_3
+   00DD A6 10         [ 2]  308 	lda	#0x10
+   00DF C7r00r04      [ 4]  309 	sta	(_strtoul_PARM_3 + 1)
+                            310 ;../strtoul.c:84: ptr += 2;
+   00E2 B6*01         [ 3]  311 	lda	*_strtoul_sloc1_1_0
+   00E4 C7r00r07      [ 4]  312 	sta	_strtoul_ptr_65536_137
+   00E7 B6*02         [ 3]  313 	lda	*(_strtoul_sloc1_1_0 + 1)
+   00E9 C7r00r08      [ 4]  314 	sta	(_strtoul_ptr_65536_137 + 1)
+   00EC CCr01r77      [ 3]  315 	jmp	00120$
+   00EF                     316 00111$:
+                            317 ;../strtoul.c:86: else if (*ptr == '0')
+   00EF C6r00r07      [ 4]  318 	lda	_strtoul_ptr_65536_137
+   00F2 87            [ 2]  319 	psha
+   00F3 8A            [ 2]  320 	pulh
+   00F4 CEr00r08      [ 4]  321 	ldx	(_strtoul_ptr_65536_137 + 1)
+   00F7 F6            [ 2]  322 	lda	,x
+   00F8 A1 30         [ 2]  323 	cmp	#0x30
+   00FA 26 13         [ 3]  324 	bne	00108$
+                            325 ;../strtoul.c:88: base = 8;
+   00FC 4F            [ 1]  326 	clra
+   00FD C7r00r03      [ 4]  327 	sta	_strtoul_PARM_3
+   0100 A6 08         [ 2]  328 	lda	#0x08
+   0102 C7r00r04      [ 4]  329 	sta	(_strtoul_PARM_3 + 1)
+                            330 ;../strtoul.c:89: ptr++;
+   0105 45r00r07      [ 3]  331 	ldhx	#_strtoul_ptr_65536_137
+   0108 6C 01         [ 4]  332 	inc	1,x
+   010A 26 01         [ 3]  333 	bne	00242$
+   010C 7C            [ 3]  334 	inc	,x
+   010D                     335 00242$:
+   010D 20 68         [ 3]  336 	bra	00120$
+   010F                     337 00108$:
+                            338 ;../strtoul.c:92: base = 10;
+   010F 4F            [ 1]  339 	clra
+   0110 C7r00r03      [ 4]  340 	sta	_strtoul_PARM_3
+   0113 A6 0A         [ 2]  341 	lda	#0x0a
+   0115 C7r00r04      [ 4]  342 	sta	(_strtoul_PARM_3 + 1)
+   0118 20 5D         [ 3]  343 	bra	00120$
+   011A                     344 00119$:
+                            345 ;../strtoul.c:95: else if (base == 16 && (!strncmp (ptr, "0x", 2) || !strncmp (ptr, "0X", 2)))
+   011A C6r00r04      [ 4]  346 	lda	(_strtoul_PARM_3 + 1)
+   011D A1 10         [ 2]  347 	cmp	#0x10
+   011F 26 06         [ 3]  348 	bne	00243$
+   0121 C6r00r03      [ 4]  349 	lda	_strtoul_PARM_3
+   0124 41 00 02      [ 4]  350 	cbeqa	#0x00,00244$
+   0127                     351 00243$:
+   0127 20 4E         [ 3]  352 	bra	00120$
+   0129                     353 00244$:
+   0129 A6r00         [ 2]  354 	lda	#___str_0
+   012B C7r00r01      [ 4]  355 	sta	(_strncmp_PARM_2 + 1)
+   012E A6s00         [ 2]  356 	lda	#>___str_0
+   0130 C7r00r00      [ 4]  357 	sta	_strncmp_PARM_2
+   0133 4F            [ 1]  358 	clra
+   0134 C7r00r00      [ 4]  359 	sta	_strncmp_PARM_3
+   0137 A6 02         [ 2]  360 	lda	#0x02
+   0139 C7r00r01      [ 4]  361 	sta	(_strncmp_PARM_3 + 1)
+   013C C6r00r08      [ 4]  362 	lda	(_strtoul_ptr_65536_137 + 1)
+   013F CEr00r07      [ 4]  363 	ldx	_strtoul_ptr_65536_137
+   0142 CDr00r00      [ 5]  364 	jsr	_strncmp
+   0145 4D            [ 1]  365 	tsta
+   0146 26 01         [ 3]  366 	bne	00245$
+   0148 5D            [ 1]  367 	tstx
+   0149                     368 00245$:
+   0149 27 22         [ 3]  369 	beq	00114$
+   014B A6r03         [ 2]  370 	lda	#___str_1
+   014D C7r00r01      [ 4]  371 	sta	(_strncmp_PARM_2 + 1)
+   0150 A6s00         [ 2]  372 	lda	#>___str_1
+   0152 C7r00r00      [ 4]  373 	sta	_strncmp_PARM_2
+   0155 4F            [ 1]  374 	clra
+   0156 C7r00r00      [ 4]  375 	sta	_strncmp_PARM_3
+   0159 A6 02         [ 2]  376 	lda	#0x02
+   015B C7r00r01      [ 4]  377 	sta	(_strncmp_PARM_3 + 1)
+   015E C6r00r08      [ 4]  378 	lda	(_strtoul_ptr_65536_137 + 1)
+   0161 CEr00r07      [ 4]  379 	ldx	_strtoul_ptr_65536_137
+   0164 CDr00r00      [ 5]  380 	jsr	_strncmp
+   0167 4D            [ 1]  381 	tsta
+   0168 26 01         [ 3]  382 	bne	00247$
+   016A 5D            [ 1]  383 	tstx
+   016B                     384 00247$:
+   016B 26 0A         [ 3]  385 	bne	00120$
+   016D                     386 00114$:
+                            387 ;../strtoul.c:96: ptr += 2;
+   016D B6*01         [ 3]  388 	lda	*_strtoul_sloc1_1_0
+   016F C7r00r07      [ 4]  389 	sta	_strtoul_ptr_65536_137
+   0172 B6*02         [ 3]  390 	lda	*(_strtoul_sloc1_1_0 + 1)
+   0174 C7r00r08      [ 4]  391 	sta	(_strtoul_ptr_65536_137 + 1)
+   0177                     392 00120$:
+                            393 ;../strtoul.c:100: if (_isdigit (*ptr, base) < 0)
+   0177 C6r00r07      [ 4]  394 	lda	_strtoul_ptr_65536_137
+   017A 87            [ 2]  395 	psha
+   017B 8A            [ 2]  396 	pulh
+   017C CEr00r08      [ 4]  397 	ldx	(_strtoul_ptr_65536_137 + 1)
+   017F F6            [ 2]  398 	lda	,x
+   0180 CEr00r04      [ 4]  399 	ldx	(_strtoul_PARM_3 + 1)
+   0183 BF*01         [ 3]  400 	stx	*_strtoul_sloc1_1_0
+   0185 BE*01         [ 3]  401 	ldx	*_strtoul_sloc1_1_0
+   0187 CDr00r00      [ 5]  402 	jsr	__isdigit
+   018A 97            [ 1]  403 	tax
+                            404 ;../strtoul.c:103: *endptr = (char*)nptr;
+   018B C6r00r01      [ 4]  405 	lda	_strtoul_PARM_2
+   018E B7*03         [ 3]  406 	sta	*_strtoul_sloc2_1_0
+   0190 C6r00r02      [ 4]  407 	lda	(_strtoul_PARM_2 + 1)
+   0193 B7*04         [ 3]  408 	sta	*(_strtoul_sloc2_1_0 + 1)
+                            409 ;../strtoul.c:100: if (_isdigit (*ptr, base) < 0)
+   0195 A3 00         [ 2]  410 	cpx	#0x00
+   0197 90 1A         [ 3]  411 	bge	00124$
+                            412 ;../strtoul.c:102: if (endptr)
+   0199 C6r00r01      [ 4]  413 	lda	_strtoul_PARM_2
+   019C CAr00r02      [ 4]  414 	ora	(_strtoul_PARM_2 + 1)
+   019F 27 0B         [ 3]  415 	beq	00122$
+                            416 ;../strtoul.c:103: *endptr = (char*)nptr;
+   01A1 55*03         [ 4]  417 	ldhx	*_strtoul_sloc2_1_0
+   01A3 C6r00r05      [ 4]  418 	lda	_strtoul_nptr_65536_136
+   01A6 F7            [ 2]  419 	sta	,x
+   01A7 C6r00r06      [ 4]  420 	lda	(_strtoul_nptr_65536_136 + 1)
+   01AA E7 01         [ 3]  421 	sta	1,x
+   01AC                     422 00122$:
+                            423 ;../strtoul.c:104: return (0);
+   01AC 4F            [ 1]  424 	clra
+   01AD 97            [ 1]  425 	tax
+   01AE B7*00         [ 3]  426 	sta	*___SDCC_hc08_ret2
+   01B0 B7*00         [ 3]  427 	sta	*___SDCC_hc08_ret3
+   01B2 81            [ 4]  428 	rts
+   01B3                     429 00124$:
+                            430 ;../strtoul.c:107: for (ret = 0;; ptr++)
+   01B3 45r00r09      [ 3]  431 	ldhx	#_strtoul_ret_65536_137
+   01B6 4F            [ 1]  432 	clra
+   01B7 F7            [ 2]  433 	sta	,x
+   01B8 E7 01         [ 3]  434 	sta	1,x
+   01BA E7 02         [ 3]  435 	sta	2,x
+   01BC E7 03         [ 3]  436 	sta	3,x
+   01BE C6r00r07      [ 4]  437 	lda	_strtoul_ptr_65536_137
+   01C1 B7*05         [ 3]  438 	sta	*_strtoul_sloc3_1_0
+   01C3 C6r00r08      [ 4]  439 	lda	(_strtoul_ptr_65536_137 + 1)
+   01C6 B7*06         [ 3]  440 	sta	*(_strtoul_sloc3_1_0 + 1)
+   01C8                     441 00136$:
+                            442 ;../strtoul.c:110: signed char digit = _isdigit (*ptr, base);
+   01C8 55*05         [ 4]  443 	ldhx	*_strtoul_sloc3_1_0
+   01CA F6            [ 2]  444 	lda	,x
+   01CB BE*01         [ 3]  445 	ldx	*_strtoul_sloc1_1_0
+   01CD CDr00r00      [ 5]  446 	jsr	__isdigit
+   01D0 C7r00r0F      [ 4]  447 	sta	_strtoul_digit_196608_144
+                            448 ;../strtoul.c:112: if (digit < 0)
+   01D3 C6r00r0F      [ 4]  449 	lda	_strtoul_digit_196608_144
+   01D6 A1 00         [ 2]  450 	cmp	#0x00
+   01D8 90 03         [ 3]  451 	bge	00251$
+   01DA CCr02rFD      [ 3]  452 	jmp	00127$
+   01DD                     453 00251$:
+                            454 ;../strtoul.c:117: range_error |= ckd_mul(&ret, ret, base);
+   01DD C6r00r04      [ 4]  455 	lda	(_strtoul_PARM_3 + 1)
+   01E0 C7r00r07      [ 4]  456 	sta	(__mullonglong_PARM_2 + 7)
+   01E3 C6r00r03      [ 4]  457 	lda	_strtoul_PARM_3
+   01E6 C7r00r06      [ 4]  458 	sta	(__mullonglong_PARM_2 + 6)
+   01E9 49            [ 1]  459 	rola	
+   01EA 4F            [ 1]  460 	clra	
+   01EB A2 00         [ 2]  461 	sbc	#0x00
+   01ED C7r00r05      [ 4]  462 	sta	(__mullonglong_PARM_2 + 5)
+   01F0 C7r00r04      [ 4]  463 	sta	(__mullonglong_PARM_2 + 4)
+   01F3 C7r00r03      [ 4]  464 	sta	(__mullonglong_PARM_2 + 3)
+   01F6 C7r00r02      [ 4]  465 	sta	(__mullonglong_PARM_2 + 2)
+   01F9 C7r00r01      [ 4]  466 	sta	(__mullonglong_PARM_2 + 1)
+   01FC C7r00r00      [ 4]  467 	sta	__mullonglong_PARM_2
+   01FF C6r00r0C      [ 4]  468 	lda	(_strtoul_ret_65536_137 + 3)
+   0202 C7r00r07      [ 4]  469 	sta	(__mullonglong_PARM_1 + 7)
+   0205 C6r00r0B      [ 4]  470 	lda	(_strtoul_ret_65536_137 + 2)
+   0208 C7r00r06      [ 4]  471 	sta	(__mullonglong_PARM_1 + 6)
+   020B C6r00r0A      [ 4]  472 	lda	(_strtoul_ret_65536_137 + 1)
+   020E C7r00r05      [ 4]  473 	sta	(__mullonglong_PARM_1 + 5)
+   0211 C6r00r09      [ 4]  474 	lda	_strtoul_ret_65536_137
+   0214 C7r00r04      [ 4]  475 	sta	(__mullonglong_PARM_1 + 4)
+   0217 4F            [ 1]  476 	clra
+   0218 C7r00r03      [ 4]  477 	sta	(__mullonglong_PARM_1 + 3)
+   021B C7r00r02      [ 4]  478 	sta	(__mullonglong_PARM_1 + 2)
+   021E C7r00r01      [ 4]  479 	sta	(__mullonglong_PARM_1 + 1)
+   0221 C7r00r00      [ 4]  480 	sta	__mullonglong_PARM_1
+                            481 ;./../../include/stdckdint.h:76: inline _Bool __ckd_mul_ulong __CKD_DEFAULT_IMPL(unsigned long, *)
+   0224 CDr00r00      [ 5]  482 	jsr	__mullonglong
+   0227 B7*0E         [ 3]  483 	sta	*(_strtoul_sloc4_1_0 + 7)
+   0229 BF*0D         [ 3]  484 	stx	*(_strtoul_sloc4_1_0 + 6)
+   022B 4E*00*0C      [ 5]  485 	mov	*___SDCC_hc08_ret2,*(_strtoul_sloc4_1_0 + 5)
+   022E 4E*00*0B      [ 5]  486 	mov	*___SDCC_hc08_ret3,*(_strtoul_sloc4_1_0 + 4)
+   0231 4E*00*0A      [ 5]  487 	mov	*___SDCC_hc08_ret4,*(_strtoul_sloc4_1_0 + 3)
+   0234 4E*00*09      [ 5]  488 	mov	*___SDCC_hc08_ret5,*(_strtoul_sloc4_1_0 + 2)
+   0237 4E*00*08      [ 5]  489 	mov	*___SDCC_hc08_ret6,*(_strtoul_sloc4_1_0 + 1)
+   023A 4E*00*07      [ 5]  490 	mov	*___SDCC_hc08_ret7,*_strtoul_sloc4_1_0
+   023D 45r00r10      [ 3]  491 	ldhx	#_strtoul_result_393216_154
+   0240 5E*07         [ 4]  492 	mov	*_strtoul_sloc4_1_0,x+
+   0242 5E*08         [ 4]  493 	mov	*(_strtoul_sloc4_1_0 + 1),x+
+   0244 5E*09         [ 4]  494 	mov	*(_strtoul_sloc4_1_0 + 2),x+
+   0246 5E*0A         [ 4]  495 	mov	*(_strtoul_sloc4_1_0 + 3),x+
+   0248 5E*0B         [ 4]  496 	mov	*(_strtoul_sloc4_1_0 + 4),x+
+   024A 5E*0C         [ 4]  497 	mov	*(_strtoul_sloc4_1_0 + 5),x+
+   024C 5E*0D         [ 4]  498 	mov	*(_strtoul_sloc4_1_0 + 6),x+
+   024E 5E*0E         [ 4]  499 	mov	*(_strtoul_sloc4_1_0 + 7),x+
+   0250 4E*0E*0A      [ 5]  500 	mov	*(_strtoul_sloc4_1_0 + 7),*(_strtoul_sloc4_1_0 + 3)
+   0253 4E*0D*09      [ 5]  501 	mov	*(_strtoul_sloc4_1_0 + 6),*(_strtoul_sloc4_1_0 + 2)
+   0256 4E*0C*08      [ 5]  502 	mov	*(_strtoul_sloc4_1_0 + 5),*(_strtoul_sloc4_1_0 + 1)
+   0259 4E*0B*07      [ 5]  503 	mov	*(_strtoul_sloc4_1_0 + 4),*_strtoul_sloc4_1_0
+   025C B6*07         [ 3]  504 	lda	*_strtoul_sloc4_1_0
+   025E C7r00r09      [ 4]  505 	sta	_strtoul_ret_65536_137
+   0261 B6*08         [ 3]  506 	lda	*(_strtoul_sloc4_1_0 + 1)
+   0263 C7r00r0A      [ 4]  507 	sta	(_strtoul_ret_65536_137 + 1)
+   0266 B6*09         [ 3]  508 	lda	*(_strtoul_sloc4_1_0 + 2)
+   0268 C7r00r0B      [ 4]  509 	sta	(_strtoul_ret_65536_137 + 2)
+   026B B6*0A         [ 3]  510 	lda	*(_strtoul_sloc4_1_0 + 3)
+   026D C7r00r0C      [ 4]  511 	sta	(_strtoul_ret_65536_137 + 3)
+   0270 4E*0A*0E      [ 5]  512 	mov	*(_strtoul_sloc4_1_0 + 3),*(_strtoul_sloc4_1_0 + 7)
+   0273 4E*09*0D      [ 5]  513 	mov	*(_strtoul_sloc4_1_0 + 2),*(_strtoul_sloc4_1_0 + 6)
+   0276 4E*08*0C      [ 5]  514 	mov	*(_strtoul_sloc4_1_0 + 1),*(_strtoul_sloc4_1_0 + 5)
+   0279 4E*07*0B      [ 5]  515 	mov	*_strtoul_sloc4_1_0,*(_strtoul_sloc4_1_0 + 4)
+   027C 6E 00*0A      [ 4]  516 	mov	#0x00,*(_strtoul_sloc4_1_0 + 3)
+   027F 6E 00*09      [ 4]  517 	mov	#0x00,*(_strtoul_sloc4_1_0 + 2)
+   0282 6E 00*08      [ 4]  518 	mov	#0x00,*(_strtoul_sloc4_1_0 + 1)
+   0285 6E 00*07      [ 4]  519 	mov	#0x00,*_strtoul_sloc4_1_0
+   0288 B6*0E         [ 3]  520 	lda	*(_strtoul_sloc4_1_0 + 7)
+   028A C1r00r17      [ 4]  521 	cmp	(_strtoul_result_393216_154 + 7)
+   028D 26 31         [ 3]  522 	bne	00252$
+   028F B6*0D         [ 3]  523 	lda	*(_strtoul_sloc4_1_0 + 6)
+   0291 C1r00r16      [ 4]  524 	cmp	(_strtoul_result_393216_154 + 6)
+   0294 26 2A         [ 3]  525 	bne	00252$
+   0296 B6*0C         [ 3]  526 	lda	*(_strtoul_sloc4_1_0 + 5)
+   0298 C1r00r15      [ 4]  527 	cmp	(_strtoul_result_393216_154 + 5)
+   029B 26 23         [ 3]  528 	bne	00252$
+   029D B6*0B         [ 3]  529 	lda	*(_strtoul_sloc4_1_0 + 4)
+   029F C1r00r14      [ 4]  530 	cmp	(_strtoul_result_393216_154 + 4)
+   02A2 26 1C         [ 3]  531 	bne	00252$
+   02A4 B6*0A         [ 3]  532 	lda	*(_strtoul_sloc4_1_0 + 3)
+   02A6 C1r00r13      [ 4]  533 	cmp	(_strtoul_result_393216_154 + 3)
+   02A9 26 15         [ 3]  534 	bne	00252$
+   02AB B6*09         [ 3]  535 	lda	*(_strtoul_sloc4_1_0 + 2)
+   02AD C1r00r12      [ 4]  536 	cmp	(_strtoul_result_393216_154 + 2)
+   02B0 26 0E         [ 3]  537 	bne	00252$
+   02B2 B6*08         [ 3]  538 	lda	*(_strtoul_sloc4_1_0 + 1)
+   02B4 C1r00r11      [ 4]  539 	cmp	(_strtoul_result_393216_154 + 1)
+   02B7 26 07         [ 3]  540 	bne	00252$
+   02B9 B6*07         [ 3]  541 	lda	*_strtoul_sloc4_1_0
+   02BB C1r00r10      [ 4]  542 	cmp	_strtoul_result_393216_154
+   02BE 27 03         [ 3]  543 	beq	00254$
+   02C0                     544 00252$:
+   02C0 4F            [ 1]  545 	clra
+   02C1 20 02         [ 3]  546 	bra	00253$
+   02C3                     547 00254$:
+   02C3 A6 01         [ 2]  548 	lda	#0x01
+   02C5                     549 00253$:
+   02C5 A8 01         [ 2]  550 	eor	#0x01
+                            551 ;../strtoul.c:117: range_error |= ckd_mul(&ret, ret, base);
+   02C7 CAr00r0D      [ 4]  552 	ora	_strtoul_range_error_65536_137
+   02CA C7r00r0D      [ 4]  553 	sta	_strtoul_range_error_65536_137
+                            554 ;../strtoul.c:125: ret += (unsigned char)digit;
+   02CD C6r00r0F      [ 4]  555 	lda	_strtoul_digit_196608_144
+   02D0 B7*0A         [ 3]  556 	sta	*(_strtoul_sloc4_1_0 + 3)
+   02D2 6E 00*09      [ 4]  557 	mov	#0x00,*(_strtoul_sloc4_1_0 + 2)
+   02D5 6E 00*08      [ 4]  558 	mov	#0x00,*(_strtoul_sloc4_1_0 + 1)
+   02D8 6E 00*07      [ 4]  559 	mov	#0x00,*_strtoul_sloc4_1_0
+   02DB 45r00r09      [ 3]  560 	ldhx	#_strtoul_ret_65536_137
+   02DE E6 03         [ 3]  561 	lda	3,x
+   02E0 BB*0A         [ 3]  562 	add	*(_strtoul_sloc4_1_0 + 3)
+   02E2 E7 03         [ 3]  563 	sta	3,x
+   02E4 E6 02         [ 3]  564 	lda	2,x
+   02E6 B9*09         [ 3]  565 	adc	*(_strtoul_sloc4_1_0 + 2)
+   02E8 E7 02         [ 3]  566 	sta	2,x
+   02EA E6 01         [ 3]  567 	lda	1,x
+   02EC B9*08         [ 3]  568 	adc	*(_strtoul_sloc4_1_0 + 1)
+   02EE E7 01         [ 3]  569 	sta	1,x
+   02F0 F6            [ 2]  570 	lda	,x
+   02F1 B9*07         [ 3]  571 	adc	*_strtoul_sloc4_1_0
+   02F3 F7            [ 2]  572 	sta	,x
+                            573 ;../strtoul.c:107: for (ret = 0;; ptr++)
+   02F4 55*05         [ 4]  574 	ldhx	*_strtoul_sloc3_1_0
+   02F6 AF 01         [ 2]  575 	aix	#1
+   02F8 35*05         [ 4]  576 	sthx	*_strtoul_sloc3_1_0
+   02FA CCr01rC8      [ 3]  577 	jmp	00136$
+   02FD                     578 00127$:
+                            579 ;../strtoul.c:128: if (endptr)
+   02FD C6r00r01      [ 4]  580 	lda	_strtoul_PARM_2
+   0300 CAr00r02      [ 4]  581 	ora	(_strtoul_PARM_2 + 1)
+   0303 27 09         [ 3]  582 	beq	00129$
+                            583 ;../strtoul.c:129: *endptr = (char*)ptr;
+   0305 55*03         [ 4]  584 	ldhx	*_strtoul_sloc2_1_0
+   0307 B6*05         [ 3]  585 	lda	*_strtoul_sloc3_1_0
+   0309 F7            [ 2]  586 	sta	,x
+   030A B6*06         [ 3]  587 	lda	*(_strtoul_sloc3_1_0 + 1)
+   030C E7 01         [ 3]  588 	sta	1,x
+   030E                     589 00129$:
+                            590 ;../strtoul.c:131: if (range_error)
+   030E C6r00r0D      [ 4]  591 	lda	_strtoul_range_error_65536_137
+   0311 27 11         [ 3]  592 	beq	00131$
+                            593 ;../strtoul.c:133: errno = ERANGE;
+   0313 4F            [ 1]  594 	clra
+   0314 C7r00r00      [ 4]  595 	sta	_errno
+   0317 A6 22         [ 2]  596 	lda	#0x22
+   0319 C7r00r01      [ 4]  597 	sta	(_errno + 1)
+                            598 ;../strtoul.c:134: return (ULONG_MAX);
+   031C A6 FF         [ 2]  599 	lda	#0xff
+   031E 97            [ 1]  600 	tax
+   031F B7*00         [ 3]  601 	sta	*___SDCC_hc08_ret2
+   0321 B7*00         [ 3]  602 	sta	*___SDCC_hc08_ret3
+   0323 81            [ 4]  603 	rts
+   0324                     604 00131$:
+                            605 ;../strtoul.c:137: return (neg ? -ret : ret);
+   0324 C6r00r0E      [ 4]  606 	lda	_strtoul_neg_65536_137
+   0327 27 1A         [ 3]  607 	beq	00143$
+   0329 4F            [ 1]  608 	clra
+   032A C0r00r0C      [ 4]  609 	sub	(_strtoul_ret_65536_137 + 3)
+   032D B7*0A         [ 3]  610 	sta	*(_strtoul_sloc4_1_0 + 3)
+   032F 4F            [ 1]  611 	clra
+   0330 C2r00r0B      [ 4]  612 	sbc	(_strtoul_ret_65536_137 + 2)
+   0333 B7*09         [ 3]  613 	sta	*(_strtoul_sloc4_1_0 + 2)
+   0335 4F            [ 1]  614 	clra
+   0336 C2r00r0A      [ 4]  615 	sbc	(_strtoul_ret_65536_137 + 1)
+   0339 B7*08         [ 3]  616 	sta	*(_strtoul_sloc4_1_0 + 1)
+   033B 4F            [ 1]  617 	clra
+   033C C2r00r09      [ 4]  618 	sbc	_strtoul_ret_65536_137
+   033F B7*07         [ 3]  619 	sta	*_strtoul_sloc4_1_0
+   0341 20 0B         [ 3]  620 	bra	00144$
+   0343                     621 00143$:
+   0343 45r00r09      [ 3]  622 	ldhx	#_strtoul_ret_65536_137
+   0346 7E*07         [ 4]  623 	mov	,x+,*_strtoul_sloc4_1_0
+   0348 7E*08         [ 4]  624 	mov	,x+,*(_strtoul_sloc4_1_0 + 1)
+   034A 7E*09         [ 4]  625 	mov	,x+,*(_strtoul_sloc4_1_0 + 2)
+   034C 7E*0A         [ 4]  626 	mov	,x+,*(_strtoul_sloc4_1_0 + 3)
+   034E                     627 00144$:
+   034E 4E*07*00      [ 5]  628 	mov	*_strtoul_sloc4_1_0,*___SDCC_hc08_ret3
+   0351 4E*08*00      [ 5]  629 	mov	*(_strtoul_sloc4_1_0 + 1),*___SDCC_hc08_ret2
+   0354 BE*09         [ 3]  630 	ldx	*(_strtoul_sloc4_1_0 + 2)
+   0356 B6*0A         [ 3]  631 	lda	*(_strtoul_sloc4_1_0 + 3)
+                            632 ;../strtoul.c:138: }
+   0358 81            [ 4]  633 	rts
+                            634 	.area CSEG    (CODE)
+                            635 	.area CONST   (CODE)
+                            636 	.area CONST   (CODE)
+   0000                     637 ___str_0:
+   0000 30 78               638 	.ascii "0x"
+   0002 00                  639 	.db 0x00
+                            640 	.area CSEG    (CODE)
+                            641 	.area CONST   (CODE)
+   0003                     642 ___str_1:
+   0003 30 58               643 	.ascii "0X"
+   0005 00                  644 	.db 0x00
+                            645 	.area CSEG    (CODE)
+                            646 	.area XINIT   (CODE)
+                            647 	.area CABS    (ABS,CODE)

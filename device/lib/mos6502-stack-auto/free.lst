@@ -1,0 +1,347 @@
+                              1 ;--------------------------------------------------------
+                              2 ; File Created by SDCC : free open source ISO C Compiler 
+                              3 ; Version 4.2.14 #0 (Linux)
+                              4 ;--------------------------------------------------------
+                              5 	.module free
+                              6 	.optsdcc -mmos6502
+                              7 	
+                              8 ;--------------------------------------------------------
+                              9 ; Public variables in this module
+                             10 ;--------------------------------------------------------
+                             11 	.globl _free
+                             12 ;--------------------------------------------------------
+                             13 ; ZP ram data
+                             14 ;--------------------------------------------------------
+                             15 	.area ZP      (PAG)
+                             16 ;--------------------------------------------------------
+                             17 ; overlayable items in ram
+                             18 ;--------------------------------------------------------
+                             19 ;--------------------------------------------------------
+                             20 ; uninitialized external ram data
+                             21 ;--------------------------------------------------------
+                             22 	.area BSS
+                             23 ;--------------------------------------------------------
+                             24 ; absolute external ram data
+                             25 ;--------------------------------------------------------
+                             26 	.area DABS    (ABS)
+                             27 ;--------------------------------------------------------
+                             28 ; initialized external ram data
+                             29 ;--------------------------------------------------------
+                             30 	.area DATA
+                             31 ;--------------------------------------------------------
+                             32 ; global & static initialisations
+                             33 ;--------------------------------------------------------
+                             34 	.area _CODE
+                             35 	.area GSINIT
+                             36 	.area GSFINAL
+                             37 	.area GSINIT
+                             38 ;--------------------------------------------------------
+                             39 ; Home
+                             40 ;--------------------------------------------------------
+                             41 	.area _CODE
+                             42 	.area _CODE
+                             43 ;--------------------------------------------------------
+                             44 ; code
+                             45 ;--------------------------------------------------------
+                             46 	.area CODE
+                             47 ;------------------------------------------------------------
+                             48 ;Allocation info for local variables in function 'free'
+                             49 ;------------------------------------------------------------
+                             50 ;ptr                       Allocated to stack - sp +15
+                             51 ;h                         Allocated to stack - sp +13
+                             52 ;next_free                 Allocated to stack - sp +11
+                             53 ;prev_free                 Allocated to stack - sp +9
+                             54 ;f                         Allocated to stack - sp +7
+                             55 ;sloc0                     Allocated to stack - sp +5
+                             56 ;sloc1                     Allocated to stack - sp +3
+                             57 ;sloc2                     Allocated to stack - sp +1
+                             58 ;------------------------------------------------------------
+                             59 ;	../free.c: 50: void free(void *ptr)
+                             60 ;	-----------------------------------------
+                             61 ;	 function free
+                             62 ;	-----------------------------------------
+                             63 ;	Register assignment is optimal.
+                             64 ;	Stack space usage: 16 bytes.
+   0000                      65 _free:
+   0000 85*00         [ 3]   66 	sta	*(__TEMP+0)
+   0002 8A            [ 2]   67 	txa
+   0003 48            [ 3]   68 	pha
+   0004 A5*00         [ 3]   69 	lda	*(__TEMP+0)
+   0006 48            [ 3]   70 	pha
+   0007 86*01         [ 3]   71 	stx	*(__TEMP+1)
+   0009 BA            [ 2]   72 	tsx
+   000A 8A            [ 2]   73 	txa
+   000B 18            [ 2]   74 	clc
+   000C 69 F2         [ 2]   75 	adc	#0xf2
+   000E AA            [ 2]   76 	tax
+   000F 9A            [ 2]   77 	txs
+   0010 A6*01         [ 3]   78 	ldx	*(__TEMP+1)
+   0012 A5*00         [ 3]   79 	lda	*(__TEMP+0)
+                             80 ;	../free.c: 55: if(!ptr)
+   0014 BA            [ 2]   81 	tsx
+   0015 BD 0F 01      [ 5]   82 	lda	0x10f,x
+   0018 1D 10 01      [ 5]   83 	ora	0x110,x
+   001B D0 03         [ 4]   84 	bne	00102$
+                             85 ;	../free.c: 56: return;
+   001D 4Cr26r02      [ 3]   86 	jmp	00113$
+   0020                      87 00102$:
+                             88 ;	../free.c: 58: prev_free = 0;
+   0020 BA            [ 2]   89 	tsx
+   0021 A9 00         [ 2]   90 	lda	#0x00
+   0023 9D 09 01      [ 5]   91 	sta	0x109,x
+   0026 9D 0A 01      [ 5]   92 	sta	0x10a,x
+                             93 ;	../free.c: 59: for(h = __sdcc_heap_free, f = &__sdcc_heap_free; h && h < ptr; prev_free = h, f = &(h->next_free), h = h->next_free); // Find adjacent blocks in free list
+   0029 ADr00r00      [ 4]   94 	lda	___sdcc_heap_free
+   002C 9D 05 01      [ 5]   95 	sta	0x105,x
+   002F ADr01r00      [ 4]   96 	lda	(___sdcc_heap_free + 1)
+   0032 9D 06 01      [ 5]   97 	sta	0x106,x
+   0035 A9r00         [ 2]   98 	lda	#___sdcc_heap_free
+   0037 9D 03 01      [ 5]   99 	sta	0x103,x
+   003A A9s00         [ 2]  100 	lda	#>___sdcc_heap_free
+   003C 9D 04 01      [ 5]  101 	sta	0x104,x
+   003F                     102 00111$:
+   003F BA            [ 2]  103 	tsx
+   0040 BD 05 01      [ 5]  104 	lda	0x105,x
+   0043 1D 06 01      [ 5]  105 	ora	0x106,x
+   0046 F0 5E         [ 4]  106 	beq	00103$
+   0048 BD 0F 01      [ 5]  107 	lda	0x10f,x
+   004B 9D 01 01      [ 5]  108 	sta	0x101,x
+   004E BD 10 01      [ 5]  109 	lda	0x110,x
+   0051 9D 02 01      [ 5]  110 	sta	0x102,x
+   0054 BD 05 01      [ 5]  111 	lda	0x105,x
+   0057 38            [ 2]  112 	sec
+   0058 FD 01 01      [ 5]  113 	sbc	0x101,x
+   005B BD 06 01      [ 5]  114 	lda	0x106,x
+   005E FD 02 01      [ 5]  115 	sbc	0x102,x
+   0061 B0 43         [ 4]  116 	bcs	00103$
+   0063 BD 05 01      [ 5]  117 	lda	0x105,x
+   0066 9D 09 01      [ 5]  118 	sta	0x109,x
+   0069 BD 06 01      [ 5]  119 	lda	0x106,x
+   006C 9D 0A 01      [ 5]  120 	sta	0x10a,x
+   006F BD 05 01      [ 5]  121 	lda	0x105,x
+   0072 18            [ 2]  122 	clc
+   0073 69 02         [ 2]  123 	adc	#0x02
+   0075 9D 07 01      [ 5]  124 	sta	0x107,x
+   0078 BD 06 01      [ 5]  125 	lda	0x106,x
+   007B 69 00         [ 2]  126 	adc	#0x00
+   007D 9D 08 01      [ 5]  127 	sta	0x108,x
+   0080 BD 07 01      [ 5]  128 	lda	0x107,x
+   0083 9D 03 01      [ 5]  129 	sta	0x103,x
+   0086 BD 08 01      [ 5]  130 	lda	0x108,x
+   0089 9D 04 01      [ 5]  131 	sta	0x104,x
+   008C BD 07 01      [ 5]  132 	lda	0x107,x
+   008F 85*00         [ 3]  133 	sta	*(__DPTR+0)
+   0091 BD 08 01      [ 5]  134 	lda	0x108,x
+   0094 85*01         [ 3]  135 	sta	*(__DPTR+1)
+   0096 A0 00         [ 2]  136 	ldy	#0x00
+   0098 B1*00         [ 6]  137 	lda	[__DPTR],y
+   009A 9D 05 01      [ 5]  138 	sta	0x105,x
+   009D C8            [ 2]  139 	iny
+   009E B1*00         [ 6]  140 	lda	[__DPTR],y
+   00A0 9D 06 01      [ 5]  141 	sta	0x106,x
+   00A3 4Cr3Fr00      [ 3]  142 	jmp	00111$
+   00A6                     143 00103$:
+                            144 ;	../free.c: 60: next_free = h;
+   00A6 BA            [ 2]  145 	tsx
+   00A7 BD 05 01      [ 5]  146 	lda	0x105,x
+   00AA 9D 0B 01      [ 5]  147 	sta	0x10b,x
+   00AD BD 06 01      [ 5]  148 	lda	0x106,x
+   00B0 9D 0C 01      [ 5]  149 	sta	0x10c,x
+                            150 ;	../free.c: 62: h = (void HEAPSPACE *)((char HEAPSPACE *)(ptr) - offsetof(struct header, next_free));
+   00B3 BD 0F 01      [ 5]  151 	lda	0x10f,x
+   00B6 85*00         [ 3]  152 	sta	*(__TEMP+0)
+   00B8 BD 10 01      [ 5]  153 	lda	0x110,x
+   00BB AA            [ 2]  154 	tax
+   00BC A5*00         [ 3]  155 	lda	*(__TEMP+0)
+   00BE 38            [ 2]  156 	sec
+   00BF E9 02         [ 2]  157 	sbc	#0x02
+   00C1 B0 01         [ 4]  158 	bcs	00153$
+   00C3 CA            [ 2]  159 	dex
+   00C4                     160 00153$:
+   00C4 48            [ 3]  161 	pha
+   00C5 8A            [ 2]  162 	txa
+   00C6 BA            [ 2]  163 	tsx
+   00C7 9D 0F 01      [ 5]  164 	sta	0x10f,x
+   00CA 68            [ 4]  165 	pla
+                            166 ;	../free.c: 65: h->next_free = next_free;
+   00CB 9D 0E 01      [ 5]  167 	sta	0x10e, x
+   00CE 9D 02 01      [ 5]  168 	sta	0x102,x
+   00D1 BD 0F 01      [ 5]  169 	lda	0x10f,x
+   00D4 9D 03 01      [ 5]  170 	sta	0x103,x
+   00D7 BD 02 01      [ 5]  171 	lda	0x102,x
+   00DA 85*00         [ 3]  172 	sta	*(__DPTR+0)
+   00DC BD 03 01      [ 5]  173 	lda	0x103,x
+   00DF 85*01         [ 3]  174 	sta	*(__DPTR+1)
+   00E1 BD 0C 01      [ 5]  175 	lda	0x10c,x
+   00E4 A0 02         [ 2]  176 	ldy	#0x02
+   00E6 91*00         [ 6]  177 	sta	[__DPTR],y
+   00E8 BD 0D 01      [ 5]  178 	lda	0x10d,x
+   00EB C8            [ 2]  179 	iny
+   00EC 91*00         [ 6]  180 	sta	[__DPTR],y
+                            181 ;	../free.c: 66: *f = h;
+   00EE BD 04 01      [ 5]  182 	lda	0x104,x
+   00F1 85*00         [ 3]  183 	sta	*(__DPTR+0)
+   00F3 BD 05 01      [ 5]  184 	lda	0x105,x
+   00F6 85*01         [ 3]  185 	sta	*(__DPTR+1)
+   00F8 BD 0E 01      [ 5]  186 	lda	0x10e,x
+   00FB A0 00         [ 2]  187 	ldy	#0x00
+   00FD 91*00         [ 6]  188 	sta	[__DPTR],y
+   00FF BD 0F 01      [ 5]  189 	lda	0x10f,x
+   0102 C8            [ 2]  190 	iny
+   0103 91*00         [ 6]  191 	sta	[__DPTR],y
+                            192 ;	../free.c: 68: if(next_free == h->next) // Merge with next block
+   0105 BD 0E 01      [ 5]  193 	lda	0x10e,x
+   0108 85*00         [ 3]  194 	sta	*(__DPTR+0)
+   010A BD 0F 01      [ 5]  195 	lda	0x10f,x
+   010D 85*01         [ 3]  196 	sta	*(__DPTR+1)
+   010F 88            [ 2]  197 	dey
+   0110 B1*00         [ 6]  198 	lda	[__DPTR],y
+   0112 9D 04 01      [ 5]  199 	sta	0x104,x
+   0115 C8            [ 2]  200 	iny
+   0116 B1*00         [ 6]  201 	lda	[__DPTR],y
+   0118 9D 05 01      [ 5]  202 	sta	0x105,x
+   011B BD 0C 01      [ 5]  203 	lda	0x10c,x
+   011E DD 04 01      [ 5]  204 	cmp	0x104,x
+   0121 D0 6C         [ 4]  205 	bne	00105$
+   0123 BD 0D 01      [ 5]  206 	lda	0x10d,x
+   0126 DD 05 01      [ 5]  207 	cmp	0x105,x
+   0129 D0 64         [ 4]  208 	bne	00105$
+                            209 ;	../free.c: 70: h->next_free = h->next->next_free;
+   012B BD 04 01      [ 5]  210 	lda	0x104,x
+   012E 85*00         [ 3]  211 	sta	*(__DPTR+0)
+   0130 BD 05 01      [ 5]  212 	lda	0x105,x
+   0133 85*01         [ 3]  213 	sta	*(__DPTR+1)
+   0135 C8            [ 2]  214 	iny
+   0136 B1*00         [ 6]  215 	lda	[__DPTR],y
+   0138 9D 04 01      [ 5]  216 	sta	0x104,x
+   013B C8            [ 2]  217 	iny
+   013C B1*00         [ 6]  218 	lda	[__DPTR],y
+   013E 9D 05 01      [ 5]  219 	sta	0x105,x
+   0141 BD 02 01      [ 5]  220 	lda	0x102,x
+   0144 85*00         [ 3]  221 	sta	*(__DPTR+0)
+   0146 BD 03 01      [ 5]  222 	lda	0x103,x
+   0149 85*01         [ 3]  223 	sta	*(__DPTR+1)
+   014B BD 04 01      [ 5]  224 	lda	0x104,x
+   014E 88            [ 2]  225 	dey
+   014F 91*00         [ 6]  226 	sta	[__DPTR],y
+   0151 BD 05 01      [ 5]  227 	lda	0x105,x
+   0154 C8            [ 2]  228 	iny
+   0155 91*00         [ 6]  229 	sta	[__DPTR],y
+                            230 ;	../free.c: 71: h->next = h->next->next;
+   0157 BD 0E 01      [ 5]  231 	lda	0x10e,x
+   015A 85*00         [ 3]  232 	sta	*(__DPTR+0)
+   015C BD 0F 01      [ 5]  233 	lda	0x10f,x
+   015F 85*01         [ 3]  234 	sta	*(__DPTR+1)
+   0161 A0 01         [ 2]  235 	ldy	#0x01
+   0163 B1*00         [ 6]  236 	lda	[__DPTR],y
+   0165 AA            [ 2]  237 	tax
+   0166 88            [ 2]  238 	dey
+   0167 B1*00         [ 6]  239 	lda	[__DPTR],y
+   0169 85*00         [ 3]  240 	sta	*(__DPTR+0)
+   016B 86*01         [ 3]  241 	stx	*(__DPTR+1)
+   016D C8            [ 2]  242 	iny
+   016E B1*00         [ 6]  243 	lda	[__DPTR],y
+   0170 AA            [ 2]  244 	tax
+   0171 88            [ 2]  245 	dey
+   0172 B1*00         [ 6]  246 	lda	[__DPTR],y
+   0174 85*00         [ 3]  247 	sta	*(__TEMP+0)
+   0176 86*01         [ 3]  248 	stx	*(__TEMP+1)
+   0178 BA            [ 2]  249 	tsx
+   0179 BD 0D 01      [ 5]  250 	lda	0x10d,x
+   017C 85*00         [ 3]  251 	sta	*(__DPTR+0)
+   017E BD 0E 01      [ 5]  252 	lda	0x10e,x
+   0181 85*01         [ 3]  253 	sta	*(__DPTR+1)
+   0183 A5*00         [ 3]  254 	lda	*(__TEMP+0)
+   0185 A6*01         [ 3]  255 	ldx	*(__TEMP+1)
+   0187 91*00         [ 6]  256 	sta	[__DPTR],y
+   0189 8A            [ 2]  257 	txa
+   018A C8            [ 2]  258 	iny
+   018B 91*00         [ 6]  259 	sta	[__DPTR],y
+   018D A6*01         [ 3]  260 	ldx	*(__TEMP+1)
+   018F                     261 00105$:
+                            262 ;	../free.c: 74: if (prev_free && prev_free->next == h) // Merge with previous block
+   018F BA            [ 2]  263 	tsx
+   0190 BD 09 01      [ 5]  264 	lda	0x109,x
+   0193 1D 0A 01      [ 5]  265 	ora	0x10a,x
+   0196 D0 03         [ 4]  266 	bne	00157$
+   0198 4Cr26r02      [ 3]  267 	jmp	00113$
+   019B                     268 00157$:
+   019B BD 09 01      [ 5]  269 	lda	0x109,x
+   019E 85*00         [ 3]  270 	sta	*(__DPTR+0)
+   01A0 BD 0A 01      [ 5]  271 	lda	0x10a,x
+   01A3 85*01         [ 3]  272 	sta	*(__DPTR+1)
+   01A5 A0 00         [ 2]  273 	ldy	#0x00
+   01A7 B1*00         [ 6]  274 	lda	[__DPTR],y
+   01A9 9D 03 01      [ 5]  275 	sta	0x103,x
+   01AC C8            [ 2]  276 	iny
+   01AD B1*00         [ 6]  277 	lda	[__DPTR],y
+   01AF 9D 04 01      [ 5]  278 	sta	0x104,x
+   01B2 BD 03 01      [ 5]  279 	lda	0x103,x
+   01B5 DD 0D 01      [ 5]  280 	cmp	0x10d,x
+   01B8 D0 6C         [ 4]  281 	bne	00113$
+   01BA BD 04 01      [ 5]  282 	lda	0x104,x
+   01BD DD 0E 01      [ 5]  283 	cmp	0x10e,x
+   01C0 D0 64         [ 4]  284 	bne	00113$
+                            285 ;	../free.c: 76: prev_free->next = h->next;
+   01C2 BD 0D 01      [ 5]  286 	lda	0x10d,x
+   01C5 85*00         [ 3]  287 	sta	*(__DPTR+0)
+   01C7 BD 0E 01      [ 5]  288 	lda	0x10e,x
+   01CA 85*01         [ 3]  289 	sta	*(__DPTR+1)
+   01CC 88            [ 2]  290 	dey
+   01CD B1*00         [ 6]  291 	lda	[__DPTR],y
+   01CF 9D 03 01      [ 5]  292 	sta	0x103,x
+   01D2 C8            [ 2]  293 	iny
+   01D3 B1*00         [ 6]  294 	lda	[__DPTR],y
+   01D5 9D 04 01      [ 5]  295 	sta	0x104,x
+   01D8 BD 09 01      [ 5]  296 	lda	0x109,x
+   01DB 85*00         [ 3]  297 	sta	*(__DPTR+0)
+   01DD BD 0A 01      [ 5]  298 	lda	0x10a,x
+   01E0 85*01         [ 3]  299 	sta	*(__DPTR+1)
+   01E2 BD 03 01      [ 5]  300 	lda	0x103,x
+   01E5 88            [ 2]  301 	dey
+   01E6 91*00         [ 6]  302 	sta	[__DPTR],y
+   01E8 BD 04 01      [ 5]  303 	lda	0x104,x
+   01EB C8            [ 2]  304 	iny
+   01EC 91*00         [ 6]  305 	sta	[__DPTR],y
+                            306 ;	../free.c: 77: prev_free->next_free = h->next_free;
+   01EE BD 09 01      [ 5]  307 	lda	0x109,x
+   01F1 9D 03 01      [ 5]  308 	sta	0x103,x
+   01F4 BD 0A 01      [ 5]  309 	lda	0x10a,x
+   01F7 9D 04 01      [ 5]  310 	sta	0x104,x
+   01FA BD 01 01      [ 5]  311 	lda	0x101,x
+   01FD 85*00         [ 3]  312 	sta	*(__DPTR+0)
+   01FF BD 02 01      [ 5]  313 	lda	0x102,x
+   0202 85*01         [ 3]  314 	sta	*(__DPTR+1)
+   0204 C8            [ 2]  315 	iny
+   0205 B1*00         [ 6]  316 	lda	[__DPTR],y
+   0207 9D 01 01      [ 5]  317 	sta	0x101,x
+   020A C8            [ 2]  318 	iny
+   020B B1*00         [ 6]  319 	lda	[__DPTR],y
+   020D 9D 02 01      [ 5]  320 	sta	0x102,x
+   0210 BD 03 01      [ 5]  321 	lda	0x103,x
+   0213 85*00         [ 3]  322 	sta	*(__DPTR+0)
+   0215 BD 04 01      [ 5]  323 	lda	0x104,x
+   0218 85*01         [ 3]  324 	sta	*(__DPTR+1)
+   021A BD 01 01      [ 5]  325 	lda	0x101,x
+   021D 88            [ 2]  326 	dey
+   021E 91*00         [ 6]  327 	sta	[__DPTR],y
+   0220 BD 02 01      [ 5]  328 	lda	0x102,x
+   0223 C8            [ 2]  329 	iny
+   0224 91*00         [ 6]  330 	sta	[__DPTR],y
+   0226                     331 00113$:
+                            332 ;	../free.c: 79: }
+   0226 85*00         [ 3]  333 	sta	*(__TEMP+0)
+   0228 86*01         [ 3]  334 	stx	*(__TEMP+1)
+   022A BA            [ 2]  335 	tsx
+   022B 8A            [ 2]  336 	txa
+   022C 18            [ 2]  337 	clc
+   022D 69 10         [ 2]  338 	adc	#0x10
+   022F AA            [ 2]  339 	tax
+   0230 9A            [ 2]  340 	txs
+   0231 A6*01         [ 3]  341 	ldx	*(__TEMP+1)
+   0233 A5*00         [ 3]  342 	lda	*(__TEMP+0)
+   0235 60            [ 6]  343 	rts
+                            344 	.area CODE
+                            345 	.area RODATA
+                            346 	.area XINIT
+                            347 	.area CABS    (ABS)

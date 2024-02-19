@@ -1,0 +1,228 @@
+                                      1 ;--------------------------------------------------------
+                                      2 ; File Created by SDCC : free open source ISO C Compiler 
+                                      3 ; Version 4.2.14 #0 (Linux)
+                                      4 ;--------------------------------------------------------
+                                      5 	.module _memset
+                                      6 	.optsdcc -mds400 --model-flat24
+                                      7 	
+                                      8 ;--------------------------------------------------------
+                                      9 ; CPU specific extensions
+                                     10 ;--------------------------------------------------------
+                                     11 	.DS80C390
+                                     12 	.amode	2	; 24 bit flat addressing
+                           000082    13 dpl	=	0x82
+                           000083    14 dph	=	0x83
+                           000084    15 dpl1	=	0x84
+                           000085    16 dph1	=	0x85
+                           000086    17 dps	=	0x86
+                           000093    18 dpx	=	0x93
+                           000095    19 dpx1	=	0x95
+                           00009B    20 esp	=	0x9B
+                           00009C    21 ap	=	0x9C
+                           00009C    22 acc1	=	0x9C
+                           0000D1    23 mcnt0	=	0xD1
+                           0000D2    24 mcnt1	=	0xD2
+                           0000D3    25 ma	=	0xD3
+                           0000D4    26 mb	=	0xD4
+                           0000D5    27 mc	=	0xD5
+                           00009D    28 acon	=	0x9D
+                           0000C6    29 mcon	=	0xC6
+                           0000D1    30 F1	=	0xD1	; user flag
+                                     31 ;--------------------------------------------------------
+                                     32 ; Public variables in this module
+                                     33 ;--------------------------------------------------------
+                                     34 	.globl _memset_PARM_3
+                                     35 	.globl _memset_PARM_2
+                                     36 	.globl _memset
+                                     37 ;--------------------------------------------------------
+                                     38 ; special function registers
+                                     39 ;--------------------------------------------------------
+                                     40 ;--------------------------------------------------------
+                                     41 ; special function bits
+                                     42 ;--------------------------------------------------------
+                                     43 ;--------------------------------------------------------
+                                     44 ; overlayable register banks
+                                     45 ;--------------------------------------------------------
+                                     46 	.area REG_BANK_0	(REL,OVR,DATA)
+      000000                         47 	.ds 8
+                                     48 	.area REG_BANK_3	(REL,OVR,DATA)
+      000000                         49 	.ds 8
+                                     50 ;--------------------------------------------------------
+                                     51 ; internal ram data
+                                     52 ;--------------------------------------------------------
+                                     53 	.area DSEG    (DATA)
+                                     54 ;--------------------------------------------------------
+                                     55 ; overlayable items in internal ram
+                                     56 ;--------------------------------------------------------
+                                     57 	.area	OSEG    (OVR,DATA)
+                                     58 ;--------------------------------------------------------
+                                     59 ; indirectly addressable internal ram data
+                                     60 ;--------------------------------------------------------
+                                     61 	.area ISEG    (DATA)
+                                     62 ;--------------------------------------------------------
+                                     63 ; absolute internal ram data
+                                     64 ;--------------------------------------------------------
+                                     65 	.area IABS    (ABS,DATA)
+                                     66 	.area IABS    (ABS,DATA)
+                                     67 ;--------------------------------------------------------
+                                     68 ; bit data
+                                     69 ;--------------------------------------------------------
+                                     70 	.area BSEG    (BIT)
+                                     71 ;--------------------------------------------------------
+                                     72 ; paged external ram data
+                                     73 ;--------------------------------------------------------
+                                     74 	.area PSEG    (PAG,XDATA)
+                                     75 ;--------------------------------------------------------
+                                     76 ; uninitialized external ram data
+                                     77 ;--------------------------------------------------------
+                                     78 	.area XSEG    (XDATA)
+      000000                         79 _memset_PARM_2:
+      000000                         80 	.ds 1
+      000001                         81 _memset_PARM_3:
+      000001                         82 	.ds 2
+      000003                         83 _memset_s_65536_62:
+      000003                         84 	.ds 4
+                                     85 ;--------------------------------------------------------
+                                     86 ; absolute external ram data
+                                     87 ;--------------------------------------------------------
+                                     88 	.area XABS    (ABS,XDATA)
+                                     89 ;--------------------------------------------------------
+                                     90 ; initialized external ram data
+                                     91 ;--------------------------------------------------------
+                                     92 	.area XISEG   (XDATA)
+                                     93 ;--------------------------------------------------------
+                                     94 ; global & static initialisations
+                                     95 ;--------------------------------------------------------
+                                     96 	.area HOME    (CODE)
+                                     97 	.area GSINIT  (CODE)
+                                     98 	.area GSFINAL (CODE)
+                                     99 	.area GSINIT  (CODE)
+                                    100 ;--------------------------------------------------------
+                                    101 ; Home
+                                    102 ;--------------------------------------------------------
+                                    103 	.area HOME    (CODE)
+                                    104 	.area HOME    (CODE)
+                                    105 ;--------------------------------------------------------
+                                    106 ; code
+                                    107 ;--------------------------------------------------------
+                                    108 	.area CSEG    (CODE)
+                                    109 ;------------------------------------------------------------
+                                    110 ;Allocation info for local variables in function 'memset'
+                                    111 ;------------------------------------------------------------
+                                    112 ;c                         Allocated with name '_memset_PARM_2'
+                                    113 ;n                         Allocated with name '_memset_PARM_3'
+                                    114 ;s                         Allocated with name '_memset_s_65536_62'
+                                    115 ;dst                       Allocated to registers 
+                                    116 ;sz                        Allocated to registers r3 r4 
+                                    117 ;data                      Allocated to registers r2 
+                                    118 ;------------------------------------------------------------
+                                    119 ;	_memset.c:42: void *memset (void *s, unsigned char c, size_t n)
+                                    120 ;	-----------------------------------------
+                                    121 ;	 function memset
+                                    122 ;	-----------------------------------------
+      000000                        123 _memset:
+                           000002   124 	ar2 = 0x02
+                           000003   125 	ar3 = 0x03
+                           000004   126 	ar4 = 0x04
+                           000005   127 	ar5 = 0x05
+                           000006   128 	ar6 = 0x06
+                           000007   129 	ar7 = 0x07
+                           000000   130 	ar0 = 0x00
+                           000001   131 	ar1 = 0x01
+      000000 75 86 01         [12]  132 	mov     dps, #1
+      000003 90s00r00r03      [12]  133 	mov     dptr, #_memset_s_65536_62
+      000007 E5 82            [ 8]  134 	mov	a,dpl
+      000009 F0               [ 8]  135 	movx	@dptr,a
+      00000A A3               [12]  136 	inc	dptr
+      00000B E5 83            [ 8]  137 	mov	a,dph
+      00000D F0               [ 8]  138 	movx	@dptr,a
+      00000E A3               [12]  139 	inc	dptr
+      00000F E5 93            [ 8]  140 	mov	a,dpx
+      000011 F0               [ 8]  141 	movx	@dptr,a
+      000012 A3               [12]  142 	inc	dptr
+      000013 E5 F0            [ 8]  143 	mov	a,b
+      000015 F0               [ 8]  144 	movx	@dptr,a
+      000016 75 86 00         [12]  145 	mov	dps,#0
+                                    146 ;	_memset.c:189: register size_t sz = n;
+      000019 90s00r00r01      [12]  147 	mov	dptr,#_memset_PARM_3
+                                    148 ;	genAssign: resultIsFar = FALSE
+      00001D E0               [ 8]  149 	movx	a,@dptr
+      00001E FB               [ 4]  150 	mov	r3,a
+      00001F A3               [12]  151 	inc	dptr
+      000020 E0               [ 8]  152 	movx	a,@dptr
+      000021 FC               [ 4]  153 	mov	r4,a
+                                    154 ;	_memset.c:190: if (sz != 0)
+      000022 90s00r00r01      [12]  155 	mov	dptr,#_memset_PARM_3
+      000026 E0               [ 8]  156 	movx	a,@dptr
+      000027 F5 F0            [ 8]  157 	mov	b,a
+      000029 A3               [12]  158 	inc	dptr
+      00002A E0               [ 8]  159 	movx	a,@dptr
+      00002B 45 F0            [ 8]  160 	orl	a,b
+      00002D 60 34            [12]  161 	jz  00105$
+      00002F                        162 00117$:
+                                    163 ;	_memset.c:192: register char *dst = s;
+      00002F 90s00r00r03      [12]  164 	mov	dptr,#_memset_s_65536_62
+                                    165 ;	genAssign: resultIsFar = FALSE
+      000033 E0               [ 8]  166 	movx	a,@dptr
+      000034 F8               [ 4]  167 	mov	r0,a
+      000035 A3               [12]  168 	inc	dptr
+      000036 E0               [ 8]  169 	movx	a,@dptr
+      000037 F9               [ 4]  170 	mov	r1,a
+      000038 A3               [12]  171 	inc	dptr
+      000039 E0               [ 8]  172 	movx	a,@dptr
+      00003A FE               [ 4]  173 	mov	r6,a
+      00003B A3               [12]  174 	inc	dptr
+      00003C E0               [ 8]  175 	movx	a,@dptr
+      00003D FF               [ 4]  176 	mov	r7,a
+                                    177 ;	_memset.c:193: register char data = (char)c;
+      00003E 90s00r00r00      [12]  178 	mov	dptr,#_memset_PARM_2
+                                    179 ;	genAssign: resultIsFar = FALSE
+      000042 E0               [ 8]  180 	movx	a,@dptr
+      000043 FA               [ 4]  181 	mov	r2,a
+                                    182 ;	_memset.c:194: do {
+                                    183 ;	genAssign: resultIsFar = FALSE
+      000044                        184 00101$:
+                                    185 ;	_memset.c:195: *dst++ = data;
+      000044 88 82            [ 8]  186 	mov	dpl,r0
+      000046 89 83            [ 8]  187 	mov	dph,r1
+      000048 8E 93            [ 8]  188 	mov	dpx,r6
+      00004A 8F F0            [ 8]  189 	mov	b,r7
+      00004C EA               [ 4]  190 	mov	a,r2
+      00004D 12s00r00r00      [16]  191 	lcall	__gptrput
+      000051 A3               [12]  192 	inc	dptr
+      000052 A8 82            [ 8]  193 	mov	r0,dpl
+      000054 A9 83            [ 8]  194 	mov	r1,dph
+      000056 AE 93            [ 8]  195 	mov	r6,dpx
+      000058 AF F0            [ 8]  196 	mov	r7,b
+                                    197 ;	_memset.c:196: } while (--sz);
+      00005A 1B               [ 4]  198 	dec	r3
+      00005B BB FF 01         [16]  199 	cjne	r3,#0xff,00118$
+      00005E 1C               [ 4]  200 	dec	r4
+      00005F                        201 00118$:
+      00005F EB               [ 4]  202 	mov	a,r3
+      000060 4C               [ 4]  203 	orl	a,r4
+      000061 70 E1            [12]  204 	jnz  00101$
+      000063                        205 00119$:
+      000063                        206 00105$:
+                                    207 ;	_memset.c:198: return s;
+      000063 75 86 01         [12]  208 	mov     dps, #1
+      000066 90s00r00r03      [12]  209 	mov     dptr, #_memset_s_65536_62
+      00006A E0               [ 8]  210 	movx	a,@dptr
+      00006B F5 82            [ 8]  211 	mov	dpl,a
+      00006D A3               [12]  212 	inc	dptr
+      00006E E0               [ 8]  213 	movx	a,@dptr
+      00006F F5 83            [ 8]  214 	mov	dph,a
+      000071 A3               [12]  215 	inc	dptr
+      000072 E0               [ 8]  216 	movx	a,@dptr
+      000073 F5 93            [ 8]  217 	mov	dpx,a
+      000075 A3               [12]  218 	inc	dptr
+      000076 E0               [ 8]  219 	movx	a,@dptr
+      000077 F5 F0            [ 8]  220 	mov	b,a
+      000079 75 86 00         [12]  221 	mov	dps,#0
+      00007C                        222 00106$:
+                                    223 ;	_memset.c:199: }
+      00007C 22               [16]  224 	ret
+                                    225 	.area CSEG    (CODE)
+                                    226 	.area CONST   (CODE)
+                                    227 	.area XINIT   (CODE)
+                                    228 	.area CABS    (ABS,CODE)

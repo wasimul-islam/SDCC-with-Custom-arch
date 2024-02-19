@@ -1,0 +1,651 @@
+                              1 ;--------------------------------------------------------
+                              2 ; File Created by SDCC : free open source ISO C Compiler 
+                              3 ; Version 4.2.14 #0 (Linux)
+                              4 ;--------------------------------------------------------
+                              5 	.module expf
+                              6 	.optsdcc -mhc08
+                              7 	
+                              8 	.area HOME    (CODE)
+                              9 	.area GSINIT0 (CODE)
+                             10 	.area GSINIT  (CODE)
+                             11 	.area GSFINAL (CODE)
+                             12 	.area CSEG    (CODE)
+                             13 	.area XINIT   (CODE)
+                             14 	.area CONST   (CODE)
+                             15 	.area DSEG    (PAG)
+                             16 	.area OSEG    (PAG, OVR)
+                             17 	.area XSEG
+                             18 	.area XISEG
+                             19 ;--------------------------------------------------------
+                             20 ; Public variables in this module
+                             21 ;--------------------------------------------------------
+                             22 	.globl _ldexpf
+                             23 	.globl _expf
+                             24 ;--------------------------------------------------------
+                             25 ; ram data
+                             26 ;--------------------------------------------------------
+                             27 	.area DSEG    (PAG)
+                             28 ;--------------------------------------------------------
+                             29 ; overlayable items in ram
+                             30 ;--------------------------------------------------------
+                             31 ;--------------------------------------------------------
+                             32 ; absolute ram data
+                             33 ;--------------------------------------------------------
+                             34 	.area IABS    (ABS)
+                             35 	.area IABS    (ABS)
+                             36 ;--------------------------------------------------------
+                             37 ; absolute external ram data
+                             38 ;--------------------------------------------------------
+                             39 	.area XABS    (ABS)
+                             40 ;--------------------------------------------------------
+                             41 ; initialized external ram data
+                             42 ;--------------------------------------------------------
+                             43 	.area XISEG
+                             44 ;--------------------------------------------------------
+                             45 ; extended address mode data
+                             46 ;--------------------------------------------------------
+                             47 	.area XSEG
+                             48 ;--------------------------------------------------------
+                             49 ; global & static initialisations
+                             50 ;--------------------------------------------------------
+                             51 	.area HOME    (CODE)
+                             52 	.area GSINIT  (CODE)
+                             53 	.area GSFINAL (CODE)
+                             54 	.area GSINIT  (CODE)
+                             55 ;--------------------------------------------------------
+                             56 ; Home
+                             57 ;--------------------------------------------------------
+                             58 	.area HOME    (CODE)
+                             59 	.area HOME    (CODE)
+                             60 ;--------------------------------------------------------
+                             61 ; code
+                             62 ;--------------------------------------------------------
+                             63 	.area CSEG    (CODE)
+                             64 ;------------------------------------------------------------
+                             65 ;Allocation info for local variables in function 'expf'
+                             66 ;------------------------------------------------------------
+                             67 ;x                         Allocated to stack - sp +21
+                             68 ;n                         Allocated to registers 
+                             69 ;xn                        Allocated to stack - sp +13
+                             70 ;g                         Allocated to stack - sp +9
+                             71 ;r                         Allocated to stack - sp +5
+                             72 ;z                         Allocated to stack - sp +1
+                             73 ;y                         Allocated to stack - sp +1
+                             74 ;sign                      Allocated to registers x 
+                             75 ;sloc0                     Allocated to stack - sp +15
+                             76 ;sloc1                     Allocated to stack - sp +13
+                             77 ;sloc2                     Allocated to stack - sp +9
+                             78 ;------------------------------------------------------------
+                             79 ;../expf.c:331: float expf(float x) _FLOAT_FUNC_REENTRANT
+                             80 ;	-----------------------------------------
+                             81 ;	 function expf
+                             82 ;	-----------------------------------------
+                             83 ;	Register assignment is optimal.
+                             84 ;	Stack space usage: 18 bytes.
+   0000                      85 _expf:
+   0000 A7 EE         [ 2]   86 	ais	#-18
+                             87 ;../expf.c:337: if(x>=0.0)
+   0002 95            [ 2]   88 	tsx
+   0003 45r00r00      [ 3]   89 	ldhx	#___fslt_PARM_1
+   0006 9E E6 15      [ 4]   90 	lda	21,s
+   0009 F7            [ 2]   91 	sta	,x
+   000A 9E E6 16      [ 4]   92 	lda	22,s
+   000D E7 01         [ 3]   93 	sta	1,x
+   000F 9E E6 17      [ 4]   94 	lda	23,s
+   0012 E7 02         [ 3]   95 	sta	2,x
+   0014 9E E6 18      [ 4]   96 	lda	24,s
+   0017 E7 03         [ 3]   97 	sta	3,x
+   0019 45r00r00      [ 3]   98 	ldhx	#___fslt_PARM_2
+   001C 4F            [ 1]   99 	clra
+   001D F7            [ 2]  100 	sta	,x
+   001E E7 01         [ 3]  101 	sta	1,x
+   0020 E7 02         [ 3]  102 	sta	2,x
+   0022 E7 03         [ 3]  103 	sta	3,x
+   0024 CDr00r00      [ 5]  104 	jsr	___fslt
+   0027 4D            [ 1]  105 	tsta
+   0028 26 13         [ 3]  106 	bne	00102$
+                            107 ;../expf.c:338: { y=x;  sign=0; }
+   002A 95            [ 2]  108 	tsx
+   002B E6 14         [ 3]  109 	lda	20,x
+   002D F7            [ 2]  110 	sta	,x
+   002E E6 15         [ 3]  111 	lda	21,x
+   0030 E7 01         [ 3]  112 	sta	1,x
+   0032 E6 16         [ 3]  113 	lda	22,x
+   0034 E7 02         [ 3]  114 	sta	2,x
+   0036 E6 17         [ 3]  115 	lda	23,x
+   0038 E7 03         [ 3]  116 	sta	3,x
+   003A 5F            [ 1]  117 	clrx
+   003B 20 14         [ 3]  118 	bra	00103$
+   003D                     119 00102$:
+                            120 ;../expf.c:340: { y=-x; sign=1; }
+   003D 95            [ 2]  121 	tsx
+   003E E6 17         [ 3]  122 	lda	23,x
+   0040 E7 03         [ 3]  123 	sta	3,x
+   0042 E6 16         [ 3]  124 	lda	22,x
+   0044 E7 02         [ 3]  125 	sta	2,x
+   0046 E6 15         [ 3]  126 	lda	21,x
+   0048 E7 01         [ 3]  127 	sta	1,x
+   004A E6 14         [ 3]  128 	lda	20,x
+   004C A8 80         [ 2]  129 	eor	#0x80
+   004E F7            [ 2]  130 	sta	,x
+   004F AE 01         [ 2]  131 	ldx	#0x01
+   0051                     132 00103$:
+                            133 ;../expf.c:342: if(y<EXPEPS) return 1.0;
+   0051 9E E6 01      [ 4]  134 	lda	1,s
+   0054 C7r00r00      [ 4]  135 	sta	___fslt_PARM_1
+   0057 9E E6 02      [ 4]  136 	lda	2,s
+   005A C7r00r01      [ 4]  137 	sta	(___fslt_PARM_1 + 1)
+   005D 9E E6 03      [ 4]  138 	lda	3,s
+   0060 C7r00r02      [ 4]  139 	sta	(___fslt_PARM_1 + 2)
+   0063 9E E6 04      [ 4]  140 	lda	4,s
+   0066 C7r00r03      [ 4]  141 	sta	(___fslt_PARM_1 + 3)
+   0069 A6 33         [ 2]  142 	lda	#0x33
+   006B C7r00r00      [ 4]  143 	sta	___fslt_PARM_2
+   006E A6 D6         [ 2]  144 	lda	#0xd6
+   0070 C7r00r01      [ 4]  145 	sta	(___fslt_PARM_2 + 1)
+   0073 A6 BF         [ 2]  146 	lda	#0xbf
+   0075 C7r00r02      [ 4]  147 	sta	(___fslt_PARM_2 + 2)
+   0078 A6 95         [ 2]  148 	lda	#0x95
+   007A C7r00r03      [ 4]  149 	sta	(___fslt_PARM_2 + 3)
+   007D 89            [ 2]  150 	pshx
+   007E CDr00r00      [ 5]  151 	jsr	___fslt
+   0081 88            [ 2]  152 	pulx
+   0082 4D            [ 1]  153 	tsta
+   0083 27 0B         [ 3]  154 	beq	00105$
+   0085 4F            [ 1]  155 	clra
+   0086 97            [ 1]  156 	tax
+   0087 6E 80*00      [ 4]  157 	mov	#0x80,*___SDCC_hc08_ret2
+   008A 6E 3F*00      [ 4]  158 	mov	#0x3f,*___SDCC_hc08_ret3
+   008D CCr05r10      [ 3]  159 	jmp	00118$
+   0090                     160 00105$:
+                            161 ;../expf.c:344: if(y>BIGX)
+   0090 A6 42         [ 2]  162 	lda	#0x42
+   0092 C7r00r00      [ 4]  163 	sta	___fslt_PARM_1
+   0095 A6 B1         [ 2]  164 	lda	#0xb1
+   0097 C7r00r01      [ 4]  165 	sta	(___fslt_PARM_1 + 1)
+   009A A6 72         [ 2]  166 	lda	#0x72
+   009C C7r00r02      [ 4]  167 	sta	(___fslt_PARM_1 + 2)
+   009F A6 18         [ 2]  168 	lda	#0x18
+   00A1 C7r00r03      [ 4]  169 	sta	(___fslt_PARM_1 + 3)
+   00A4 9E E6 01      [ 4]  170 	lda	1,s
+   00A7 C7r00r00      [ 4]  171 	sta	___fslt_PARM_2
+   00AA 9E E6 02      [ 4]  172 	lda	2,s
+   00AD C7r00r01      [ 4]  173 	sta	(___fslt_PARM_2 + 1)
+   00B0 9E E6 03      [ 4]  174 	lda	3,s
+   00B3 C7r00r02      [ 4]  175 	sta	(___fslt_PARM_2 + 2)
+   00B6 9E E6 04      [ 4]  176 	lda	4,s
+   00B9 C7r00r03      [ 4]  177 	sta	(___fslt_PARM_2 + 3)
+   00BC 89            [ 2]  178 	pshx
+   00BD CDr00r00      [ 5]  179 	jsr	___fslt
+   00C0 88            [ 2]  180 	pulx
+   00C1 4D            [ 1]  181 	tsta
+   00C2 27 21         [ 3]  182 	beq	00110$
+                            183 ;../expf.c:346: if(sign)
+   00C4 5D            [ 1]  184 	tstx
+   00C5 27 15         [ 3]  185 	beq	00107$
+                            186 ;../expf.c:348: errno=ERANGE;
+   00C7 4F            [ 1]  187 	clra
+   00C8 C7r00r00      [ 4]  188 	sta	_errno
+   00CB A6 22         [ 2]  189 	lda	#0x22
+   00CD C7r00r01      [ 4]  190 	sta	(_errno + 1)
+                            191 ;../expf.c:350: ;
+   00D0 A6 FF         [ 2]  192 	lda	#0xff
+   00D2 97            [ 1]  193 	tax
+   00D3 6E 7F*00      [ 4]  194 	mov	#0x7f,*___SDCC_hc08_ret2
+   00D6 6E 7F*00      [ 4]  195 	mov	#0x7f,*___SDCC_hc08_ret3
+   00D9 CCr05r10      [ 3]  196 	jmp	00118$
+   00DC                     197 00107$:
+                            198 ;../expf.c:354: return 0.0;
+   00DC 4F            [ 1]  199 	clra
+   00DD 97            [ 1]  200 	tax
+   00DE B7*00         [ 3]  201 	sta	*___SDCC_hc08_ret2
+   00E0 B7*00         [ 3]  202 	sta	*___SDCC_hc08_ret3
+   00E2 CCr05r10      [ 3]  203 	jmp	00118$
+   00E5                     204 00110$:
+                            205 ;../expf.c:358: z=y*K1;
+   00E5 A6 3F         [ 2]  206 	lda	#0x3f
+   00E7 C7r00r00      [ 4]  207 	sta	___fsmul_PARM_1
+   00EA A6 B8         [ 2]  208 	lda	#0xb8
+   00EC C7r00r01      [ 4]  209 	sta	(___fsmul_PARM_1 + 1)
+   00EF A6 AA         [ 2]  210 	lda	#0xaa
+   00F1 C7r00r02      [ 4]  211 	sta	(___fsmul_PARM_1 + 2)
+   00F4 A6 3B         [ 2]  212 	lda	#0x3b
+   00F6 C7r00r03      [ 4]  213 	sta	(___fsmul_PARM_1 + 3)
+   00F9 9E E6 01      [ 4]  214 	lda	1,s
+   00FC C7r00r00      [ 4]  215 	sta	___fsmul_PARM_2
+   00FF 9E E6 02      [ 4]  216 	lda	2,s
+   0102 C7r00r01      [ 4]  217 	sta	(___fsmul_PARM_2 + 1)
+   0105 9E E6 03      [ 4]  218 	lda	3,s
+   0108 C7r00r02      [ 4]  219 	sta	(___fsmul_PARM_2 + 2)
+   010B 9E E6 04      [ 4]  220 	lda	4,s
+   010E C7r00r03      [ 4]  221 	sta	(___fsmul_PARM_2 + 3)
+                            222 ;../expf.c:359: n=z;
+   0111 89            [ 2]  223 	pshx
+   0112 CDr00r00      [ 5]  224 	jsr	___fsmul
+   0115 9E E7 13      [ 4]  225 	sta	19,s
+   0118 9E EF 12      [ 4]  226 	stx	18,s
+   011B B6*00         [ 3]  227 	lda	*___SDCC_hc08_ret2
+   011D 9E E7 11      [ 4]  228 	sta	17,s
+   0120 B6*00         [ 3]  229 	lda	*___SDCC_hc08_ret3
+   0122 9E E7 10      [ 4]  230 	sta	16,s
+   0125 88            [ 2]  231 	pulx
+   0126 9E E6 0F      [ 4]  232 	lda	15,s
+   0129 C7r00r00      [ 4]  233 	sta	___fs2sint_PARM_1
+   012C 9E E6 10      [ 4]  234 	lda	16,s
+   012F C7r00r01      [ 4]  235 	sta	(___fs2sint_PARM_1 + 1)
+   0132 9E E6 11      [ 4]  236 	lda	17,s
+   0135 C7r00r02      [ 4]  237 	sta	(___fs2sint_PARM_1 + 2)
+   0138 9E E6 12      [ 4]  238 	lda	18,s
+   013B C7r00r03      [ 4]  239 	sta	(___fs2sint_PARM_1 + 3)
+   013E 89            [ 2]  240 	pshx
+   013F CDr00r00      [ 5]  241 	jsr	___fs2sint
+   0142 9E E7 0F      [ 4]  242 	sta	15,s
+   0145 9E EF 0E      [ 4]  243 	stx	14,s
+   0148 88            [ 2]  244 	pulx
+                            245 ;../expf.c:361: if(n<0) --n;
+   0149 9E E6 0D      [ 4]  246 	lda	13,s
+   014C A0 00         [ 2]  247 	sub	#0x00
+   014E 90 10         [ 3]  248 	bge	00112$
+   0150 9E E6 0E      [ 4]  249 	lda	14,s
+   0153 A0 01         [ 2]  250 	sub	#0x01
+   0155 9E E7 0E      [ 4]  251 	sta	14,s
+   0158 9E E6 0D      [ 4]  252 	lda	13,s
+   015B A2 00         [ 2]  253 	sbc	#0
+   015D 9E E7 0D      [ 4]  254 	sta	13,s
+   0160                     255 00112$:
+                            256 ;../expf.c:362: if(z-n>=0.5) ++n;
+   0160 89            [ 2]  257 	pshx
+   0161 9E E6 0F      [ 4]  258 	lda	15,s
+   0164 9E EE 0E      [ 4]  259 	ldx	14,s
+   0167 CDr00r00      [ 5]  260 	jsr	___sint2fs
+   016A C7r00r03      [ 4]  261 	sta	(___fssub_PARM_2 + 3)
+   016D CFr00r02      [ 4]  262 	stx	(___fssub_PARM_2 + 2)
+   0170 B6*00         [ 3]  263 	lda	*___SDCC_hc08_ret2
+   0172 C7r00r01      [ 4]  264 	sta	(___fssub_PARM_2 + 1)
+   0175 B6*00         [ 3]  265 	lda	*___SDCC_hc08_ret3
+   0177 C7r00r00      [ 4]  266 	sta	___fssub_PARM_2
+   017A 88            [ 2]  267 	pulx
+   017B 9E E6 0F      [ 4]  268 	lda	15,s
+   017E C7r00r00      [ 4]  269 	sta	___fssub_PARM_1
+   0181 9E E6 10      [ 4]  270 	lda	16,s
+   0184 C7r00r01      [ 4]  271 	sta	(___fssub_PARM_1 + 1)
+   0187 9E E6 11      [ 4]  272 	lda	17,s
+   018A C7r00r02      [ 4]  273 	sta	(___fssub_PARM_1 + 2)
+   018D 9E E6 12      [ 4]  274 	lda	18,s
+   0190 C7r00r03      [ 4]  275 	sta	(___fssub_PARM_1 + 3)
+   0193 89            [ 2]  276 	pshx
+   0194 CDr00r00      [ 5]  277 	jsr	___fssub
+   0197 C7r00r03      [ 4]  278 	sta	(___fslt_PARM_1 + 3)
+   019A CFr00r02      [ 4]  279 	stx	(___fslt_PARM_1 + 2)
+   019D B6*00         [ 3]  280 	lda	*___SDCC_hc08_ret2
+   019F C7r00r01      [ 4]  281 	sta	(___fslt_PARM_1 + 1)
+   01A2 B6*00         [ 3]  282 	lda	*___SDCC_hc08_ret3
+   01A4 C7r00r00      [ 4]  283 	sta	___fslt_PARM_1
+   01A7 88            [ 2]  284 	pulx
+   01A8 4F            [ 1]  285 	clra
+   01A9 C7r00r01      [ 4]  286 	sta	(___fslt_PARM_2 + 1)
+   01AC C7r00r02      [ 4]  287 	sta	(___fslt_PARM_2 + 2)
+   01AF C7r00r03      [ 4]  288 	sta	(___fslt_PARM_2 + 3)
+   01B2 A6 3F         [ 2]  289 	lda	#0x3f
+   01B4 C7r00r00      [ 4]  290 	sta	___fslt_PARM_2
+   01B7 89            [ 2]  291 	pshx
+   01B8 CDr00r00      [ 5]  292 	jsr	___fslt
+   01BB 88            [ 2]  293 	pulx
+   01BC 4D            [ 1]  294 	tsta
+   01BD 26 08         [ 3]  295 	bne	00114$
+   01BF 9E 6C 0E      [ 5]  296 	inc	14,s
+   01C2 26 03         [ 3]  297 	bne	00161$
+   01C4 9E 6C 0D      [ 5]  298 	inc	13,s
+   01C7                     299 00161$:
+   01C7                     300 00114$:
+                            301 ;../expf.c:363: xn=n;
+   01C7 89            [ 2]  302 	pshx
+   01C8 9E E6 0F      [ 4]  303 	lda	15,s
+   01CB 9E EE 0E      [ 4]  304 	ldx	14,s
+   01CE CDr00r00      [ 5]  305 	jsr	___sint2fs
+   01D1 9E E7 13      [ 4]  306 	sta	19,s
+   01D4 9E EF 12      [ 4]  307 	stx	18,s
+   01D7 B6*00         [ 3]  308 	lda	*___SDCC_hc08_ret2
+   01D9 9E E7 11      [ 4]  309 	sta	17,s
+   01DC B6*00         [ 3]  310 	lda	*___SDCC_hc08_ret3
+   01DE 9E E7 10      [ 4]  311 	sta	16,s
+   01E1 88            [ 2]  312 	pulx
+                            313 ;../expf.c:364: g=((y-xn*C1))-xn*C2;
+   01E2 A6 3F         [ 2]  314 	lda	#0x3f
+   01E4 C7r00r00      [ 4]  315 	sta	___fsmul_PARM_1
+   01E7 A6 31         [ 2]  316 	lda	#0x31
+   01E9 C7r00r01      [ 4]  317 	sta	(___fsmul_PARM_1 + 1)
+   01EC A6 80         [ 2]  318 	lda	#0x80
+   01EE C7r00r02      [ 4]  319 	sta	(___fsmul_PARM_1 + 2)
+   01F1 4F            [ 1]  320 	clra
+   01F2 C7r00r03      [ 4]  321 	sta	(___fsmul_PARM_1 + 3)
+   01F5 9E E6 0F      [ 4]  322 	lda	15,s
+   01F8 C7r00r00      [ 4]  323 	sta	___fsmul_PARM_2
+   01FB 9E E6 10      [ 4]  324 	lda	16,s
+   01FE C7r00r01      [ 4]  325 	sta	(___fsmul_PARM_2 + 1)
+   0201 9E E6 11      [ 4]  326 	lda	17,s
+   0204 C7r00r02      [ 4]  327 	sta	(___fsmul_PARM_2 + 2)
+   0207 9E E6 12      [ 4]  328 	lda	18,s
+   020A C7r00r03      [ 4]  329 	sta	(___fsmul_PARM_2 + 3)
+   020D 89            [ 2]  330 	pshx
+   020E CDr00r00      [ 5]  331 	jsr	___fsmul
+   0211 C7r00r03      [ 4]  332 	sta	(___fssub_PARM_2 + 3)
+   0214 CFr00r02      [ 4]  333 	stx	(___fssub_PARM_2 + 2)
+   0217 B6*00         [ 3]  334 	lda	*___SDCC_hc08_ret2
+   0219 C7r00r01      [ 4]  335 	sta	(___fssub_PARM_2 + 1)
+   021C B6*00         [ 3]  336 	lda	*___SDCC_hc08_ret3
+   021E C7r00r00      [ 4]  337 	sta	___fssub_PARM_2
+   0221 88            [ 2]  338 	pulx
+   0222 9E E6 01      [ 4]  339 	lda	1,s
+   0225 C7r00r00      [ 4]  340 	sta	___fssub_PARM_1
+   0228 9E E6 02      [ 4]  341 	lda	2,s
+   022B C7r00r01      [ 4]  342 	sta	(___fssub_PARM_1 + 1)
+   022E 9E E6 03      [ 4]  343 	lda	3,s
+   0231 C7r00r02      [ 4]  344 	sta	(___fssub_PARM_1 + 2)
+   0234 9E E6 04      [ 4]  345 	lda	4,s
+   0237 C7r00r03      [ 4]  346 	sta	(___fssub_PARM_1 + 3)
+   023A 89            [ 2]  347 	pshx
+   023B CDr00r00      [ 5]  348 	jsr	___fssub
+   023E 9E E7 0D      [ 4]  349 	sta	13,s
+   0241 9E EF 0C      [ 4]  350 	stx	12,s
+   0244 B6*00         [ 3]  351 	lda	*___SDCC_hc08_ret2
+   0246 9E E7 0B      [ 4]  352 	sta	11,s
+   0249 B6*00         [ 3]  353 	lda	*___SDCC_hc08_ret3
+   024B 9E E7 0A      [ 4]  354 	sta	10,s
+   024E 88            [ 2]  355 	pulx
+   024F A6 B9         [ 2]  356 	lda	#0xb9
+   0251 C7r00r00      [ 4]  357 	sta	___fsmul_PARM_1
+   0254 A6 5E         [ 2]  358 	lda	#0x5e
+   0256 C7r00r01      [ 4]  359 	sta	(___fsmul_PARM_1 + 1)
+   0259 A6 80         [ 2]  360 	lda	#0x80
+   025B C7r00r02      [ 4]  361 	sta	(___fsmul_PARM_1 + 2)
+   025E A6 83         [ 2]  362 	lda	#0x83
+   0260 C7r00r03      [ 4]  363 	sta	(___fsmul_PARM_1 + 3)
+   0263 9E E6 0F      [ 4]  364 	lda	15,s
+   0266 C7r00r00      [ 4]  365 	sta	___fsmul_PARM_2
+   0269 9E E6 10      [ 4]  366 	lda	16,s
+   026C C7r00r01      [ 4]  367 	sta	(___fsmul_PARM_2 + 1)
+   026F 9E E6 11      [ 4]  368 	lda	17,s
+   0272 C7r00r02      [ 4]  369 	sta	(___fsmul_PARM_2 + 2)
+   0275 9E E6 12      [ 4]  370 	lda	18,s
+   0278 C7r00r03      [ 4]  371 	sta	(___fsmul_PARM_2 + 3)
+   027B 89            [ 2]  372 	pshx
+   027C CDr00r00      [ 5]  373 	jsr	___fsmul
+   027F C7r00r03      [ 4]  374 	sta	(___fssub_PARM_2 + 3)
+   0282 CFr00r02      [ 4]  375 	stx	(___fssub_PARM_2 + 2)
+   0285 B6*00         [ 3]  376 	lda	*___SDCC_hc08_ret2
+   0287 C7r00r01      [ 4]  377 	sta	(___fssub_PARM_2 + 1)
+   028A B6*00         [ 3]  378 	lda	*___SDCC_hc08_ret3
+   028C C7r00r00      [ 4]  379 	sta	___fssub_PARM_2
+   028F 88            [ 2]  380 	pulx
+   0290 9E E6 09      [ 4]  381 	lda	9,s
+   0293 C7r00r00      [ 4]  382 	sta	___fssub_PARM_1
+   0296 9E E6 0A      [ 4]  383 	lda	10,s
+   0299 C7r00r01      [ 4]  384 	sta	(___fssub_PARM_1 + 1)
+   029C 9E E6 0B      [ 4]  385 	lda	11,s
+   029F C7r00r02      [ 4]  386 	sta	(___fssub_PARM_1 + 2)
+   02A2 9E E6 0C      [ 4]  387 	lda	12,s
+   02A5 C7r00r03      [ 4]  388 	sta	(___fssub_PARM_1 + 3)
+                            389 ;../expf.c:365: z=g*g;
+   02A8 89            [ 2]  390 	pshx
+   02A9 CDr00r00      [ 5]  391 	jsr	___fssub
+   02AC 9E E7 0D      [ 4]  392 	sta	13,s
+   02AF 9E EF 0C      [ 4]  393 	stx	12,s
+   02B2 B6*00         [ 3]  394 	lda	*___SDCC_hc08_ret2
+   02B4 9E E7 0B      [ 4]  395 	sta	11,s
+   02B7 B6*00         [ 3]  396 	lda	*___SDCC_hc08_ret3
+   02B9 9E E7 0A      [ 4]  397 	sta	10,s
+   02BC 88            [ 2]  398 	pulx
+   02BD 9E E6 09      [ 4]  399 	lda	9,s
+   02C0 C7r00r00      [ 4]  400 	sta	___fsmul_PARM_1
+   02C3 9E E6 0A      [ 4]  401 	lda	10,s
+   02C6 C7r00r01      [ 4]  402 	sta	(___fsmul_PARM_1 + 1)
+   02C9 9E E6 0B      [ 4]  403 	lda	11,s
+   02CC C7r00r02      [ 4]  404 	sta	(___fsmul_PARM_1 + 2)
+   02CF 9E E6 0C      [ 4]  405 	lda	12,s
+   02D2 C7r00r03      [ 4]  406 	sta	(___fsmul_PARM_1 + 3)
+   02D5 9E E6 09      [ 4]  407 	lda	9,s
+   02D8 C7r00r00      [ 4]  408 	sta	___fsmul_PARM_2
+   02DB 9E E6 0A      [ 4]  409 	lda	10,s
+   02DE C7r00r01      [ 4]  410 	sta	(___fsmul_PARM_2 + 1)
+   02E1 9E E6 0B      [ 4]  411 	lda	11,s
+   02E4 C7r00r02      [ 4]  412 	sta	(___fsmul_PARM_2 + 2)
+   02E7 9E E6 0C      [ 4]  413 	lda	12,s
+   02EA C7r00r03      [ 4]  414 	sta	(___fsmul_PARM_2 + 3)
+                            415 ;../expf.c:366: r=P(z)*g;
+   02ED 89            [ 2]  416 	pshx
+   02EE CDr00r00      [ 5]  417 	jsr	___fsmul
+   02F1 9E E7 13      [ 4]  418 	sta	19,s
+   02F4 9E EF 12      [ 4]  419 	stx	18,s
+   02F7 B6*00         [ 3]  420 	lda	*___SDCC_hc08_ret2
+   02F9 9E E7 11      [ 4]  421 	sta	17,s
+   02FC B6*00         [ 3]  422 	lda	*___SDCC_hc08_ret3
+   02FE 9E E7 10      [ 4]  423 	sta	16,s
+   0301 88            [ 2]  424 	pulx
+   0302 A6 3B         [ 2]  425 	lda	#0x3b
+   0304 C7r00r00      [ 4]  426 	sta	___fsmul_PARM_1
+   0307 A6 88         [ 2]  427 	lda	#0x88
+   0309 C7r00r01      [ 4]  428 	sta	(___fsmul_PARM_1 + 1)
+   030C A6 53         [ 2]  429 	lda	#0x53
+   030E C7r00r02      [ 4]  430 	sta	(___fsmul_PARM_1 + 2)
+   0311 A6 08         [ 2]  431 	lda	#0x08
+   0313 C7r00r03      [ 4]  432 	sta	(___fsmul_PARM_1 + 3)
+   0316 9E E6 0F      [ 4]  433 	lda	15,s
+   0319 C7r00r00      [ 4]  434 	sta	___fsmul_PARM_2
+   031C 9E E6 10      [ 4]  435 	lda	16,s
+   031F C7r00r01      [ 4]  436 	sta	(___fsmul_PARM_2 + 1)
+   0322 9E E6 11      [ 4]  437 	lda	17,s
+   0325 C7r00r02      [ 4]  438 	sta	(___fsmul_PARM_2 + 2)
+   0328 9E E6 12      [ 4]  439 	lda	18,s
+   032B C7r00r03      [ 4]  440 	sta	(___fsmul_PARM_2 + 3)
+   032E 89            [ 2]  441 	pshx
+   032F CDr00r00      [ 5]  442 	jsr	___fsmul
+   0332 C7r00r03      [ 4]  443 	sta	(___fsadd_PARM_1 + 3)
+   0335 CFr00r02      [ 4]  444 	stx	(___fsadd_PARM_1 + 2)
+   0338 B6*00         [ 3]  445 	lda	*___SDCC_hc08_ret2
+   033A C7r00r01      [ 4]  446 	sta	(___fsadd_PARM_1 + 1)
+   033D B6*00         [ 3]  447 	lda	*___SDCC_hc08_ret3
+   033F C7r00r00      [ 4]  448 	sta	___fsadd_PARM_1
+   0342 88            [ 2]  449 	pulx
+   0343 A6 3E         [ 2]  450 	lda	#0x3e
+   0345 C7r00r00      [ 4]  451 	sta	___fsadd_PARM_2
+   0348 A6 80         [ 2]  452 	lda	#0x80
+   034A C7r00r01      [ 4]  453 	sta	(___fsadd_PARM_2 + 1)
+   034D 4F            [ 1]  454 	clra
+   034E C7r00r02      [ 4]  455 	sta	(___fsadd_PARM_2 + 2)
+   0351 C7r00r03      [ 4]  456 	sta	(___fsadd_PARM_2 + 3)
+   0354 89            [ 2]  457 	pshx
+   0355 CDr00r00      [ 5]  458 	jsr	___fsadd
+   0358 C7r00r03      [ 4]  459 	sta	(___fsmul_PARM_1 + 3)
+   035B CFr00r02      [ 4]  460 	stx	(___fsmul_PARM_1 + 2)
+   035E B6*00         [ 3]  461 	lda	*___SDCC_hc08_ret2
+   0360 C7r00r01      [ 4]  462 	sta	(___fsmul_PARM_1 + 1)
+   0363 B6*00         [ 3]  463 	lda	*___SDCC_hc08_ret3
+   0365 C7r00r00      [ 4]  464 	sta	___fsmul_PARM_1
+   0368 88            [ 2]  465 	pulx
+   0369 9E E6 09      [ 4]  466 	lda	9,s
+   036C C7r00r00      [ 4]  467 	sta	___fsmul_PARM_2
+   036F 9E E6 0A      [ 4]  468 	lda	10,s
+   0372 C7r00r01      [ 4]  469 	sta	(___fsmul_PARM_2 + 1)
+   0375 9E E6 0B      [ 4]  470 	lda	11,s
+   0378 C7r00r02      [ 4]  471 	sta	(___fsmul_PARM_2 + 2)
+   037B 9E E6 0C      [ 4]  472 	lda	12,s
+   037E C7r00r03      [ 4]  473 	sta	(___fsmul_PARM_2 + 3)
+                            474 ;../expf.c:367: r=0.5+(r/(Q(z)-r));
+   0381 89            [ 2]  475 	pshx
+   0382 CDr00r00      [ 5]  476 	jsr	___fsmul
+   0385 9E E7 0D      [ 4]  477 	sta	13,s
+   0388 9E EF 0C      [ 4]  478 	stx	12,s
+   038B B6*00         [ 3]  479 	lda	*___SDCC_hc08_ret2
+   038D 9E E7 0B      [ 4]  480 	sta	11,s
+   0390 B6*00         [ 3]  481 	lda	*___SDCC_hc08_ret3
+   0392 9E E7 0A      [ 4]  482 	sta	10,s
+   0395 88            [ 2]  483 	pulx
+   0396 A6 3D         [ 2]  484 	lda	#0x3d
+   0398 C7r00r00      [ 4]  485 	sta	___fsmul_PARM_1
+   039B A6 4C         [ 2]  486 	lda	#0x4c
+   039D C7r00r01      [ 4]  487 	sta	(___fsmul_PARM_1 + 1)
+   03A0 A6 BF         [ 2]  488 	lda	#0xbf
+   03A2 C7r00r02      [ 4]  489 	sta	(___fsmul_PARM_1 + 2)
+   03A5 A6 5B         [ 2]  490 	lda	#0x5b
+   03A7 C7r00r03      [ 4]  491 	sta	(___fsmul_PARM_1 + 3)
+   03AA 9E E6 0F      [ 4]  492 	lda	15,s
+   03AD C7r00r00      [ 4]  493 	sta	___fsmul_PARM_2
+   03B0 9E E6 10      [ 4]  494 	lda	16,s
+   03B3 C7r00r01      [ 4]  495 	sta	(___fsmul_PARM_2 + 1)
+   03B6 9E E6 11      [ 4]  496 	lda	17,s
+   03B9 C7r00r02      [ 4]  497 	sta	(___fsmul_PARM_2 + 2)
+   03BC 9E E6 12      [ 4]  498 	lda	18,s
+   03BF C7r00r03      [ 4]  499 	sta	(___fsmul_PARM_2 + 3)
+   03C2 89            [ 2]  500 	pshx
+   03C3 CDr00r00      [ 5]  501 	jsr	___fsmul
+   03C6 C7r00r03      [ 4]  502 	sta	(___fsadd_PARM_1 + 3)
+   03C9 CFr00r02      [ 4]  503 	stx	(___fsadd_PARM_1 + 2)
+   03CC B6*00         [ 3]  504 	lda	*___SDCC_hc08_ret2
+   03CE C7r00r01      [ 4]  505 	sta	(___fsadd_PARM_1 + 1)
+   03D1 B6*00         [ 3]  506 	lda	*___SDCC_hc08_ret3
+   03D3 C7r00r00      [ 4]  507 	sta	___fsadd_PARM_1
+   03D6 88            [ 2]  508 	pulx
+   03D7 4F            [ 1]  509 	clra
+   03D8 C7r00r01      [ 4]  510 	sta	(___fsadd_PARM_2 + 1)
+   03DB C7r00r02      [ 4]  511 	sta	(___fsadd_PARM_2 + 2)
+   03DE C7r00r03      [ 4]  512 	sta	(___fsadd_PARM_2 + 3)
+   03E1 A6 3F         [ 2]  513 	lda	#0x3f
+   03E3 C7r00r00      [ 4]  514 	sta	___fsadd_PARM_2
+   03E6 89            [ 2]  515 	pshx
+   03E7 CDr00r00      [ 5]  516 	jsr	___fsadd
+   03EA C7r00r03      [ 4]  517 	sta	(___fssub_PARM_1 + 3)
+   03ED CFr00r02      [ 4]  518 	stx	(___fssub_PARM_1 + 2)
+   03F0 B6*00         [ 3]  519 	lda	*___SDCC_hc08_ret2
+   03F2 C7r00r01      [ 4]  520 	sta	(___fssub_PARM_1 + 1)
+   03F5 B6*00         [ 3]  521 	lda	*___SDCC_hc08_ret3
+   03F7 C7r00r00      [ 4]  522 	sta	___fssub_PARM_1
+   03FA 88            [ 2]  523 	pulx
+   03FB 9E E6 09      [ 4]  524 	lda	9,s
+   03FE C7r00r00      [ 4]  525 	sta	___fssub_PARM_2
+   0401 9E E6 0A      [ 4]  526 	lda	10,s
+   0404 C7r00r01      [ 4]  527 	sta	(___fssub_PARM_2 + 1)
+   0407 9E E6 0B      [ 4]  528 	lda	11,s
+   040A C7r00r02      [ 4]  529 	sta	(___fssub_PARM_2 + 2)
+   040D 9E E6 0C      [ 4]  530 	lda	12,s
+   0410 C7r00r03      [ 4]  531 	sta	(___fssub_PARM_2 + 3)
+   0413 89            [ 2]  532 	pshx
+   0414 CDr00r00      [ 5]  533 	jsr	___fssub
+   0417 C7r00r03      [ 4]  534 	sta	(___fsdiv_PARM_2 + 3)
+   041A CFr00r02      [ 4]  535 	stx	(___fsdiv_PARM_2 + 2)
+   041D B6*00         [ 3]  536 	lda	*___SDCC_hc08_ret2
+   041F C7r00r01      [ 4]  537 	sta	(___fsdiv_PARM_2 + 1)
+   0422 B6*00         [ 3]  538 	lda	*___SDCC_hc08_ret3
+   0424 C7r00r00      [ 4]  539 	sta	___fsdiv_PARM_2
+   0427 88            [ 2]  540 	pulx
+   0428 9E E6 09      [ 4]  541 	lda	9,s
+   042B C7r00r00      [ 4]  542 	sta	___fsdiv_PARM_1
+   042E 9E E6 0A      [ 4]  543 	lda	10,s
+   0431 C7r00r01      [ 4]  544 	sta	(___fsdiv_PARM_1 + 1)
+   0434 9E E6 0B      [ 4]  545 	lda	11,s
+   0437 C7r00r02      [ 4]  546 	sta	(___fsdiv_PARM_1 + 2)
+   043A 9E E6 0C      [ 4]  547 	lda	12,s
+   043D C7r00r03      [ 4]  548 	sta	(___fsdiv_PARM_1 + 3)
+   0440 89            [ 2]  549 	pshx
+   0441 CDr00r00      [ 5]  550 	jsr	___fsdiv
+   0444 C7r00r03      [ 4]  551 	sta	(___fsadd_PARM_1 + 3)
+   0447 CFr00r02      [ 4]  552 	stx	(___fsadd_PARM_1 + 2)
+   044A B6*00         [ 3]  553 	lda	*___SDCC_hc08_ret2
+   044C C7r00r01      [ 4]  554 	sta	(___fsadd_PARM_1 + 1)
+   044F B6*00         [ 3]  555 	lda	*___SDCC_hc08_ret3
+   0451 C7r00r00      [ 4]  556 	sta	___fsadd_PARM_1
+   0454 88            [ 2]  557 	pulx
+   0455 4F            [ 1]  558 	clra
+   0456 C7r00r01      [ 4]  559 	sta	(___fsadd_PARM_2 + 1)
+   0459 C7r00r02      [ 4]  560 	sta	(___fsadd_PARM_2 + 2)
+   045C C7r00r03      [ 4]  561 	sta	(___fsadd_PARM_2 + 3)
+   045F A6 3F         [ 2]  562 	lda	#0x3f
+   0461 C7r00r00      [ 4]  563 	sta	___fsadd_PARM_2
+   0464 89            [ 2]  564 	pshx
+   0465 CDr00r00      [ 5]  565 	jsr	___fsadd
+   0468 9E E7 09      [ 4]  566 	sta	9,s
+   046B 9E EF 08      [ 4]  567 	stx	8,s
+   046E B6*00         [ 3]  568 	lda	*___SDCC_hc08_ret2
+   0470 9E E7 07      [ 4]  569 	sta	7,s
+   0473 B6*00         [ 3]  570 	lda	*___SDCC_hc08_ret3
+   0475 9E E7 06      [ 4]  571 	sta	6,s
+   0478 88            [ 2]  572 	pulx
+                            573 ;../expf.c:369: n++;
+   0479 9E E6 0E      [ 4]  574 	lda	14,s
+   047C AB 01         [ 2]  575 	add	#0x01
+   047E C7r00r01      [ 4]  576 	sta	(_ldexpf_PARM_2 + 1)
+   0481 9E E6 0D      [ 4]  577 	lda	13,s
+   0484 A9 00         [ 2]  578 	adc	#0
+   0486 C7r00r00      [ 4]  579 	sta	_ldexpf_PARM_2
+                            580 ;../expf.c:370: z=ldexpf(r, n);
+   0489 9E E6 05      [ 4]  581 	lda	5,s
+   048C C7r00r00      [ 4]  582 	sta	_ldexpf_PARM_1
+   048F 9E E6 06      [ 4]  583 	lda	6,s
+   0492 C7r00r01      [ 4]  584 	sta	(_ldexpf_PARM_1 + 1)
+   0495 9E E6 07      [ 4]  585 	lda	7,s
+   0498 C7r00r02      [ 4]  586 	sta	(_ldexpf_PARM_1 + 2)
+   049B 9E E6 08      [ 4]  587 	lda	8,s
+   049E C7r00r03      [ 4]  588 	sta	(_ldexpf_PARM_1 + 3)
+   04A1 89            [ 2]  589 	pshx
+   04A2 CDr00r00      [ 5]  590 	jsr	_ldexpf
+   04A5 9E E7 0D      [ 4]  591 	sta	13,s
+   04A8 9E EF 0C      [ 4]  592 	stx	12,s
+   04AB B6*00         [ 3]  593 	lda	*___SDCC_hc08_ret2
+   04AD 9E E7 0B      [ 4]  594 	sta	11,s
+   04B0 B6*00         [ 3]  595 	lda	*___SDCC_hc08_ret3
+   04B2 9E E7 0A      [ 4]  596 	sta	10,s
+   04B5 88            [ 2]  597 	pulx
+                            598 ;../expf.c:371: if(sign)
+   04B6 5D            [ 1]  599 	tstx
+   04B7 27 49         [ 3]  600 	beq	00116$
+                            601 ;../expf.c:372: return 1.0/z;
+   04B9 45r00r00      [ 3]  602 	ldhx	#___fsdiv_PARM_1
+   04BC A6 3F         [ 2]  603 	lda	#0x3f
+   04BE F7            [ 2]  604 	sta	,x
+   04BF A6 80         [ 2]  605 	lda	#0x80
+   04C1 E7 01         [ 3]  606 	sta	1,x
+   04C3 4F            [ 1]  607 	clra
+   04C4 E7 02         [ 3]  608 	sta	2,x
+   04C6 E7 03         [ 3]  609 	sta	3,x
+   04C8 95            [ 2]  610 	tsx
+   04C9 45r00r00      [ 3]  611 	ldhx	#___fsdiv_PARM_2
+   04CC 9E E6 09      [ 4]  612 	lda	9,s
+   04CF F7            [ 2]  613 	sta	,x
+   04D0 9E E6 0A      [ 4]  614 	lda	10,s
+   04D3 E7 01         [ 3]  615 	sta	1,x
+   04D5 9E E6 0B      [ 4]  616 	lda	11,s
+   04D8 E7 02         [ 3]  617 	sta	2,x
+   04DA 9E E6 0C      [ 4]  618 	lda	12,s
+   04DD E7 03         [ 3]  619 	sta	3,x
+   04DF CDr00r00      [ 5]  620 	jsr	___fsdiv
+   04E2 9E E7 12      [ 4]  621 	sta	18,s
+   04E5 9E EF 11      [ 4]  622 	stx	17,s
+   04E8 B6*00         [ 3]  623 	lda	*___SDCC_hc08_ret2
+   04EA 9E E7 10      [ 4]  624 	sta	16,s
+   04ED B6*00         [ 3]  625 	lda	*___SDCC_hc08_ret3
+   04EF 9E E7 0F      [ 4]  626 	sta	15,s
+   04F2 95            [ 2]  627 	tsx
+   04F3 E6 0E         [ 3]  628 	lda	14,x
+   04F5 B7*00         [ 3]  629 	sta	*___SDCC_hc08_ret3
+   04F7 E6 0F         [ 3]  630 	lda	15,x
+   04F9 B7*00         [ 3]  631 	sta	*___SDCC_hc08_ret2
+   04FB EE 10         [ 3]  632 	ldx	16,x
+   04FD 9E E6 12      [ 4]  633 	lda	18,s
+   0500 20 0E         [ 3]  634 	bra	00118$
+   0502                     635 00116$:
+                            636 ;../expf.c:374: return z;
+   0502 95            [ 2]  637 	tsx
+   0503 E6 08         [ 3]  638 	lda	8,x
+   0505 B7*00         [ 3]  639 	sta	*___SDCC_hc08_ret3
+   0507 E6 09         [ 3]  640 	lda	9,x
+   0509 B7*00         [ 3]  641 	sta	*___SDCC_hc08_ret2
+   050B EE 0A         [ 3]  642 	ldx	10,x
+   050D 9E E6 0C      [ 4]  643 	lda	12,s
+   0510                     644 00118$:
+                            645 ;../expf.c:375: }
+   0510 A7 12         [ 2]  646 	ais	#18
+   0512 81            [ 4]  647 	rts
+                            648 	.area CSEG    (CODE)
+                            649 	.area CONST   (CODE)
+                            650 	.area XINIT   (CODE)
+                            651 	.area CABS    (ABS,CODE)

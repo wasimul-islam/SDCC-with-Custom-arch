@@ -1,0 +1,627 @@
+                                      1 ;--------------------------------------------------------
+                                      2 ; File Created by SDCC : free open source ISO C Compiler 
+                                      3 ; Version 4.2.14 #0 (Linux)
+                                      4 ;--------------------------------------------------------
+                                      5 	.module strtol
+                                      6 	.optsdcc -mds390 --model-flat24
+                                      7 	
+                                      8 ;--------------------------------------------------------
+                                      9 ; CPU specific extensions
+                                     10 ;--------------------------------------------------------
+                                     11 	.DS80C390
+                                     12 	.amode	2	; 24 bit flat addressing
+                           000082    13 dpl	=	0x82
+                           000083    14 dph	=	0x83
+                           000084    15 dpl1	=	0x84
+                           000085    16 dph1	=	0x85
+                           000086    17 dps	=	0x86
+                           000093    18 dpx	=	0x93
+                           000095    19 dpx1	=	0x95
+                           00009B    20 esp	=	0x9B
+                           00009C    21 ap	=	0x9C
+                           00009C    22 acc1	=	0x9C
+                           0000D1    23 mcnt0	=	0xD1
+                           0000D2    24 mcnt1	=	0xD2
+                           0000D3    25 ma	=	0xD3
+                           0000D4    26 mb	=	0xD4
+                           0000D5    27 mc	=	0xD5
+                           00009D    28 acon	=	0x9D
+                           0000C6    29 mcon	=	0xC6
+                           0000D1    30 F1	=	0xD1	; user flag
+                                     31 ;--------------------------------------------------------
+                                     32 ; Public variables in this module
+                                     33 ;--------------------------------------------------------
+                                     34 	.globl _strtoul
+                                     35 	.globl _strtol_PARM_3
+                                     36 	.globl _strtol_PARM_2
+                                     37 	.globl _strtol
+                                     38 ;--------------------------------------------------------
+                                     39 ; special function registers
+                                     40 ;--------------------------------------------------------
+                                     41 ;--------------------------------------------------------
+                                     42 ; special function bits
+                                     43 ;--------------------------------------------------------
+                                     44 ;--------------------------------------------------------
+                                     45 ; overlayable register banks
+                                     46 ;--------------------------------------------------------
+                                     47 	.area REG_BANK_0	(REL,OVR,DATA)
+      000000                         48 	.ds 8
+                                     49 ;--------------------------------------------------------
+                                     50 ; internal ram data
+                                     51 ;--------------------------------------------------------
+                                     52 	.area DSEG    (DATA)
+                                     53 ;--------------------------------------------------------
+                                     54 ; overlayable items in internal ram
+                                     55 ;--------------------------------------------------------
+                                     56 ;--------------------------------------------------------
+                                     57 ; indirectly addressable internal ram data
+                                     58 ;--------------------------------------------------------
+                                     59 	.area ISEG    (DATA)
+                                     60 ;--------------------------------------------------------
+                                     61 ; absolute internal ram data
+                                     62 ;--------------------------------------------------------
+                                     63 	.area IABS    (ABS,DATA)
+                                     64 	.area IABS    (ABS,DATA)
+                                     65 ;--------------------------------------------------------
+                                     66 ; bit data
+                                     67 ;--------------------------------------------------------
+                                     68 	.area BSEG    (BIT)
+                                     69 ;--------------------------------------------------------
+                                     70 ; paged external ram data
+                                     71 ;--------------------------------------------------------
+                                     72 	.area PSEG    (PAG,XDATA)
+                                     73 ;--------------------------------------------------------
+                                     74 ; uninitialized external ram data
+                                     75 ;--------------------------------------------------------
+                                     76 	.area XSEG    (XDATA)
+      000000                         77 _strtol_PARM_2:
+      000000                         78 	.ds 4
+      000004                         79 _strtol_PARM_3:
+      000004                         80 	.ds 2
+      000006                         81 _strtol_nptr_65536_56:
+      000006                         82 	.ds 4
+      00000A                         83 _strtol_ptr_65536_57:
+      00000A                         84 	.ds 4
+      00000E                         85 _strtol_rptr_65536_57:
+      00000E                         86 	.ds 4
+      000012                         87 _strtol_neg_65536_57:
+      000012                         88 	.ds 1
+      000013                         89 _strtol_sloc1_1_0:
+      000013                         90 	.ds 4
+                                     91 ;--------------------------------------------------------
+                                     92 ; absolute external ram data
+                                     93 ;--------------------------------------------------------
+                                     94 	.area XABS    (ABS,XDATA)
+                                     95 ;--------------------------------------------------------
+                                     96 ; initialized external ram data
+                                     97 ;--------------------------------------------------------
+                                     98 	.area XISEG   (XDATA)
+                                     99 ;--------------------------------------------------------
+                                    100 ; global & static initialisations
+                                    101 ;--------------------------------------------------------
+                                    102 	.area HOME    (CODE)
+                                    103 	.area GSINIT  (CODE)
+                                    104 	.area GSFINAL (CODE)
+                                    105 	.area GSINIT  (CODE)
+                                    106 ;--------------------------------------------------------
+                                    107 ; Home
+                                    108 ;--------------------------------------------------------
+                                    109 	.area HOME    (CODE)
+                                    110 	.area HOME    (CODE)
+                                    111 ;--------------------------------------------------------
+                                    112 ; code
+                                    113 ;--------------------------------------------------------
+                                    114 	.area CSEG    (CODE)
+                                    115 ;------------------------------------------------------------
+                                    116 ;Allocation info for local variables in function 'strtol'
+                                    117 ;------------------------------------------------------------
+                                    118 ;endptr                    Allocated with name '_strtol_PARM_2'
+                                    119 ;base                      Allocated with name '_strtol_PARM_3'
+                                    120 ;nptr                      Allocated with name '_strtol_nptr_65536_56'
+                                    121 ;__1310720007              Allocated to registers 
+                                    122 ;__1310720004              Allocated to registers 
+                                    123 ;ptr                       Allocated with name '_strtol_ptr_65536_57'
+                                    124 ;rptr                      Allocated with name '_strtol_rptr_65536_57'
+                                    125 ;u                         Allocated to registers r3 r4 r5 r6 
+                                    126 ;neg                       Allocated with name '_strtol_neg_65536_57'
+                                    127 ;__1310720005              Allocated to registers 
+                                    128 ;c                         Allocated to registers 
+                                    129 ;__1310720008              Allocated to registers 
+                                    130 ;c                         Allocated to registers 
+                                    131 ;sloc0                     Allocated with name '_strtol_sloc0_1_0'
+                                    132 ;sloc1                     Allocated with name '_strtol_sloc1_1_0'
+                                    133 ;------------------------------------------------------------
+                                    134 ;	strtol.c:38: long int strtol(const char *nptr, char **endptr, int base)
+                                    135 ;	-----------------------------------------
+                                    136 ;	 function strtol
+                                    137 ;	-----------------------------------------
+      000000                        138 _strtol:
+                           000002   139 	ar2 = 0x02
+                           000003   140 	ar3 = 0x03
+                           000004   141 	ar4 = 0x04
+                           000005   142 	ar5 = 0x05
+                           000006   143 	ar6 = 0x06
+                           000007   144 	ar7 = 0x07
+                           000000   145 	ar0 = 0x00
+                           000001   146 	ar1 = 0x01
+      000000 75 86 01         [12]  147 	mov     dps, #1
+      000003 90s00r00r06      [12]  148 	mov     dptr, #_strtol_nptr_65536_56
+      000007 E5 82            [ 8]  149 	mov	a,dpl
+      000009 F0               [ 8]  150 	movx	@dptr,a
+      00000A A3               [12]  151 	inc	dptr
+      00000B E5 83            [ 8]  152 	mov	a,dph
+      00000D F0               [ 8]  153 	movx	@dptr,a
+      00000E A3               [12]  154 	inc	dptr
+      00000F E5 93            [ 8]  155 	mov	a,dpx
+      000011 F0               [ 8]  156 	movx	@dptr,a
+      000012 A3               [12]  157 	inc	dptr
+      000013 E5 F0            [ 8]  158 	mov	a,b
+      000015 F0               [ 8]  159 	movx	@dptr,a
+      000016 75 86 00         [12]  160 	mov	dps,#0
+                                    161 ;	strtol.c:45: while (isblank (*ptr))
+      000019 90s00r00r06      [12]  162 	mov	dptr,#_strtol_nptr_65536_56
+                                    163 ;	genAssign: resultIsFar = FALSE
+      00001D E0               [ 8]  164 	movx	a,@dptr
+      00001E FE               [ 4]  165 	mov	r6,a
+      00001F A3               [12]  166 	inc	dptr
+      000020 E0               [ 8]  167 	movx	a,@dptr
+      000021 FF               [ 4]  168 	mov	r7,a
+      000022 A3               [12]  169 	inc	dptr
+      000023 E0               [ 8]  170 	movx	a,@dptr
+      000024 F8               [ 4]  171 	mov	r0,a
+      000025 A3               [12]  172 	inc	dptr
+      000026 E0               [ 8]  173 	movx	a,@dptr
+      000027 F9               [ 4]  174 	mov	r1,a
+      000028                        175 00101$:
+      000028 8E 82            [ 8]  176 	mov	dpl,r6
+      00002A 8F 83            [ 8]  177 	mov	dph,r7
+      00002C 88 93            [ 8]  178 	mov	dpx,r0
+      00002E 89 F0            [ 8]  179 	mov	b,r1
+      000030 12s00r00r00      [16]  180 	lcall	__gptrget
+      000034 FA               [ 4]  181 	mov	r2,a
+                                    182 ;	../../device/include/ctype.h:53: return ((unsigned char)c == ' ' || (unsigned char)c == '\t');
+      000035 BA 20 02         [16]  183 	cjne	r2,#0x20,00208$
+      000038 80 03            [12]  184 	sjmp 00132$
+      00003A                        185 00208$:
+      00003A BA 09 0B         [16]  186 	cjne r2,#0x09,00158$
+      00003D                        187 00210$:
+      00003D                        188 00132$:
+                                    189 ;	strtol.c:46: ptr++;
+      00003D 0E               [ 4]  190 	inc	r6
+      00003E BE 00 05         [16]  191 	cjne	r6,#0x00,00211$
+      000041 0F               [ 4]  192 	inc	r7
+      000042 BF 00 01         [16]  193 	cjne	r7,#0x00,00211$
+      000045 08               [ 4]  194 	inc	r0
+      000046                        195 00211$:
+      000046 80 E0            [12]  196 	sjmp 00101$
+      000048                        197 00158$:
+                                    198 ;	genAssign: resultIsFar = TRUE
+      000048 90s00r00r0A      [12]  199 	mov	dptr,#_strtol_ptr_65536_57
+      00004C EE               [ 4]  200 	mov	a,r6
+      00004D F0               [ 8]  201 	movx	@dptr,a
+      00004E A3               [12]  202 	inc	dptr
+      00004F EF               [ 4]  203 	mov	a,r7
+      000050 F0               [ 8]  204 	movx	@dptr,a
+      000051 A3               [12]  205 	inc	dptr
+      000052 E8               [ 4]  206 	mov	a,r0
+      000053 F0               [ 8]  207 	movx	@dptr,a
+      000054 A3               [12]  208 	inc	dptr
+      000055 E9               [ 4]  209 	mov	a,r1
+      000056 F0               [ 8]  210 	movx	@dptr,a
+                                    211 ;	strtol.c:50: if (*ptr == '-')
+      000057 8E 82            [ 8]  212 	mov	dpl,r6
+      000059 8F 83            [ 8]  213 	mov	dph,r7
+      00005B 88 93            [ 8]  214 	mov	dpx,r0
+      00005D 89 F0            [ 8]  215 	mov	b,r1
+      00005F 12s00r00r00      [16]  216 	lcall	__gptrget
+      000063 FA               [ 4]  217 	mov	r2,a
+      000064 BA 2D 1C         [16]  218 	cjne r2,#0x2d,00105$
+      000067                        219 00213$:
+                                    220 ;	strtol.c:52: neg = true;
+                                    221 ;	genAssign: resultIsFar = TRUE
+      000067 90s00r00r12      [12]  222 	mov	dptr,#_strtol_neg_65536_57
+      00006B 74 01            [ 8]  223 	mov	a,#0x01
+      00006D F0               [ 8]  224 	movx	@dptr,a
+                                    225 ;	strtol.c:53: ptr++;
+      00006E 90s00r00r0A      [12]  226 	mov	dptr,#_strtol_ptr_65536_57
+      000072 74 01            [ 8]  227 	mov	a,#0x01
+      000074 2E               [ 4]  228 	add	a,r6
+      000075 F0               [ 8]  229 	movx	@dptr,a
+      000076 E4               [ 4]  230 	clr	a
+      000077 3F               [ 4]  231 	addc	a,r7
+      000078 A3               [12]  232 	inc	dptr
+      000079 F0               [ 8]  233 	movx	@dptr,a
+      00007A E4               [ 4]  234 	clr	a
+      00007B 38               [ 4]  235 	addc	a,r0
+      00007C A3               [12]  236 	inc	dptr
+      00007D F0               [ 8]  237 	movx	@dptr,a
+      00007E A3               [12]  238 	inc	dptr
+      00007F E9               [ 4]  239 	mov	a,r1
+      000080 F0               [ 8]  240 	movx	@dptr,a
+      000081 80 06            [12]  241 	sjmp 00106$
+      000083                        242 00105$:
+                                    243 ;	strtol.c:56: neg = false;
+                                    244 ;	genAssign: resultIsFar = TRUE
+      000083 90s00r00r12      [12]  245 	mov	dptr,#_strtol_neg_65536_57
+      000087 E4               [ 4]  246 	clr	a
+      000088 F0               [ 8]  247 	movx	@dptr,a
+      000089                        248 00106$:
+                                    249 ;	strtol.c:59: if (neg && (isblank (*ptr) || *ptr == '-' || *ptr == '+'))
+      000089 90s00r00r12      [12]  250 	mov	dptr,#_strtol_neg_65536_57
+      00008D E0               [ 8]  251 	movx	a,@dptr
+      00008E 70 04            [12]  252 	jnz	00214$
+      000090 02s00r01r1A      [16]  253 	ljmp	00110$
+      000094                        254 00214$:
+      000094 90s00r00r0A      [12]  255 	mov	dptr,#_strtol_ptr_65536_57
+      000098 E0               [ 8]  256 	movx	a,@dptr
+      000099 C0 E0            [ 8]  257 	push	acc
+      00009B A3               [12]  258 	inc	dptr
+      00009C E0               [ 8]  259 	movx	a,@dptr
+      00009D C0 E0            [ 8]  260 	push	acc
+      00009F A3               [12]  261 	inc	dptr
+      0000A0 E0               [ 8]  262 	movx	a,@dptr
+      0000A1 C0 E0            [ 8]  263 	push	acc
+      0000A3 A3               [12]  264 	inc	dptr
+      0000A4 E0               [ 8]  265 	movx	a,@dptr
+      0000A5 F5 F0            [ 8]  266 	mov	b,a
+      0000A7 D0 93            [ 8]  267 	pop	dpx
+      0000A9 D0 83            [ 8]  268 	pop	dph
+      0000AB D0 82            [ 8]  269 	pop	dpl
+      0000AD 12s00r00r00      [16]  270 	lcall	__gptrget
+      0000B1 FB               [ 4]  271 	mov	r3,a
+      0000B2 8B 04            [ 8]  272 	mov	ar4,r3
+                                    273 ;	../../device/include/ctype.h:53: return ((unsigned char)c == ' ' || (unsigned char)c == '\t');
+      0000B4 BC 20 02         [16]  274 	cjne	r4,#0x20,00215$
+      0000B7 80 0D            [12]  275 	sjmp 00109$
+      0000B9                        276 00215$:
+      0000B9 BC 09 02         [16]  277 	cjne	r4,#0x09,00216$
+      0000BC 80 08            [12]  278 	sjmp 00109$
+      0000BE                        279 00216$:
+                                    280 ;	strtol.c:59: if (neg && (isblank (*ptr) || *ptr == '-' || *ptr == '+'))
+      0000BE BB 2D 02         [16]  281 	cjne	r3,#0x2d,00217$
+      0000C1 80 03            [12]  282 	sjmp 00109$
+      0000C3                        283 00217$:
+      0000C3 BB 2B 54         [16]  284 	cjne r3,#0x2b,00110$
+      0000C6                        285 00219$:
+      0000C6                        286 00109$:
+                                    287 ;	strtol.c:61: if (endptr)
+      0000C6 90s00r00r00      [12]  288 	mov	dptr,#_strtol_PARM_2
+                                    289 ;	genAssign: resultIsFar = FALSE
+      0000CA E0               [ 8]  290 	movx	a,@dptr
+      0000CB FB               [ 4]  291 	mov	r3,a
+      0000CC A3               [12]  292 	inc	dptr
+      0000CD E0               [ 8]  293 	movx	a,@dptr
+      0000CE FC               [ 4]  294 	mov	r4,a
+      0000CF A3               [12]  295 	inc	dptr
+      0000D0 E0               [ 8]  296 	movx	a,@dptr
+      0000D1 FD               [ 4]  297 	mov	r5,a
+      0000D2 A3               [12]  298 	inc	dptr
+      0000D3 E0               [ 8]  299 	movx	a,@dptr
+      0000D4 FE               [ 4]  300 	mov	r6,a
+      0000D5 90s00r00r00      [12]  301 	mov	dptr,#_strtol_PARM_2
+      0000D9 E0               [ 8]  302 	movx	a,@dptr
+      0000DA F5 F0            [ 8]  303 	mov	b,a
+      0000DC A3               [12]  304 	inc	dptr
+      0000DD E0               [ 8]  305 	movx	a,@dptr
+      0000DE 42 F0            [ 8]  306 	orl	b,a
+      0000E0 A3               [12]  307 	inc	dptr
+      0000E1 E0               [ 8]  308 	movx	a,@dptr
+      0000E2 45 F0            [ 8]  309 	orl	a,b
+      0000E4 60 29            [12]  310 	jz  00108$
+      0000E6                        311 00220$:
+                                    312 ;	strtol.c:62: *endptr = nptr;
+      0000E6 8B 82            [ 8]  313 	mov	dpl,r3
+      0000E8 8C 83            [ 8]  314 	mov	dph,r4
+      0000EA 8D 93            [ 8]  315 	mov	dpx,r5
+      0000EC 8E F0            [ 8]  316 	mov	b,r6
+      0000EE 75 86 01         [12]  317 	mov     dps, #1
+      0000F1 90s00r00r06      [12]  318 	mov     dptr, #_strtol_nptr_65536_56
+      0000F5 E0               [ 8]  319 	movx	a,@dptr
+      0000F6 F5 9C            [ 8]  320 	mov	acc1, a
+      0000F8 A3               [12]  321 	inc	dptr
+      0000F9 E0               [ 8]  322 	movx	a,@dptr
+      0000FA 15 86            [ 8]  323 	dec	dps
+      0000FC 12s00r00r00      [16]  324 	lcall	__gptrputWord
+      000100 A3               [12]  325 	inc	dptr
+      000101 05 86            [ 8]  326 	inc	dps
+      000103 A3               [12]  327 	inc	dptr
+      000104 E0               [ 8]  328 	movx	a,@dptr
+      000105 F5 9C            [ 8]  329 	mov	acc1, a
+      000107 A3               [12]  330 	inc	dptr
+      000108 E0               [ 8]  331 	movx	a,@dptr
+      000109 15 86            [ 8]  332 	dec	dps
+      00010B 12s00r00r00      [16]  333 	lcall	__gptrputWord
+      00010F                        334 00108$:
+                                    335 ;	strtol.c:63: return (0);
+      00010F 90 00 00 00      [12]  336 	mov  dptr,#0x0000
+      000113 75 F0 00         [12]  337 	mov	b,#0x00
+      000116 02s00r02rC0      [16]  338 	ljmp	00129$
+      00011A                        339 00110$:
+                                    340 ;	strtol.c:66: u = strtoul(ptr, &rptr, base);
+      00011A 90s00r00r00      [12]  341 	mov	dptr,#_strtoul_PARM_2
+      00011E 74r0E            [ 8]  342 	mov	a,#_strtol_rptr_65536_57
+      000120 F0               [ 8]  343 	movx	@dptr,a
+      000121 A3               [12]  344 	inc	dptr
+      000122 74s00            [ 8]  345 	mov	a,#(_strtol_rptr_65536_57 >> 8)
+      000124 F0               [ 8]  346 	movx	@dptr,a
+      000125 A3               [12]  347 	inc	dptr
+      000126 74s00            [ 8]  348 	mov	a,#(_strtol_rptr_65536_57 >> 16)
+      000128 F0               [ 8]  349 	movx	@dptr,a
+      000129 A3               [12]  350 	inc	dptr
+      00012A E4               [ 4]  351 	clr	a
+      00012B F0               [ 8]  352 	movx	@dptr,a
+      00012C 90s00r00r04      [12]  353 	mov	dptr,#_strtol_PARM_3
+                                    354 ;	genAssign: resultIsFar = TRUE
+      000130 75 86 21         [12]  355 	mov	dps,#0x21
+      000133 90s00r00r00      [12]  356 	mov	dptr,#_strtoul_PARM_3
+      000137 E0               [ 8]  357 	movx	a,@dptr
+      000138 F0               [ 8]  358 	movx	@dptr,a
+      000139 A3               [12]  359 	inc	dptr
+      00013A A3               [12]  360 	inc	dptr
+      00013B E0               [ 8]  361 	movx	a,@dptr
+      00013C F0               [ 8]  362 	movx	@dptr,a
+      00013D 75 86 01         [12]  363 	mov	dps, #1
+      000140 90s00r00r0A      [12]  364 	mov	dptr,#_strtol_ptr_65536_57
+      000144 E0               [ 8]  365 	movx	a,@dptr
+      000145 F5 82            [ 8]  366 	mov	dpl,a
+      000147 A3               [12]  367 	inc	dptr
+      000148 E0               [ 8]  368 	movx	a,@dptr
+      000149 F5 83            [ 8]  369 	mov	dph,a
+      00014B A3               [12]  370 	inc	dptr
+      00014C E0               [ 8]  371 	movx	a,@dptr
+      00014D F5 93            [ 8]  372 	mov	dpx,a
+      00014F A3               [12]  373 	inc	dptr
+      000150 E0               [ 8]  374 	movx	a,@dptr
+      000151 F5 F0            [ 8]  375 	mov	b,a
+      000153 75 86 00         [12]  376 	mov	dps,#0
+      000156 12s00r00r00      [16]  377 	lcall	_strtoul
+      00015A AB 82            [ 8]  378 	mov	r3,dpl
+      00015C AC 83            [ 8]  379 	mov	r4,dph
+      00015E AD 93            [ 8]  380 	mov	r5,dpx
+      000160 AE F0            [ 8]  381 	mov	r6,b
+                                    382 ;	genAssign: resultIsFar = TRUE
+                                    383 ;	strtol.c:69: if (rptr == ptr)
+      000162 90s00r00r0E      [12]  384 	mov	dptr,#_strtol_rptr_65536_57
+                                    385 ;	genAssign: resultIsFar = FALSE
+      000166 E0               [ 8]  386 	movx	a,@dptr
+      000167 FF               [ 4]  387 	mov	r7,a
+      000168 A3               [12]  388 	inc	dptr
+      000169 E0               [ 8]  389 	movx	a,@dptr
+      00016A F8               [ 4]  390 	mov	r0,a
+      00016B A3               [12]  391 	inc	dptr
+      00016C E0               [ 8]  392 	movx	a,@dptr
+      00016D F9               [ 4]  393 	mov	r1,a
+      00016E A3               [12]  394 	inc	dptr
+      00016F E0               [ 8]  395 	movx	a,@dptr
+      000170 FA               [ 4]  396 	mov	r2,a
+      000171 90s00r00r0A      [12]  397 	mov	dptr,#_strtol_ptr_65536_57
+      000175 C0 07            [ 8]  398 	push	ar7
+      000177 C0 00            [ 8]  399 	push	ar0
+      000179 C0 01            [ 8]  400 	push	ar1
+      00017B C0 02            [ 8]  401 	push	ar2
+      00017D E0               [ 8]  402 	movx	a,@dptr
+      00017E C0 E0            [ 8]  403 	push	acc
+      000180 A3               [12]  404 	inc	dptr
+      000181 E0               [ 8]  405 	movx	a,@dptr
+      000182 C0 E0            [ 8]  406 	push	acc
+      000184 A3               [12]  407 	inc	dptr
+      000185 E0               [ 8]  408 	movx	a,@dptr
+      000186 C0 E0            [ 8]  409 	push	acc
+      000188 A3               [12]  410 	inc	dptr
+      000189 E0               [ 8]  411 	movx	a,@dptr
+      00018A F5 F0            [ 8]  412 	mov	b,a
+      00018C D0 93            [ 8]  413 	pop	dpx
+      00018E D0 83            [ 8]  414 	pop	dph
+      000190 D0 82            [ 8]  415 	pop	dpl
+      000192 12s00r00r00      [16]  416 	lcall	___gptr_cmp
+      000196 15 81            [ 8]  417 	dec	sp
+      000198 15 81            [ 8]  418 	dec	sp
+      00019A 15 81            [ 8]  419 	dec	sp
+      00019C 15 81            [ 8]  420 	dec	sp
+      00019E 60 02            [12]  421 	jz   00222$
+      0001A0                        422 00221$:
+      0001A0 80 54            [12]  423 	sjmp 00117$
+      0001A2                        424 00222$:
+                                    425 ;	strtol.c:71: if (endptr)
+      0001A2 90s00r00r00      [12]  426 	mov	dptr,#_strtol_PARM_2
+                                    427 ;	genAssign: resultIsFar = FALSE
+      0001A6 E0               [ 8]  428 	movx	a,@dptr
+      0001A7 FA               [ 4]  429 	mov	r2,a
+      0001A8 A3               [12]  430 	inc	dptr
+      0001A9 E0               [ 8]  431 	movx	a,@dptr
+      0001AA FB               [ 4]  432 	mov	r3,a
+      0001AB A3               [12]  433 	inc	dptr
+      0001AC E0               [ 8]  434 	movx	a,@dptr
+      0001AD FC               [ 4]  435 	mov	r4,a
+      0001AE A3               [12]  436 	inc	dptr
+      0001AF E0               [ 8]  437 	movx	a,@dptr
+      0001B0 FD               [ 4]  438 	mov	r5,a
+      0001B1 90s00r00r00      [12]  439 	mov	dptr,#_strtol_PARM_2
+      0001B5 E0               [ 8]  440 	movx	a,@dptr
+      0001B6 F5 F0            [ 8]  441 	mov	b,a
+      0001B8 A3               [12]  442 	inc	dptr
+      0001B9 E0               [ 8]  443 	movx	a,@dptr
+      0001BA 42 F0            [ 8]  444 	orl	b,a
+      0001BC A3               [12]  445 	inc	dptr
+      0001BD E0               [ 8]  446 	movx	a,@dptr
+      0001BE 45 F0            [ 8]  447 	orl	a,b
+      0001C0 60 29            [12]  448 	jz  00115$
+      0001C2                        449 00223$:
+                                    450 ;	strtol.c:72: *endptr = nptr;
+      0001C2 8A 82            [ 8]  451 	mov	dpl,r2
+      0001C4 8B 83            [ 8]  452 	mov	dph,r3
+      0001C6 8C 93            [ 8]  453 	mov	dpx,r4
+      0001C8 8D F0            [ 8]  454 	mov	b,r5
+      0001CA 75 86 01         [12]  455 	mov     dps, #1
+      0001CD 90s00r00r06      [12]  456 	mov     dptr, #_strtol_nptr_65536_56
+      0001D1 E0               [ 8]  457 	movx	a,@dptr
+      0001D2 F5 9C            [ 8]  458 	mov	acc1, a
+      0001D4 A3               [12]  459 	inc	dptr
+      0001D5 E0               [ 8]  460 	movx	a,@dptr
+      0001D6 15 86            [ 8]  461 	dec	dps
+      0001D8 12s00r00r00      [16]  462 	lcall	__gptrputWord
+      0001DC A3               [12]  463 	inc	dptr
+      0001DD 05 86            [ 8]  464 	inc	dps
+      0001DF A3               [12]  465 	inc	dptr
+      0001E0 E0               [ 8]  466 	movx	a,@dptr
+      0001E1 F5 9C            [ 8]  467 	mov	acc1, a
+      0001E3 A3               [12]  468 	inc	dptr
+      0001E4 E0               [ 8]  469 	movx	a,@dptr
+      0001E5 15 86            [ 8]  470 	dec	dps
+      0001E7 12s00r00r00      [16]  471 	lcall	__gptrputWord
+      0001EB                        472 00115$:
+                                    473 ;	strtol.c:73: return (0);
+      0001EB 90 00 00 00      [12]  474 	mov  dptr,#0x0000
+      0001EF 75 F0 00         [12]  475 	mov	b,#0x00
+      0001F2 02s00r02rC0      [16]  476 	ljmp	00129$
+      0001F6                        477 00117$:
+                                    478 ;	strtol.c:76: if (endptr)
+      0001F6 90s00r00r00      [12]  479 	mov	dptr,#_strtol_PARM_2
+                                    480 ;	genAssign: resultIsFar = TRUE
+      0001FA 75 86 21         [12]  481 	mov	dps,#0x21
+      0001FD 90s00r00r13      [12]  482 	mov	dptr,#_strtol_sloc1_1_0
+      000201 E0               [ 8]  483 	movx	a,@dptr
+      000202 F0               [ 8]  484 	movx	@dptr,a
+      000203 A3               [12]  485 	inc	dptr
+      000204 A3               [12]  486 	inc	dptr
+      000205 E0               [ 8]  487 	movx	a,@dptr
+      000206 F0               [ 8]  488 	movx	@dptr,a
+      000207 A3               [12]  489 	inc	dptr
+      000208 A3               [12]  490 	inc	dptr
+      000209 E0               [ 8]  491 	movx	a,@dptr
+      00020A F0               [ 8]  492 	movx	@dptr,a
+      00020B A3               [12]  493 	inc	dptr
+      00020C A3               [12]  494 	inc	dptr
+      00020D E0               [ 8]  495 	movx	a,@dptr
+      00020E F0               [ 8]  496 	movx	@dptr,a
+      00020F 75 86 00         [12]  497 	mov	dps,#0
+      000212 90s00r00r00      [12]  498 	mov	dptr,#_strtol_PARM_2
+      000216 E0               [ 8]  499 	movx	a,@dptr
+      000217 F5 F0            [ 8]  500 	mov	b,a
+      000219 A3               [12]  501 	inc	dptr
+      00021A E0               [ 8]  502 	movx	a,@dptr
+      00021B 42 F0            [ 8]  503 	orl	b,a
+      00021D A3               [12]  504 	inc	dptr
+      00021E E0               [ 8]  505 	movx	a,@dptr
+      00021F 45 F0            [ 8]  506 	orl	a,b
+      000221 60 28            [12]  507 	jz  00119$
+      000223                        508 00224$:
+                                    509 ;	strtol.c:77: *endptr = rptr;
+      000223 90s00r00r13      [12]  510 	mov	dptr,#_strtol_sloc1_1_0
+      000227 E0               [ 8]  511 	movx	a,@dptr
+      000228 C0 E0            [ 8]  512 	push	acc
+      00022A A3               [12]  513 	inc	dptr
+      00022B E0               [ 8]  514 	movx	a,@dptr
+      00022C C0 E0            [ 8]  515 	push	acc
+      00022E A3               [12]  516 	inc	dptr
+      00022F E0               [ 8]  517 	movx	a,@dptr
+      000230 C0 E0            [ 8]  518 	push	acc
+      000232 A3               [12]  519 	inc	dptr
+      000233 E0               [ 8]  520 	movx	a,@dptr
+      000234 F5 F0            [ 8]  521 	mov	b,a
+      000236 D0 93            [ 8]  522 	pop	dpx
+      000238 D0 83            [ 8]  523 	pop	dph
+      00023A D0 82            [ 8]  524 	pop	dpl
+      00023C 8F 9C            [ 8]  525 	mov	acc1, r7
+      00023E E8               [ 4]  526 	mov	a,r0
+      00023F 12s00r00r00      [16]  527 	lcall	__gptrputWord
+      000243 A3               [12]  528 	inc	dptr
+      000244 89 9C            [ 8]  529 	mov	acc1, r1
+      000246 EA               [ 4]  530 	mov	a,r2
+      000247 12s00r00r00      [16]  531 	lcall	__gptrputWord
+      00024B                        532 00119$:
+                                    533 ;	strtol.c:80: if (!neg && u > LONG_MAX)
+      00024B 90s00r00r12      [12]  534 	mov	dptr,#_strtol_neg_65536_57
+      00024F E0               [ 8]  535 	movx	a,@dptr
+      000250 70 22            [12]  536 	jnz  00124$
+      000252                        537 00225$:
+      000252 C3               [ 4]  538 	clr	c
+      000253 74 FF            [ 8]  539 	mov	a,#0xff
+      000255 9B               [ 4]  540 	subb	a,r3
+      000256 74 FF            [ 8]  541 	mov	a,#0xff
+      000258 9C               [ 4]  542 	subb	a,r4
+      000259 74 FF            [ 8]  543 	mov	a,#0xff
+      00025B 9D               [ 4]  544 	subb	a,r5
+      00025C 74 7F            [ 8]  545 	mov	a,#0x7f
+      00025E 9E               [ 4]  546 	subb	a,r6
+      00025F 50 13            [12]  547 	jnc  00124$
+      000261                        548 00226$:
+                                    549 ;	strtol.c:82: errno = ERANGE;
+                                    550 ;	genAssign: resultIsFar = TRUE
+      000261 90s00r00r00      [12]  551 	mov	dptr,#_errno
+      000265 74 22            [ 8]  552 	mov	a,#0x22
+      000267 F0               [ 8]  553 	movx	@dptr,a
+      000268 E4               [ 4]  554 	clr	a
+      000269 A3               [12]  555 	inc	dptr
+      00026A F0               [ 8]  556 	movx	@dptr,a
+                                    557 ;	strtol.c:83: return (LONG_MAX);
+      00026B 90 FF FF FF      [12]  558 	mov	dptr,#0xffffff
+      00026F 75 F0 7F         [12]  559 	mov	b,#0x7f
+      000272 80 4C            [12]  560 	sjmp 00129$
+      000274                        561 00124$:
+                                    562 ;	strtol.c:85: else if (neg && u > -LONG_MIN)
+      000274 90s00r00r12      [12]  563 	mov	dptr,#_strtol_neg_65536_57
+      000278 E0               [ 8]  564 	movx	a,@dptr
+      000279 60 1F            [12]  565 	jz  00125$
+      00027B                        566 00227$:
+      00027B C3               [ 4]  567 	clr	c
+      00027C E4               [ 4]  568 	clr	a
+      00027D 9B               [ 4]  569 	subb	a,r3
+      00027E E4               [ 4]  570 	clr	a
+      00027F 9C               [ 4]  571 	subb	a,r4
+      000280 E4               [ 4]  572 	clr	a
+      000281 9D               [ 4]  573 	subb	a,r5
+      000282 74 80            [ 8]  574 	mov	a,#0x80
+      000284 9E               [ 4]  575 	subb	a,r6
+      000285 50 13            [12]  576 	jnc  00125$
+      000287                        577 00228$:
+                                    578 ;	strtol.c:87: errno = ERANGE;
+                                    579 ;	genAssign: resultIsFar = TRUE
+      000287 90s00r00r00      [12]  580 	mov	dptr,#_errno
+      00028B 74 22            [ 8]  581 	mov	a,#0x22
+      00028D F0               [ 8]  582 	movx	@dptr,a
+      00028E E4               [ 4]  583 	clr	a
+      00028F A3               [12]  584 	inc	dptr
+      000290 F0               [ 8]  585 	movx	@dptr,a
+                                    586 ;	strtol.c:88: return (LONG_MIN);
+      000291 90 00 00 00      [12]  587 	mov  dptr,#0x0000
+      000295 75 F0 80         [12]  588 	mov	b,#0x80
+      000298 80 26            [12]  589 	sjmp 00129$
+      00029A                        590 00125$:
+                                    591 ;	strtol.c:91: return (neg ? -u : u);
+      00029A 90s00r00r12      [12]  592 	mov	dptr,#_strtol_neg_65536_57
+      00029E E0               [ 8]  593 	movx	a,@dptr
+      00029F 60 0F            [12]  594 	jz  00137$
+      0002A1                        595 00229$:
+      0002A1 C3               [ 4]  596 	clr	c
+      0002A2 E4               [ 4]  597 	clr	a
+      0002A3 9B               [ 4]  598 	subb	a,r3
+      0002A4 FA               [ 4]  599 	mov	r2,a
+      0002A5 E4               [ 4]  600 	clr	a
+      0002A6 9C               [ 4]  601 	subb	a,r4
+      0002A7 FF               [ 4]  602 	mov	r7,a
+      0002A8 E4               [ 4]  603 	clr	a
+      0002A9 9D               [ 4]  604 	subb	a,r5
+      0002AA F8               [ 4]  605 	mov	r0,a
+      0002AB E4               [ 4]  606 	clr	a
+      0002AC 9E               [ 4]  607 	subb	a,r6
+      0002AD F9               [ 4]  608 	mov	r1,a
+      0002AE 80 08            [12]  609 	sjmp 00138$
+      0002B0                        610 00137$:
+                                    611 ;	genAssign: resultIsFar = FALSE
+      0002B0 8B 02            [ 8]  612 	mov	ar2,r3
+      0002B2 8C 07            [ 8]  613 	mov	ar7,r4
+      0002B4 8D 00            [ 8]  614 	mov	ar0,r5
+      0002B6 8E 01            [ 8]  615 	mov	ar1,r6
+      0002B8                        616 00138$:
+      0002B8 8A 82            [ 8]  617 	mov	dpl,r2
+      0002BA 8F 83            [ 8]  618 	mov	dph,r7
+      0002BC 88 93            [ 8]  619 	mov	dpx,r0
+      0002BE 89 F0            [ 8]  620 	mov	b,r1
+      0002C0                        621 00129$:
+                                    622 ;	strtol.c:92: }
+      0002C0 22               [16]  623 	ret
+                                    624 	.area CSEG    (CODE)
+                                    625 	.area CONST   (CODE)
+                                    626 	.area XINIT   (CODE)
+                                    627 	.area CABS    (ABS,CODE)
